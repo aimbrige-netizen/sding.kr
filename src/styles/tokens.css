@@ -1,0 +1,48 @@
+/* src/styles/tokens.css
+   색, 간격, 글자 크기의 유일한 출처다. 값은 docs/PLAN.md '디자인 토큰'과 같다. */
+:root {
+  color-scheme: light;
+  --brand: #FF5416;      --brand-deep: #D63A00;
+  --ink-900: #2A1A14;    --ink-600: #6B5A52;
+  --cream: #FFFAF6;      --peach: #FFF1E8;
+  --line: #F1E1D8;       --white: #FFFFFF;
+
+  --r-sm: 12px;  --r-md: 24px;  --r-lg: 32px;  --r-pill: 999px;
+  --shadow-soft: 0 12px 32px -12px rgb(255 84 22 / .28);
+  --shadow-lift: 0 24px 60px -20px rgb(255 84 22 / .38);
+  --glow-hero: radial-gradient(60% 50% at 50% 0%, #FFE2D0, rgb(255 250 246 / 0));
+
+  --fs-display: clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem);   /* 'Coming Soon' 후킹 전용. 390px 96px, 1440px 184px */
+  --fs-h1: clamp(2.5rem, 1.796rem + 3.005vw, 4.5rem);
+  --fs-h2: clamp(1.875rem, 1.479rem + 1.690vw, 3rem);
+  --fs-h3: clamp(1.375rem, 1.243rem + 0.563vw, 1.75rem);
+  --fs-lead: clamp(1.125rem, 1.037rem + 0.376vw, 1.375rem);
+  --fs-body: clamp(1rem, 0.956rem + 0.188vw, 1.125rem);
+  --fs-cap: clamp(0.8125rem, 0.790rem + 0.094vw, 0.875rem);
+
+  /* 간격 단계: --sp-N = N x 4px = Tailwind 간격 N */
+  --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;  --sp-6: 24px;
+  --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px; --sp-14: 56px; --sp-16: 64px;
+
+  --section-y: clamp(72px, 10vw, 140px);
+  --gutter: clamp(16px, 4vw, 40px);
+  --container: 1200px;
+  --header-h: 60px;
+  --header-blur: 12px;
+  --peek: clamp(170px, 25vh, 250px);   /* 첫 화면 아래에 보이는 영상 프레임 높이 */
+  --tap: 44px;                         /* 최소 터치 영역 */
+  --btn-h: 60px;                       /* 주 버튼 높이 */
+  --btn-fs: 1.25rem;                   /* 주 버튼 글자 20px. 오렌지 위 흰 글자 기준 */
+  --buddy: 56px;                       /* 사운드 버디 */
+  --ctrl: 44px;                        /* 영상 재생·일시정지 버튼 */
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+@supports (height: 100svh) { :root { --peek: clamp(170px, 25svh, 250px); } }
+@media (min-width: 768px) { :root { --header-h: 72px; --btn-h: 64px; --buddy: 64px; --ctrl: 48px; } }
+
+html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
+body { background: var(--cream); color: var(--ink-900); word-break: keep-all; overflow-wrap: break-word; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
