@@ -70,6 +70,7 @@ export function RidePreview({ labels, children }: Props) {
     const root = ref.current;
     if (!root) return;
     if (riding) {
+      if (!paused) return;   // 사라지는 중인 큰 버튼을 한 번 더 눌러도 라이드는 그대로 간다
       root.setAttribute('data-ride', 'on');
       setPaused(false);
       schedule(left.current);
@@ -101,7 +102,7 @@ export function RidePreview({ labels, children }: Props) {
         labels={labels}
         onPlay={() => {
           start();
-          ctrlRef.current?.focus();
+          ctrlRef.current?.focus({ preventScroll: true });
         }}
         onToggle={() => (playing ? pause() : start())}
         ctrlRef={ctrlRef}

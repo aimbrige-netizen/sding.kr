@@ -136,7 +136,7 @@
     transition: scale 200ms var(--ease), opacity 300ms var(--ease), visibility 0s;
   }
   .play-big svg { width: 34%; height: 34%; margin-left: 7%; }
-  .play-big:hover { scale: 1.03; }
+  @media (hover: hover) { .play-big:hover { scale: 1.03; } }
   .play-big:active { scale: .98; transition-duration: 100ms; }
   .play-big[data-off] { opacity: 0; visibility: hidden; transition: opacity 300ms var(--ease), visibility 0s 300ms; }
   @media (min-width: 768px) { .play-big { top: 50%; width: clamp(80px, 9.6cqw, 104px); } }
@@ -161,7 +161,7 @@
     transition: scale 200ms var(--ease);
   }
   .play-ctrl svg { width: 40%; height: 40%; }
-  .play-ctrl:hover { scale: 1.03; }
+  @media (hover: hover) { .play-ctrl:hover { scale: 1.03; } }
   .play-ctrl:active { scale: .98; transition-duration: 100ms; }
   @media (min-width: 768px) { .play-ctrl { left: var(--sp-6); top: var(--sp-6); } }
 
@@ -185,7 +185,7 @@
     transition: box-shadow 200ms var(--ease);
   }
   .transcript summary::-webkit-details-marker { display: none; }
-  .transcript summary:hover { box-shadow: var(--shadow-soft); }
+  @media (hover: hover) { .transcript summary:hover { box-shadow: var(--shadow-soft); } }
   .transcript summary svg { width: 16px; height: 16px; color: var(--brand); transition: rotate 400ms var(--ease); }
   .transcript[open] summary svg { rotate: 45deg; }
   .transcript-body {

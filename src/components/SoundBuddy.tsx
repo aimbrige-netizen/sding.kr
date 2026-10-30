@@ -20,7 +20,8 @@ export function SoundBuddy({ copy }: { copy: Copy }) {
   const [tipClosed, setTipClosed] = useState(false);   // Esc로 닫은 툴팁(WCAG 1.4.13)
   const [tipFlash, setTipFlash] = useState(false);     // 터치 기기에서 누른 뒤 잠깐 보이는 툴팁
 
-  // 첫 방문 2초 뒤 '소리 켜 볼까요?'를 6초 동안 보인다. 같은 세션에서는 다시 띄우지 않는다
+  // 첫 방문 2초 뒤 '소리 켜 볼까요?'를 6초 동안 보인다. 같은 세션에서는 다시 띄우지 않는다.
+  // 2초는 탭이 보이는 동안만 잰다. 뒤쪽 탭에서 열면 아무도 못 본 채 말풍선이 지나간다
   useEffect(() => {
     let seen = false;
     try {
@@ -29,26 +30,39 @@ export function SoundBuddy({ copy }: { copy: Copy }) {
       // 저장소를 쓸 수 없으면 이번 방문에만 보인다
     }
     if (seen) return;
-    const show = window.setTimeout(() => {
-      setBubble(true);
-      try {
-        sessionStorage.setItem(BUBBLE_KEY, '1');
-      } catch {
-        // 위와 같다
-      }
-    }, BUBBLE_DELAY_MS);
-    const hide = window.setTimeout(() => setBubble(false), BUBBLE_DELAY_MS + BUBBLE_SHOW_MS);
+    let show = 0;
+    let hide = 0;
+    const wait = () => {
+      window.clearTimeout(show);
+      if (document.hidden) return;
+      show = window.setTimeout(() => {
+        document.removeEventListener('visibilitychange', wait);
+        setBubble(true);
+        try {
+          sessionStorage.setItem(BUBBLE_KEY, '1');
+        } catch {
+          // 위와 같다
+        }
+        hide = window.setTimeout(() => setBubble(false), BUBBLE_SHOW_MS);
+      }, BUBBLE_DELAY_MS);
+    };
+    wait();
+    document.addEventListener('visibilitychange', wait);
     return () => {
       window.clearTimeout(show);
       window.clearTimeout(hide);
+      document.removeEventListener('visibilitychange', wait);
     };
   }, []);
 
-  // Esc로 툴팁을 닫는다. hover로 열린 툴팁도 닫히도록 문서에서 듣되, 툴팁이 열려 있을 수 있을 때만 반응한다
+  // Esc로 툴팁을 닫는다. hover로 열린 툴팁도 닫히도록 문서에서 듣되, 툴팁이 열려 있을 때만 반응한다.
+  // 마우스로 눌러 포커스만 남은 버튼에서 Esc를 누르면 브라우저가 :focus-visible을 켜므로 그때도 닫는다.
+  // 닫힌 툴팁은 다음 hover나 포커스에서 다시 열린다
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const root = rootRef.current;
-      if (e.key === 'Escape' && root && (root.matches(':hover, :focus-within') || root.hasAttribute('data-tip-flash'))) setTipClosed(true);
+      if (e.key !== 'Escape' || !root) return;
+      if (root.matches(':hover') || root.querySelector('.buddy-btn:focus-visible') || root.hasAttribute('data-tip-flash')) setTipClosed(true);
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -85,7 +99,7 @@ export function SoundBuddy({ copy }: { copy: Copy }) {
       data-bubble={(bubble && !soundOn) || undefined}
       data-tip-closed={tipClosed || undefined}
       data-tip-flash={tipFlash || undefined}
-      onPointerLeave={() => setTipClosed(false)}
+      onPointerEnter={() => setTipClosed(false)}
       onAnimationEnd={(e) => { if (e.target === e.currentTarget.querySelector('.buddy-body')) rootRef.current?.removeAttribute('data-boing'); }}
     >
       <p className="buddy-bubble" aria-hidden="true">{copy.bubble}</p>
@@ -97,7 +111,7 @@ export function SoundBuddy({ copy }: { copy: Copy }) {
         aria-pressed={soundOn}
         aria-describedby={tipId}
         onClick={onClick}
-        onBlur={() => setTipClosed(false)}
+        onFocus={() => setTipClosed(false)}
       >
         <svg className="buddy-zz" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M3 15h5l-5 6h5" />

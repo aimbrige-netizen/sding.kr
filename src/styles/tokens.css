@@ -10,7 +10,7 @@
   --r-sm: 12px;  --r-md: 24px;  --r-lg: 32px;  --r-pill: 999px;
   --shadow-soft: 0 12px 32px -12px rgb(255 84 22 / .28);
   --shadow-lift: 0 24px 60px -20px rgb(255 84 22 / .38);
-  --shadow-seal: 10px 14px 18px -12px rgb(255 84 22 / .32);   /* D-day 실링. 오른쪽 아래로만 져 'Soon'의 'n' 쪽 크림을 물들이지 않는다 */
+  --shadow-seal: 14px 4px 16px -12px rgb(255 84 22 / .32);    /* D-day 실링. 오른쪽으로만 져 'Soon'의 'n' 옆 크림을 물들이지 않는다 */
   --glow-hero: radial-gradient(60% 50% at 50% 0%, #FFE2D0, rgb(255 250 246 / 0));
 
   /* 'Coming Soon' 후킹 전용. 390px 96px, 1440px 184px.
@@ -55,9 +55,10 @@
     --film-w: min(var(--film-max), calc((var(--peek) - var(--sp-3)) / .36 * 16 / 9));   /* 16:9 */
   }
 }
-/* 1024px부터 후킹은 한 줄이다. 실링까지 여백 안에 들어오도록 폭으로도 줄인다 */
+/* 1024px부터 후킹은 한 줄이다. 실링까지 여백 안에 들어오도록 폭으로도 줄인다.
+   마지막 값은 브라우저 글자 크기를 키워도 한 줄이 --container 안에 들게 한다(기본 글자 크기에서는 쓰이지 않는다) */
 @media (min-width: 1024px) {
-  :root { --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), calc((100vw - 2 * var(--gutter)) / 6.9), 20.6svh); }
+  :root { --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), calc((100vw - 2 * var(--gutter)) / 6.9), 20.6svh, calc(var(--container) / 6.1)); }
 }
 
 html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }

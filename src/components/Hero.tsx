@@ -2,6 +2,7 @@ import { Fragment, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { HookMotion } from './HookMotion';
 import { Sparkle } from './Icons';
+import { InlineScript } from './InlineScript';
 import { COPY } from '@/content/site';
 import { FONT_SUBSET, hookGateScript, preloadFontSubset } from '@/lib/fonts';
 import { ctaMode, daysToLaunch, launchDotted } from '@/lib/launch';
@@ -67,6 +68,7 @@ function Seal({ counting, days }: { counting: boolean; days: number }) {
             <span data-dday-n>{days}</span>
           </span>
         ) : (
+          // TODO(seal-date): 68px 실링에서는 날짜가 왁스 밖으로 나간다. docs/OPEN_ITEMS.md에서 정한다
           <span className="seal-date">{launchDotted()}</span>
         )}
       </span>
@@ -120,7 +122,7 @@ export function Hero() {
           </span>
         </HookMotion>
         {/* 글꼴 대기(최대 700ms)는 번들을 기다리지 않도록 HTML 안에서 시작한다. 클라이언트 이동으로 그려지면 HookMotion이 대신한다 */}
-        <script dangerouslySetInnerHTML={{ __html: hookGateScript(sample) }} />
+        <InlineScript html={hookGateScript(sample)} />
 
         {/* 낮은 화면에서는 H1도 LCP 후보라 투명도 0에서 시작하지 않고 이동만 한다 */}
         <h1 id="hero-title" tabIndex={-1} className="hero-h1 rise-move" style={order(4)}>

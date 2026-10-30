@@ -35,9 +35,11 @@ export function VideoPlayer({
     const onPlay = () => setPlaying(true);
     const onPause = () => setPlaying(false);
     const onPlaying = () => setStarted(true);
+    const onEmptied = () => setPlaying(!video.paused);   // 주소를 바꾸면 브라우저가 pause 이벤트 없이 멈춘다
     video.addEventListener('play', onPlay);
     video.addEventListener('pause', onPause);
     video.addEventListener('playing', onPlaying);
+    video.addEventListener('emptied', onEmptied);
 
     // 모바일 컷은 화면 폭으로 고른다. video의 source media는 브라우저마다 달라 쓰지 않는다.
     // 폰을 돌리거나 창 폭을 바꿔 767px를 넘나들면 컷을 바꾼다
@@ -56,9 +58,14 @@ export function VideoPlayer({
       const next = pick();
       if (next === url) return;
       url = next;
-      if (unregister) players.swap(video, next);   // 아직 붙이기 전이면 붙일 때 새 컷을 쓴다
+      if (!unregister) return;   // 아직 붙이기 전이면 붙일 때 새 컷을 쓴다
+      setStarted(false);         // 새 컷의 첫 프레임이 나올 때까지 포스터를 다시 보인다
+      players.swap(video, next);
     };
     narrow?.addEventListener('change', onWidth);
+
+    // 포스터를 기다리는 동안 눌린 사운드 버디의 허락도 받도록 소리 영상을 미리 알린다
+    const unannounce = hasAudio ? players.announce(video) : null;
 
     // 포스터를 먼저 받고, 영상 주소는 포스터가 그려진 뒤에 붙인다(PLAN '소개 영상 로딩')
     const img = posterRef.current;
@@ -76,6 +83,8 @@ export function VideoPlayer({
       video.removeEventListener('play', onPlay);
       video.removeEventListener('pause', onPause);
       video.removeEventListener('playing', onPlaying);
+      video.removeEventListener('emptied', onEmptied);
+      unannounce?.();
       unregister?.();
       attachRef.current = () => {};
       video.removeAttribute('src');
@@ -96,10 +105,10 @@ export function VideoPlayer({
     else play();
   };
 
-  // 큰 재생 버튼은 재생되면 사라지므로 포커스를 작은 버튼으로 옮긴다
+  // 큰 재생 버튼은 재생되면 사라지므로 포커스를 작은 버튼으로 옮긴다. 작은 버튼이 프레임 위쪽이라 화면은 움직이지 않게 한다
   const playFromPoster = () => {
     play();
-    ctrlRef.current?.focus();
+    ctrlRef.current?.focus({ preventScroll: true });
   };
 
   return (

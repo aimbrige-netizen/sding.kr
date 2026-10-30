@@ -161,7 +161,7 @@
     justify-items: center;
     gap: 3cqw;
     border-radius: 50%;
-    box-shadow: var(--shadow-seal);   /* 오른쪽 아래로만 진다. 'n' 쪽 크림을 물들이면 'Soon'이 3:1에 못 미친다 */
+    box-shadow: var(--shadow-seal);   /* 오른쪽으로만 진다. 'n' 옆 크림을 물들이면 'Soon'이 3:1에 못 미친다 */
     color: var(--white);
     transform: rotate(10deg);
   }
@@ -233,7 +233,11 @@
     box-shadow: var(--shadow-soft);
     transition: scale 200ms var(--ease), box-shadow 200ms var(--ease);
   }
-  .btn-primary:hover { scale: 1.03; box-shadow: var(--shadow-lift); }
+  /* hover 반응은 hover할 수 있는 기기에서만 건다. 터치는 누른 뒤에도 :hover가 남는다 */
+  @media (hover: hover) {
+    .btn-primary:hover { scale: 1.03; box-shadow: var(--shadow-lift); }
+    .btn-primary:hover .btn-orb { rotate: 90deg; scale: 1.06; }
+  }
   .btn-primary:active { scale: .98; transition-duration: 100ms; }
   .btn-orb {
     display: grid;
@@ -246,7 +250,6 @@
     transition: rotate 500ms var(--ease), scale 500ms var(--ease);
   }
   .btn-orb svg { width: 22px; height: 22px; }
-  .btn-primary:hover .btn-orb { rotate: 90deg; scale: 1.06; }
   @media (min-width: 768px) {
     .btn-primary { gap: var(--sp-4); padding-left: var(--sp-8); }
   }

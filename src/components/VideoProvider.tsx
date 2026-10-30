@@ -24,6 +24,7 @@ type Entry = PlayerHandle & {
 type Media = 'audible' | 'stopped' | 'away';
 
 type Players = {
+  announce: (video: HTMLVideoElement) => () => void;
   register: (handle: PlayerHandle) => () => void;
   userPlay: (video: HTMLVideoElement) => void;
   userPause: (video: HTMLVideoElement) => void;
@@ -61,6 +62,7 @@ function isIOS() {
 
 function createController(setSoundOn: (on: boolean) => void, setMedia: (media: Media) => void) {
   const entries = new Map<HTMLVideoElement, Entry>();
+  const announced = new Set<HTMLVideoElement>();   // 포스터를 기다려 아직 등록되지 않은 소리 영상
   let sound = false;
   let io: IntersectionObserver | null = null;
   let reduce: MediaQueryList | null = null;
@@ -71,17 +73,19 @@ function createController(setSoundOn: (on: boolean) => void, setMedia: (media: M
   // 소리를 낼 영상은 hasAudio인 영상 가운데 재생 중이고 가장 많이 보이는 하나다
   const audible = () => mostVisible(all().filter((e) => e.hasAudio && !e.video.paused));
 
-  // byUser는 클릭 처리 안이라는 뜻이다. 클릭 밖에서 소리를 켜면 Safari가 영상을 멈출 수 있어 시각을 적어 둔다
+  // byUser는 클릭 처리 안이라는 뜻이다. 클릭 밖에서 재생 중인 영상의 소리를 켜면 Safari가 영상을 멈출 수 있어 시각을 적어 둔다.
+  // 멈춘 영상은 대상이 아니다(재생이 거부되어 rejected로 간다). Chrome은 muted를 바꾸는 순간 멈추므로 재생 여부를 먼저 읽는다
   const mute = (e: Entry, muted: boolean, byUser = false) => {
     if (e.video.muted === muted) return;
+    const wasPlaying = !e.video.paused;
     e.video.muted = muted;
-    if (!muted && !byUser) e.unmutedAt = performance.now();
+    if (!muted && !byUser && wasPlaying) e.unmutedAt = performance.now();
   };
 
   const applyMute = (byUser = false) => {
     const loud = sound ? audible() : undefined;
     for (const e of entries.values()) mute(e, e !== loud, byUser);
-    const stopped = all().some((e) => e.hasAudio && e.video.paused && e.ratio >= PLAY_AT && (e.userPaused || e.blocked));
+    const stopped = all().some((e) => e.hasAudio && e.video.paused && e.ratio >= PAUSE_BELOW && (e.userPaused || e.blocked));
     setMedia(loud ? 'audible' : stopped ? 'stopped' : 'away');
   };
 
@@ -113,6 +117,7 @@ function createController(setSoundOn: (on: boolean) => void, setMedia: (media: M
       e.video.play().then(() => applyMute(), (again: unknown) => rejected(e, again, false));
       return;
     }
+    systemPause(e);   // 불러오기에 실패해도 paused가 false로 남는 브라우저(Firefox)가 있다
     // iOS 저전력 모드는 무음 자동 재생도 막는다. 이유를 따로 알 수 없어 iOS의 NotAllowedError로 가린다
     block(e, name === 'NotAllowedError' && isIOS() ? 'low_power' : 'rejected');
   };
@@ -192,9 +197,13 @@ function createController(setSoundOn: (on: boolean) => void, setMedia: (media: M
       }
       applyMute();
     };
-    const onPlay = () => applyMute();
+    const onPlay = () => {
+      e.userPaused = false;   // 컨트롤러는 방문자가 멈춘 영상을 재생하지 않는다. 미디어 키처럼 밖에서 다시 재생한 경우다
+      applyMute();
+    };
     handle.video.addEventListener('pause', onPause);
     handle.video.addEventListener('play', onPlay);
+    announced.delete(handle.video);
     entries.set(handle.video, e);
     io?.observe(handle.video);
     return () => {
@@ -207,6 +216,10 @@ function createController(setSoundOn: (on: boolean) => void, setMedia: (media: M
   };
 
   const players: Players = {
+    announce: (video) => {
+      announced.add(video);
+      return () => announced.delete(video);
+    },
     register,
     userPlay: (video) => {
       const e = entries.get(video);
@@ -229,6 +242,7 @@ function createController(setSoundOn: (on: boolean) => void, setMedia: (media: M
       const at = video.currentTime;
       systemPause(e);
       video.src = src;
+      e.pausing = false;   // 주소를 바꾸면 줄 서 있던 pause 이벤트가 사라진다
       if (at > 0) video.addEventListener('loadedmetadata', () => { video.currentTime = Math.min(at, video.duration || at); }, { once: true });
       if (wasPlaying) play(e, e.byUser);
     },
@@ -252,10 +266,10 @@ function createController(setSoundOn: (on: boolean) => void, setMedia: (media: M
   const toggleSound = () => {
     setSound(!sound);
     if (sound) {
-      for (const e of entries.values()) {
-        if (!e.hasAudio || !e.video.paused) continue;
-        e.video.muted = false;
-        e.video.muted = true;
+      const waiting = all().filter((e) => e.hasAudio && e.video.paused).map((e) => e.video);
+      for (const video of [...waiting, ...announced]) {
+        video.muted = false;
+        video.muted = true;
       }
     }
     applyMute(true);
