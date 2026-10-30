@@ -23,3 +23,6 @@ export const MEDIA = {
   zone3: { kind: 'compare', before: '', after: '', alt: '같은 인물의 원본 사진과 드레스를 합성한 사진을 좌우로 비교하는 화면', aspect: '4/5' },
   zone4: { kind: 'video', src: '', srcMobile: '', poster: '', alt: '웨딩홀 입구에서 버진로드까지 1인칭으로 걸어가는 AI 시뮬레이션 영상', aspect: '16/9' },
 } satisfies Record<string, MediaSpec>;
+
+// 켤 소리가 있는지. 소리는 소개 영상에만 넣으므로(PLAN '소리와 사운드 버디') 그 파일이 올 때까지 사운드 버디를 그리지 않는다
+export const HAS_SOUND = Boolean(MEDIA.hero.src && MEDIA.hero.hasAudio);

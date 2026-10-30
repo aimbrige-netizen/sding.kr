@@ -1,0 +1,36 @@
+/* 공통 등장 효과(PLAN '모션'). 숨김 상태는 JS가 켜졌을 때(html.js)만 건다 */
+@layer components {
+  /* 첫 화면의 글과 버튼: 투명도 0→1, 24px 아래에서 올라온다. 80ms 간격(--i) */
+  .js .rise { animation: rise 600ms var(--ease) both; animation-delay: calc(var(--i, 0) * 80ms); }
+  /* LCP 후보가 되는 글(히어로 H1)은 처음부터 보이고 이동만 한다 */
+  .js .rise-move { animation: rise-move 600ms var(--ease) both; animation-delay: calc(var(--i, 0) * 80ms); }
+
+  /* 스크롤 등장: RevealArmer가 첫 화면 아래 요소에만 is-armed를 붙인다 */
+  .js [data-reveal].is-armed {
+    transition: opacity 600ms var(--ease), transform 600ms var(--ease);
+    transition-delay: calc(var(--i, 0) * 80ms);
+  }
+  .js [data-reveal].is-armed:not(.is-in) { opacity: 0; transform: translateY(24px); }
+
+  /* 동작 줄이기: 이동을 끄고 투명도만 바꾼다 */
+  @media (prefers-reduced-motion: reduce) {
+    .js .rise { animation-name: fade; }
+    .js .rise-move { animation: none; }
+    .js [data-reveal].is-armed:not(.is-in) { transform: none; }
+  }
+  @media print {
+    .js .rise, .js .rise-move, .js [data-reveal].is-armed { opacity: 1; transform: none; animation: none; }
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rise-move {
+  from { transform: translateY(24px); }
+  to { transform: none; }
+}
+@keyframes fade {
+  from { opacity: 0; }
+}

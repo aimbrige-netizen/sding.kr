@@ -14,6 +14,7 @@ export function Header() {
         <Logo href="/#top" label={COPY.homeLabel} />
         <Link
           href="/#waitlist"
+          data-cta
           className="inline-flex min-h-(--tap) items-center rounded-pill bg-brand-deep px-5 text-cap font-bold tracking-normal text-white transition-[scale,box-shadow] duration-200 ease-brand hover:scale-103 hover:shadow-(--shadow-lift) active:scale-98 active:duration-100 motion-reduce:hover:scale-100 motion-reduce:active:scale-100"
         >
           {COPY.cta[mode]}
