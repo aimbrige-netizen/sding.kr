@@ -1,9 +1,14 @@
 import type { Metadata, Viewport } from 'next';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { StoreChoice } from '@/components/StoreChoice';
+import { WaitlistDialog } from '@/components/WaitlistDialog';
+import { WaitlistForm } from '@/components/WaitlistForm';
 import { assertCompany, COMPANY } from '@/content/company';
+import { STORE_LINE } from '@/content/faq';
 import { COPY, SITE } from '@/content/site';
 import { FONT_SUBSET, preloadFontSubset } from '@/lib/fonts';
+import { ctaMode } from '@/lib/launch';
 import './globals.css';
 
 // 헤더 CTA가 모든 페이지에 있으므로 재생성 주기는 레이아웃에 둔다.
@@ -51,6 +56,7 @@ const JS_FLAG = "(function(d){d.classList.add('js');"
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   preloadFontSubset(FONT_SUBSET.latin);
+  const mode = ctaMode();
   return (
     // 'js' 클래스는 위 스크립트가 붙이므로 서버 HTML과 다르다
     <html lang="ko" data-scroll-behavior="smooth" suppressHydrationWarning>
@@ -67,6 +73,9 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         <Header />
         {children}
         <Footer />
+        <WaitlistDialog title={COPY.cta[mode]} description={mode === 'live' ? [STORE_LINE] : COPY.final.lead}>
+          {mode === 'live' ? <StoreChoice /> : <WaitlistForm />}
+        </WaitlistDialog>
       </body>
     </html>
   );

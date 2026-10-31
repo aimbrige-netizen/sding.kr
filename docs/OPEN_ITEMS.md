@@ -29,12 +29,18 @@
 | `zone4-hall` | ZONE 04 대상 웨딩홀이 실존하는지, 촬영·사용 허락, 재현 방식 | `src/content/media.ts` | 영상 납품 전 | 파일이 비어 있다. 확인 전에는 공개 페이지에 올리지 않는다 |
 | `zone2-input` | ZONE 02 날짜와 예산 외의 입력 항목, 결과가 나오는 형태 | `src/content/zones.ts` | 영상 납품 전 | 날짜와 예산만 말하는 설명이다 |
 | `zone3-photo-policy` | 사용자 사진의 처리·보관·삭제 정책 | `src/content/faq.ts` | 오픈 전 | FAQ 답에 넣지 않았다 |
-| `store` | 앱스토어·구글 플레이 주소, 지원 기기, 12월 25일 오픈의 의미 | `src/content/site.ts`, `src/content/faq.ts` | 12월 11일 | 비어 있음. 비어 있으면 CTA는 '출시 알림 받기'로 남는다. 주소가 12월 25일에 맞지 못하면 그 전에 `SITE.launchDate`를 옮긴다. 그대로 두면 FAQ와 JSON-LD가 지난 날짜를 '정식 오픈 예정'이라고 말한다 |
+| `store` | App Store·Google Play 주소, 지원 기기, 12월 25일 오픈의 의미 | `src/content/site.ts`, `src/content/faq.ts` | 12월 11일 | 비어 있음. 비어 있으면 CTA는 '출시 알림 받기'로 남는다. 주소가 12월 25일에 맞지 못하면 그 전에 `SITE.launchDate`를 옮긴다. 그대로 두면 FAQ와 JSON-LD가 지난 날짜를 '정식 오픈 예정'이라고 말한다 |
 | `sns` | SNS 계정 주소 | `src/content/site.ts`, `src/components/Footer.tsx`, `src/components/Icons.tsx` | 정해지면 | 비어 있음. 푸터의 SNS 아이콘은 아직 없다. 주소를 넣을 때 아이콘도 더해야 `sameAs`가 화면과 맞는다 |
 | `fee` | 서비스 지역과 요금 정책 | `src/content/faq.ts` | 정해지면 | FAQ 요금 항목을 숨겼다 |
-| `retention` | 출시 알림 번호 보관 기간(제안: 발송 후 30일) | `src/content/faq.ts` | 6단계 전 | 기간 없이 '목적이 끝나면 파기' |
+| `retention` | 출시 알림 번호 보관 기간(제안: 발송 후 30일). 왜 30일인지(재발송, 수신 거부 처리 등)도 설명할 수 있어야 한다 | `src/content/faq.ts`, `src/content/site.ts` | 11월 12일 변호사 검토 | FAQ는 기간 없이 '목적이 끝나면 파기', 동의 고지는 '안내 문자를 보낸 뒤 30일 안에 파기'다. 확정되면 FAQ, 고지, 처리방침을 같은 말로 맞춘다 |
+| `consent-copy` | 신청 폼의 동의 고지 문구 | `src/content/site.ts`, `src/app/api/waitlist/route.ts`의 `CONSENT_VERSION` | 11월 12일 변호사 검토 | 임시안이다. 문구가 바뀌면 `CONSENT_VERSION`을 올린다 |
+| `age-14` | '만 14세 미만은 신청할 수 없어요.' 한 줄로 충분한지 | `src/content/site.ts` | 11월 12일 변호사 검토 | 입력칸 없이 한 줄만 두었다. 자가 체크가 필요하다는 답이 오면 체크 항목을 더한다 |
 | — | 통신판매업 신고번호 | `src/content/company.ts` | 신고 완료 때 | 의도적으로 빈 값. 라벨만 보인다 |
-| — | 구글·네이버 소유확인 값, GA4 ID, Turnstile 키, Supabase 프로젝트 | Vercel 환경 변수 | 4·5·7단계 전 | `.env.example`에 이름만 있다 |
+| — | 구글·네이버 소유확인 값, GA4 ID | Vercel 환경 변수 | 4·7단계 전 | `.env.example`에 이름만 있다 |
+| `supabase-setup` | Supabase 프로젝트(서울 `ap-northeast-2`), 기획서 SQL 실행, 이 사이트 전용 `sb_secret_` 키 | Vercel Production 환경 변수 | 첫 공개 전(11월 12일까지) | 없음. 로컬 Postgres로 권한과 저장은 시험했지만 실제 프로젝트에서는 못 했다. 키가 없으면 API는 503을 돌려준다. 사용자가 `/mcp`에서 Supabase 연결을 승인하면 프로젝트 확인을 도울 수 있다 |
+| `turnstile-keys` | Turnstile 위젯(Managed 모드, 호스트 `sding.kr`만)과 실제 키 한 쌍 | Vercel Production 환경 변수 | 첫 공개 전(11월 12일까지) | 없음. 개발과 미리보기는 Cloudflare 시험 키를 쓴다. 대시보드의 'Set up with Spin'은 localhost를 넣으므로 일반 위젯 만들기를 쓴다 |
+| `store-badge-art` | 공식 App Store·Google Play 배지 파일 | `src/components/StoreChoice.tsx`, `src/content/site.ts` | 12월 11일 | 글자 링크가 대신 보인다. 사용자가 직접 받아야 한다. Apple은 Developer Program 가입이 조건이고, Google은 Partner Marketing Hub의 조건에 동의해야 한다. 한국어 검정 App Store 배지를 앞에, Google은 `GetItOnGooglePlay_Badge_Web_color_Korean.svg`, 높이는 둘 다 48px, 여백은 12px 이상이다. 배지에는 hover 확대와 등장 효과를 걸지 않고 흰 카드 위에 둔다. 사전 주문 중에는 다운로드 배지를 쓸 수 없으므로 `SITE.store.ios`는 실제로 받을 수 있게 된 뒤 채운다 |
+| `trademark-credit` | App Store 배지를 쓸 때의 Apple 크레딧 줄, Google Play 표기 | 푸터 또는 `/terms` | 배지를 넣을 때 | 지금은 글자 링크라 넣지 않았다. Apple 줄은 사이트 안 한 번, 법적 고지 자리에 둔다. Google 공식 문구는 찾지 못했다. ®는 쓰지 않는다 |
 | — | 위디 영상 사용 방식 직접 확인(선택) | 레퍼런스 분석 | 선택 | 기획서의 가정으로 남아 있다 |
 
 ## 결정이 필요한 질문
@@ -50,6 +56,10 @@
 
 9. **`poster-ai-label` 포스터 위의 AI 라벨.** 3단계 완료 기준대로 합성·시뮬레이션 존에는 파일이 없어도 `badge`와 `notice`를 보인다. 그래서 11월 13일 첫 공개부터 12월 4일 파일 납품까지 AI가 만들지 않은 포스터 그림 위에 'AI 합성' 라벨이 붙고, 그 아래에 'AI로 합성한 이미지예요.'가 쓰인다. 사실과 다르게 읽힐 수 있어 11월 12일 변호사 검토에서 함께 본다. 제안은 그대로 두고 검토 결과만 받는 것이다. 다른 길은 파일이 올 때까지 ZONE 03 고지 문구만 숨기는 것인데, 완료 기준과 달라진다.
 10. **`term-synonym` '가상 피팅'을 쓰는 범위.** 2026-11-01에 드레스 AI 합성을 풀어 쓴 말로 보고 정의 문장에 두는 권장안을 임시로 정했다. 기획서 규칙도 그에 맞췄다. 맨 위 '나중에 직접 고칠 문구'를 본다.
+11. **`vercel-plan` Vercel 요금제.** Hobby는 상업적 사용을 금지한다. 서비스를 알리는 법인 사이트는 상업적 사용에 해당하므로 첫 공개 전에 Pro(팀 월 20달러, 배포 좌석 1개 포함)로 만드는 것을 제안한다. 비용이 드는 결정이라 사용자가 정한다.
+12. **`supabase-plan` Supabase 요금제.** Free는 활동이 적으면 멈추고, 멈추면 신청이 모두 실패한 채 소유자가 직접 풀 때까지 이어진다. 자동 백업도 없다. 신청이 뜸한 기간이 있는 페이지라 맞지 않는다. 첫 공개부터 번호를 파기할 때까지 Pro(월 25달러부터)를 제안한다. 요금제는 조직 단위이므로 업체 관리 도구와 같은 조직이면 함께 올라간다. 조직을 나눌지도 함께 정한다. Free로 가면 활동 유지 방법을 따로 정해야 하는데 문서가 활동의 기준을 밝히지 않아 보장이 없다.
+13. **`ad-consent` 출시 알림 문자의 성격.** 변호사 답에 따라 폼이 바뀔 수 있다. 광고로 보면 '광고성 정보 수신동의' 체크가 하나 더 늘고, 저장할 동의 시각 칸과 성공 문구(전송자, 날짜, 처리 결과)도 바뀐다. 지금은 동의 하나로 만들었다.
+14. **`sms-format` 오픈 안내 문자.** 광고로 처리하면 '(광고) 스딩(주식회사 스딩) 연락처 / 본문 / 무료수신거부 번호' 형식이고, 비광고로 처리하면 (광고)를 붙이지 않는다. 쿠폰이나 할인을 섞으면 전체가 광고가 된다. 대행사는 전송자격인증 업체여야 한다. 12월 18일 점검에서 확인한다.
 
 ## 진행 메모
 
@@ -65,4 +75,12 @@
 - 공유 이미지의 글꼴(`assets/fonts/`)은 한글 2,780자 서브셋이다. 정의 문장이나 후킹을 바꿀 때 없는 글자를 쓰면 `next/og`가 렌더링 때 외부에서 글꼴을 받는다.
 - JS를 끄고 존 주소(`#zone-1`, `#zone-3`)로 바로 들어오면 폰 크기에서 글꼴이 늦게 도착할 때 제목이 목적지보다 40~60px 위에 멈출 때가 있다. 제목은 헤더 아래에 보인다. `#faq`와 `#intro`는 같은 시험에서 어긋나지 않았고, JS가 켜져 있으면 네 주소 모두 어긋나지 않았다(360·390px에서 24번). JS를 끈 경우에만 생기고 제목이 가려지지 않아 그대로 둔다.
 - IndexNow 키는 `public/9c7495293e61b2ab93f040374f6033e7.txt`에 있다. 무작위로 만든 공개 값이다. 첫 공개 당일 빙 웹마스터 도구에 같은 값을 등록하고, 기획서 '크롤러와 색인 파일'의 요청으로 세 주소를 알린다. 다른 키를 쓰게 되면 파일과 그 요청의 `key`를 함께 바꾼다.
+- 5단계 시험은 Cloudflare 시험 키와 실제 Siteverify, `supabase-js`, 로컬 Postgres(PGlite)에 올린 Data API 대역으로 했다. 브라우저는 Chrome, Firefox, Playwright의 WebKit 18.2 Windows 빌드로 시험했고, WebKit 빌드는 실제 Safari가 아니다. 실제 Supabase 프로젝트, 실제 Turnstile 키, Safari, iPhone, Android, 카카오톡·네이버 인앱은 아직 못 했다. 실제 프로젝트를 만들면 다음을 확인한다. (1) 번호 하나로 두 번 신청해 둘 다 `{ ok: true }`이고 행은 하나이며 첫 `consent_at`이 남는지, (2) Logs에 23505와 번호가 없는지, (3) `grant select (phone)`만으로 동작하는지. 안 되면 기획서 SQL의 권한을 공식 템플릿(`select, insert, update, delete`)으로 넓히되 그러면 23505 대신 `upsert`를 쓰는 지금 방식을 유지해야 번호가 로그에 남지 않는다. (4) 시험에 쓴 행을 지운다. 시험 번호도 실제 가입자일 수 있고 오픈 문자는 표의 모든 번호로 간다.
+- 실제 키로 카카오톡·네이버 앱에서 신청을 한 번씩 끝내 본다. Cloudflare는 인앱 브라우저의 제한을 경고한다. 실패하면 외부 브라우저 안내를 넣을지 정한다. Turnstile 무료 요금제는 위젯을 20개까지 주므로 고정된 스테이징 주소가 있으면 공개 전에 시험할 수 있다.
+- Supabase 보안 점검(Advisor)의 'RLS enabled no policy'(0008)는 의도한 결과다. `anon`과 `authenticated`에 권한이 없다.
+- `/api/waitlist`에는 요청 수 제한이 없다. 위조 요청은 Turnstile에서 막히지만 Siteverify 호출을 쓰므로, 첫 공개 때 Vercel WAF에 이 경로의 rate limit 규칙을 하나 더한다. 통신사 공유 IP를 고려해 넉넉하게 잡는다.
+- Next.js가 11월 3일에 보안 릴리스(중간 등급 7건)를 예고했다. 11월 13일 첫 공개 전에 `next`와 `eslint-config-next`를 올리고 build, lint, typecheck를 다시 돌린다.
+- 터치 기기에서 신청 창은 제목에서 시작해 키보드가 바로 뜨지 않는다. 한 번 덜 누르는 것이 동의 고지를 먼저 보는 것보다 중요하면 입력칸으로 바꾼다. 터치 기기의 바깥 누르기는 키보드가 떠 있으면 키보드만 내린다. 둘 다 실기기에서 확인한다.
+- 신청 창이 열린 동안 뒤 페이지를 잡는 `touchmove` 처리는 Chrome 터치 에뮬레이션으로만 시험했다. iOS의 문제는 에뮬레이션에서 재현되지 않으므로 iOS 18과 최신 iOS에서 주소창이 접힌 때와 키보드가 뜬 때를 확인한다.
+- macOS Safari 18.1 이하에서 스크롤 막대를 항상 보이게 설정했으면 신청 창을 열고 닫을 때 페이지가 약 15px 움직인다. `scrollbar-gutter`가 18.2부터 있어서다. 어둡게 덮인 뒤의 일이고 내용이 가려지지 않아 그대로 둔다.
 - 이 폴더는 OneDrive 바탕 화면 안에 있어 `node_modules`와 `.next`도 동기화된다. 파일 잠금이나 느려짐이 생기면 저장소를 OneDrive 밖으로 옮기는 것을 권장한다.

@@ -1,7 +1,7 @@
 import type { ReactNode, SVGProps } from 'react';
 import type { Zone } from '@/content/zones';
 
-// 24px 격자, 선 2px, 둥근 끝(PLAN '아이콘과 이미지'). 존 아이콘 4개와 반짝임 1개, 재생·정지·비교 손잡이·펼침 조작 글리프만 둔다
+// 24px 격자, 선 2px, 둥근 끝(PLAN '아이콘과 이미지'). 존 아이콘 4개와 반짝임 1개, 재생·정지·비교 손잡이·펼침·닫기 조작 글리프만 둔다
 type IconProps = Omit<SVGProps<SVGSVGElement>, 'children'>;
 
 function Svg({ children, ...props }: IconProps & { children: ReactNode }) {
@@ -94,6 +94,14 @@ export function ChevronDown(props: IconProps) {
   return (
     <Svg {...line} {...props}>
       <path d="M6 9l6 6 6-6" />
+    </Svg>
+  );
+}
+
+export function Close(props: IconProps) {
+  return (
+    <Svg {...line} {...props}>
+      <path d="M6 6l12 12M18 6L6 18" />
     </Svg>
   );
 }

@@ -6,6 +6,7 @@
 @import "../styles/film.css";
 @import "../styles/zones.css";
 @import "../styles/faq.css";
+@import "../styles/cta.css";
 @import "../styles/buddy.css";
 
 /* Tailwind 유틸리티는 tokens.css의 값만 쓴다. 기본 색, 글자 크기, 둥글기, 그림자는 끈다.

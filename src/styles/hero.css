@@ -242,6 +242,7 @@
   .btn-primary:active { scale: .98; transition-duration: 100ms; }
   .btn-orb {
     display: grid;
+    flex: none;
     place-items: center;
     width: var(--sp-12);
     height: var(--sp-12);

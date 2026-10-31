@@ -1,4 +1,5 @@
 import { AnchorFocus } from '@/components/AnchorFocus';
+import { CtaSection } from '@/components/CtaSection';
 import { Faq } from '@/components/Faq';
 import { Film } from '@/components/Film';
 import { Hero } from '@/components/Hero';
@@ -13,7 +14,6 @@ import { COPY } from '@/content/site';
 import { ZONES, zoneLabel } from '@/content/zones';
 import { graph } from '@/lib/jsonld';
 
-// 5단계에서 Faq 뒤에 CtaSection이 온다
 export default function Home() {
   return (
     <VideoProvider>
@@ -28,6 +28,7 @@ export default function Home() {
           {ZONES.map((zone, i) => <Zone key={zone.id} zone={zone} flip={i % 2 === 1} />)}
         </div>
         <Faq />
+        <CtaSection />
       </main>
       {HAS_SOUND ? <SoundBuddy copy={COPY.sound} /> : null}
       <RevealArmer />

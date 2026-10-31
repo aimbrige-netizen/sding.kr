@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import Link from 'next/link';
+import { CtaButton } from './CtaButton';
 import { HookMotion } from './HookMotion';
 import { Sparkle } from './Icons';
 import { InlineScript } from './InlineScript';
@@ -140,13 +140,12 @@ export function Hero() {
           ))}
         </p>
         <div className="hero-cta rise" style={order(6)}>
-          {/* 신청 창은 5단계 CtaButton이 연다. JS가 없으면 마지막 섹션의 폼으로 이동한다 */}
-          <Link href="/#waitlist" data-cta className="btn-primary">
+          <CtaButton className="btn-primary">
             <span>{COPY.cta[mode]}</span>
             <span className="btn-orb" aria-hidden="true">
               <Sparkle />
             </span>
-          </Link>
+          </CtaButton>
         </div>
       </div>
     </section>
