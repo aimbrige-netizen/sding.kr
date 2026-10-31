@@ -61,11 +61,12 @@
   :root { --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), calc((100vw - 2 * var(--gutter)) / 6.9), 20.6svh, calc(var(--container) / 6.1)); }
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
+html { scroll-padding-top: var(--header-h); }
+html.js { scroll-behavior: smooth; }   /* JS가 꺼지면 해시 주소에서 부드러운 스크롤을 끄는 스크립트도 없으므로 처음부터 쓰지 않는다 */
 body { background: var(--cream); color: var(--ink-900); word-break: keep-all; overflow-wrap: break-word; }
 /* 이동과 확대를 끈다. 반복 횟수를 1로 두어 무한 반복이 아주 짧은 주기로 깜빡이지 않게 한다 */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html.js { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;
   }

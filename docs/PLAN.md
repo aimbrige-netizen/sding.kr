@@ -1,4 +1,4 @@
-# 스딩 랜딩페이지 기획서 v1.3
+# 스딩 랜딩페이지 기획서 v1.4
 
 Oct 28, 2026 · @tae hyeung kwon
 
@@ -7,6 +7,8 @@ Oct 28, 2026 · @tae hyeung kwon
 **v1.2 변경(2026-10-29)**: 지원 하한을 iOS·Safari 16.4로 올리고, 폰트를 저자가 배포한 다이내믹 서브셋으로 바꿨다. 2단계(히어로와 영상 시스템)를 만들며 낮은 화면의 후킹·영상 크기, 동작 줄이기 규칙, 영상의 `autoplay` 속성을 정리했다. 교차 검토 뒤 D-day 실링의 최소 폭과 그림자(`--seal-min`, `--shadow-seal`), 기획서에 없던 영상·버디 경우(밖에서 멈춘 영상, 화면 폭이 바뀔 때의 컷, 소리 파일이 없을 때와 멈춘 소리 영상의 버디)를 더했다. 브라우저 글자 크기를 키워도 후킹이 한 줄이도록 `--fs-display`에 상한을 더했다.
 
 **v1.3 변경(2026-10-31)**: 3단계(소개와 존 4개)를 만들며 기획서끼리 어긋나던 곳을 정리했다. 768~899px의 존은 설명 두 줄을 지키려고 텍스트와 미디어를 6열씩 쓴다. 고지 문구는 ZONE 03 표대로 미디어 바로 아래에 두고 ZONE 04도 같게 한다. 진행 점은 존 구간에 있을 때만 보인다. JS가 꺼져 있으면 재생 버튼을 숨긴다.
+
+**v1.4 변경(2026-10-31)**: 4단계(FAQ와 검색 대응)를 만들며 기획서에 없던 값을 정했다. FAQ 제목은 '자주 묻는 질문'이고 질문 글자는 서체 표에 더했다. 공유 이미지는 후킹이 'Coming Soon'일 때 히어로의 눈을 함께 그리고, `next/og`가 woff2와 가변 폰트를 읽지 못해 고정 굵기 폰트를 `assets/fonts/`에 둔다. IndexNow 키는 미리 만들어 두었다. 해시 주소로 바로 들어오면 로드가 끝날 때까지 부드러운 스크롤을 끄고, JS가 꺼져 있으면 부드러운 스크롤을 쓰지 않는다. 스테이징과 프리뷰의 `noindex`는 메타 태그 코드에도 적었다. canonical과 `og:url`은 `'./'`로 써서 페이지마다 제 주소를 가리키고, `og:title`과 `og:description`은 페이지의 `title`, `description`을 따른다. Lighthouse SEO는 미리보기가 `noindex`라 `sding.kr`에서 잰다. IndexNow 전송을 첫 공개와 정식 오픈 일정에 넣었고, 만드는 단계가 없던 `not-found.tsx`는 6단계에 넣었다. FAQ의 스토어 답은 주소가 있는 곳만 말한다.
 
 ## 요약
 
@@ -34,8 +36,8 @@ Oct 28, 2026 · @tae hyeung kwon
 본문의 \[확인 필요\]는 이 목록의 항목이거나 변호사·세무사 확인이 필요한 항목에 달았다. 정해지기 전에도 기본값으로 개발은 시작할 수 있으며, 항목별 쓰임과 기본값은 자료 체크리스트와 일정 절의 표에 있다.
 
 - **개발 시작 전(11월 4일까지)**: 로고 SVG 원본(받은 값은 `Layer 2` 위치뿐이다), 영문 표기(Sding 또는 SDING), 도메인 등록처와 DNS 위치, 사전 신청 수집 항목(휴대폰 번호 또는 이메일).
-- **첫 공개 전(11월 12일까지)**: 전화번호·대표 이메일·개인정보보호책임자, 웨딩 가격 정찰제의 실제 규칙과 문구, 변호사 검토(끝나야 첫 공개를 할 수 있다), 법인 설립등기일, IndexNow 키.
-- **영상과 오픈**: 영상 제작 도구의 상업 이용 조건(납품 전), 영상 파일(12월 4일), 12월 25일 오픈의 의미와 스토어 주소, 오픈 후 후킹 문구(12월 11일).
+- **첫 공개 전(11월 12일까지)**: 전화번호·대표 이메일·개인정보보호책임자, 웨딩 가격 정찰제의 실제 규칙과 문구, 변호사 검토(끝나야 첫 공개를 할 수 있다), 법인 설립등기일, 출시 알림 번호 보관 기간, 구글·네이버 소유확인 값, GA4 ID, Turnstile 키, Supabase 프로젝트.
+- **영상과 오픈**: 영상 제작 도구의 상업 이용 조건(납품 전), 영상 파일(12월 4일), ZONE 02 입력 항목, ZONE 03 모델 초상권과 드레스 브랜드 사용 허락, ZONE 04 웨딩홀 사용 허락(납품 전), 12월 25일 오픈의 의미, 스토어 주소와 지원 기기, 오픈 후 후킹 문구(12월 11일), 사용자 사진 처리 정책(오픈 전).
 - **정해지면**: 서비스 지역과 요금 정책, SNS 계정 주소, 통신판매업 신고 시점. 위디 영상 사용 방식의 직접 확인은 선택이다.
 
 ## 프로젝트 개요
@@ -174,6 +176,7 @@ Oct 28, 2026 · @tae hyeung kwon
 | 소제목 (H3) | 28px | 22px | 700 | 1.3 | -0.02em |
 | 리드 | 22px | 18px | 500 | 1.6 | -0.01em |
 | 본문 | 18px | 16px | 400 | 1.7 | 0 |
+| FAQ 질문 | 18px | 16px | 700 | 1.4 | -0.01em |
 | 킥커·캡션 | 14px | 13px | 600 | 1.4 | 0.06em |
 
 375px에서 1440px 사이 크기는 `clamp()`로 잇는다. 정확한 값은 개발 사양의 토큰 블록에 둔다. 후킹은 `--fs-display` 하나만 쓰며 1024px부터 한 줄, 그 아래는 두 줄('Coming' / 'Soon')이다. 낮은 화면에서는 영상 노출을 지키려고 화면 높이에 맞춰 후킹을 줄이고(브라우저 창 안쪽 크기 375×667에서 66px, 1366×768에서 158px), 1024px부터는 실링까지 여백 안에 들어오도록 화면 폭으로도 줄인다.
@@ -250,7 +253,7 @@ Oct 28, 2026 · @tae hyeung kwon
 
 ### 아이콘과 이미지
 
-- 아이콘은 24px 격자, 선 두께 2px, 끝과 모서리 둥글게, `currentColor`로 그린다. 존 아이콘 4개와 반짝임 1개만 만들고 이모지는 쓰지 않는다. 재생·일시정지·펼침 화살표 같은 조작용 글리프는 같은 격자의 기능 글리프로 따로 허용한다.
+- 아이콘은 24px 격자, 선 두께 2px, 끝과 모서리 둥글게, `currentColor`로 그린다. 존 아이콘 4개와 반짝임 1개만 만들고 이모지는 쓰지 않는다. 재생·일시정지·펼침 화살표 같은 조작용 글리프는 같은 격자의 기능 글리프로 따로 허용한다. 푸터의 SNS 아이콘은 채널이 정해지면 더한다.
 - 사진과 영상은 밝은 하이키 톤, 따뜻한 자연광, 약한 피부 보정을 기준으로 한다. 과한 필터와 어두운 장면은 피한다.
 - 드레스·웨딩홀 합성 이미지에는 화면에 보이는 'AI 합성' 라벨을 붙인다. 표기 규칙은 회사정보·법적 표기 절에서 정한다.
 
@@ -266,6 +269,7 @@ Oct 28, 2026 · @tae hyeung kwon
 - 로고는 `/#top`으로 이동하고, JS 없이 CTA를 눌렀을 때는 `/#waitlist`로 이동한다. 헤더가 모든 페이지에 있으므로 `/`를 붙이고, 홈에서는 같은 문서 안에서 스크롤만 한다.
 - 고정 헤더에 제목이 가려지지 않도록 `scroll-padding-top`을 쓴다. 값은 디자인 토큰에 있다.
 - 앵커로 이동한 뒤 키보드 포커스가 따라가도록 섹션 제목에 `tabindex='-1'`을 둔다.
+- 해시 주소로 바로 들어오면 로드가 끝날 때까지 부드러운 스크롤을 끈다. 스크롤하는 동안 글꼴이 바뀌어 위쪽 높이가 줄면 목적지를 지나치기 때문이다. JS가 꺼져 있으면 부드러운 스크롤을 쓰지 않는다.
 
 ## 섹션별 상세 기획
 
@@ -395,7 +399,7 @@ Oct 28, 2026 · @tae hyeung kwon
 
 ### FAQ
 
-FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 있게 한다. 질문은 8개이며 요금 항목은 정책이 정해질 때까지 숨긴다. 답변의 첫 문장이 곧 답이고 질문의 주제어를 되풀이한다. 같은 데이터에서 FAQPage JSON-LD를 만든다.
+FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 있게 한다. 제목은 '자주 묻는 질문'이다. 질문은 8개이며 요금 항목은 정책이 정해질 때까지 숨긴다. 답변의 첫 문장이 곧 답이고 질문의 주제어를 되풀이한다. 같은 데이터에서 FAQPage JSON-LD를 만든다.
 
 | 질문 | 답변 초안 | 확정 필요 |
 | --- | --- | --- |
@@ -408,7 +412,7 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 | 이용 요금은 얼마인가요? | 요금 정책이 정해진 뒤에 쓴다. 정해지기 전에는 이 항목을 노출하지 않는다. | 요금 정책 |
 | 출시 알림에 남긴 번호는 어떻게 쓰이나요? | 출시 알림에 남긴 번호는 오픈 안내 문자를 보내는 데만 쓰고, 목적이 끝나면 파기해요. | 보관 기간 |
 
-오픈 후에는 '언제부터 쓸 수 있나요?'가 '어디서 쓸 수 있나요?'('스딩은 앱스토어와 구글 플레이에서 받을 수 있어요.')로 바뀌고, '출시 알림에 남긴 번호' 질문은 사라진다. 항목의 `when`·`hidden` 필드와 `faqFor()`가 이 전환을 처리한다(개발 사양 절 참고).
+오픈 후에는 '언제부터 쓸 수 있나요?'가 '어디서 쓸 수 있나요?'('스딩은 앱스토어와 구글 플레이에서 받을 수 있어요.', 스토어 주소가 하나면 그곳만 말한다)로 바뀌고, '출시 알림에 남긴 번호' 질문은 사라진다. 항목의 `when`·`hidden` 필드와 `faqFor()`가 이 전환을 처리한다(개발 사양 절 참고).
 
 ### 마지막 CTA
 
@@ -561,15 +565,13 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://sding.kr'),
   title: SITE.title,              // 스딩 Sding | 웨딩 가격 정찰제 · AI 웨딩 플래너
   description: SITE.description,  // 정의 문장, 합니다체
-  alternates: { canonical: '/' },
-  robots: {
-    index: true, follow: true,
-    googleBot: { 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
-  },
+  alternates: { canonical: './' },   // 페이지마다 제 주소가 된다
+  robots: process.env.NEXT_PUBLIC_SITE_ENV === 'production'   // 스테이징·프리뷰는 색인 금지
+    ? { index: true, follow: true, googleBot: { 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } }
+    : { index: false, follow: false },
   openGraph: {
-    type: 'website', locale: 'ko_KR', siteName: '스딩', url: '/',
-    title: SITE.title, description: SITE.description,
-    // og:image는 src/app/opengraph-image.tsx가 만든다
+    type: 'website', locale: 'ko_KR', siteName: '스딩', url: './',
+    // og:title과 og:description은 페이지의 title, description을 따른다. og:image는 src/app/opengraph-image.tsx가 만든다
   },
   twitter: { card: 'summary_large_image' },
   verification: {                 // 값이 비어 있으면 태그를 넣지 않는다
@@ -586,7 +588,7 @@ export const viewport: Viewport = {
 };
 ```
 
-- 공유 이미지는 `src/app/opengraph-image.tsx`가 1200×630 PNG로 만든다. 로고 텍스트, 정의 문장, 후킹 문구(`COPY.hero.hook[ctaMode()]`)와 `launchDotted()` 날짜를 담고, 로고 SVG가 오면 이 파일 안에서 바꾼다. alt는 `SITE.ogAlt`다. 페이지와 같은 `revalidate = 3600`으로 다시 만들어 오픈일에 오픈 후 문구로 바뀌게 하고, 오픈일에 카카오 공유 캐시를 지운다.
+- 공유 이미지는 `src/app/opengraph-image.tsx`가 1200×630 PNG로 만든다. 로고 텍스트, 정의 문장, 후킹 문구(`COPY.hero.hook[ctaMode()]`)와 `launchDotted()` 날짜를 담고, 후킹이 'Coming Soon'일 때는 히어로의 눈을 함께 그린다. 로고 SVG가 오면 이 파일 안에서 바꾼다. `next/og`는 woff2와 가변 폰트를 읽지 못해 Pretendard 고정 굵기 woff 3개를 `assets/fonts/`에 둔다. 방문자에게는 내려가지 않는다. 문구를 바꾸면 글자가 이 폰트에 있는지 확인한다. 없으면 `next/og`가 렌더링 때 외부에서 글꼴을 받는다. alt는 `SITE.ogAlt`다. 페이지와 같은 `revalidate = 3600`으로 다시 만들어 오픈일에 오픈 후 문구로 바뀌게 한다. 다시 만들기는 요청이 와야 시작하고 그 요청은 이전 이미지를 받으므로, 오픈일 1시(KST)가 지나 `/opengraph-image`를 열어 새 문구를 확인한 뒤 카카오 공유 캐시를 지운다.
 - 소유확인 메타 태그는 환경 변수 `NEXT_PUBLIC_GOOGLE_VERIFICATION`, `NEXT_PUBLIC_NAVER_VERIFICATION`에서 읽는다. 구글은 DNS TXT 인증을 기본으로 하고 메타 태그는 보조로 둔다. 네이버 서치어드바이저는 메타 태그로 인증한다.
 
 `www.sding.kr`은 `sding.kr`로 301 이동한다. 네이버 서치어드바이저에서도 대표 도메인을 `sding.kr`로 지정한다. 카카오톡 미리보기는 OG 태그를 읽으므로, 이미지나 문구를 바꾸면 카카오 공유 디버거에서 캐시를 지운다.
@@ -624,7 +626,11 @@ export default function robots(): MetadataRoute.Robots {
 
 학습용 봇만 막고 싶으면 GPTBot, ClaudeBot, Google-Extended 규칙의 `allow`를 `disallow: '/'`로 바꾼다. 검색과 사용자 요청 봇은 계속 허용한다. 사이트맵에는 `/`, `/privacy`, `/terms` 세 주소만 넣는다.
 
-IndexNow 키 파일을 `public/{키}.txt`로 둔다. 키는 공개 값이며 빙 웹마스터 도구에 등록할 때 정한다 \[확인 필요\]. 배포 뒤에는 IndexNow로 바뀐 주소를 알린다.
+IndexNow 키 파일을 `public/{키}.txt`로 둔다. 키는 소유자가 정하는 공개 값이라 무작위로 만들어 두었고, 빙 웹마스터 도구에 같은 값을 등록한다. 다른 키를 쓰게 되면 파일과 아래 요청의 `key`를 함께 바꾼다. 배포 뒤에는 IndexNow로 바뀐 주소를 알린다. 첫 공개 날에는 세 주소를, 정식 오픈 날에는 홈 주소를 보낸다. 응답이 200이나 202면 접수된 것이다.
+
+```bash
+curl -i -X POST https://api.indexnow.org/indexnow -H "Content-Type: application/json; charset=utf-8" -d '{"host":"sding.kr","key":"9c7495293e61b2ab93f040374f6033e7","urlList":["https://sding.kr/","https://sding.kr/privacy","https://sding.kr/terms"]}'
+```
 
 ### 구조화 데이터
 
@@ -832,7 +838,7 @@ AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형
 | 프레임워크 | Next.js 16(App Router), React 19, TypeScript, SSG. Cache Components는 끈다 | 문구가 HTML에 담겨 SEO·AEO에 유리하고, 스딩 업체 관리 도구와 같은 Next.js 계열이다. Cache Components를 켜면 `revalidate`를 쓸 수 없어 CTA 전환 방식과 맞지 않는다 |
 | 스타일 | Tailwind CSS 4(`@tailwindcss/turbopack`) + CSS 변수 토큰 | 토큰은 브랜드 시스템 절의 값을 그대로 쓴다. `globals.css`의 `@theme`에서 기본 색·글자 크기·둥글기·그림자를 끄고 토큰만 유틸리티로 잇는다. 지원 하한(Safari 16.4)에서 `color-mix()`, 투명도 수식어(`bg-white/70` 등), 컨테이너 단위(`cqw`), `:has()`를 쓸 수 있다 |
 | 검사 | ESLint 9(flat config, `eslint-config-next`), `next typegen && tsc --noEmit` | Next 16에서 `next lint`가 없어져 `npm run lint`는 `eslint`를 직접 실행한다 |
-| 폰트 | Pretendard Variable 1.3.9 다이내믹 서브셋 자체 호스팅. 저자가 배포한 CSS를 `src/styles/fonts.css`로, 글꼴 파일 92개를 `public/fonts/pretendard-1.3.9/`로 옮겼다 | 페이지에 쓰인 글자 묶음만 받아, 첫 로드에 받는 글꼴은 10개 묶음 약 255KB다(서브셋 전 단일 파일은 2MB). 영문·숫자 묶음(91번)은 preload하고, 후킹의 ı 묶음(74번)은 후킹이 'Coming Soon'일 때만 preload한다. 직접 서브셋을 만들면 OFL 예약 글꼴 이름 문제가 생겨 저자 배포본을 쓴다 |
+| 폰트 | Pretendard Variable 1.3.9 다이내믹 서브셋 자체 호스팅. 저자가 배포한 CSS를 `src/styles/fonts.css`로, 글꼴 파일 92개를 `public/fonts/pretendard-1.3.9/`로 옮겼다 | 페이지에 쓰인 글자 묶음만 받아, 첫 로드에 받는 글꼴은 11개 묶음 약 282KB이고 FAQ 답을 열면 한 묶음이 더 온다(서브셋 전 단일 파일은 2MB). 영문·숫자 묶음(91번)은 preload하고, 후킹의 ı 묶음(74번)은 후킹이 'Coming Soon'일 때만 preload한다. 직접 서브셋을 만들면 OFL 예약 글꼴 이름 문제가 생겨 저자 배포본을 쓴다 |
 | 모션 | CSS와 `IntersectionObserver` | 애니메이션 라이브러리 없이 번들을 가볍게 둔다 |
 | 상태 | `useSound()`와 신청 창 상태만 | 외부 상태 라이브러리는 쓰지 않는다 |
 | 호스팅 | Vercel(서울 리전) 또는 Cloudflare Pages | 둘 중 하나. 기본 제안은 Vercel이다 |
@@ -852,9 +858,10 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
     PLAN.md                    이 기획서
     OPEN_ITEMS.md              정해지지 않은 값과 질문
     design/                    히어로 시안(B안 확정)과 비교 이미지
-  scripts/                     llms.txt 생성 스크립트(4단계)
+  assets/fonts/                공유 이미지 전용 Pretendard 고정 굵기 woff 3개 + 라이선스 파일
+  scripts/                     llms.mjs(빌드 직전 실행), icons.mjs(임시 아이콘, 손으로 실행)
   public/
-    llms.txt                   빌드 직전에 생성
+    llms.txt                   빌드 직전에 생성. 저장소에 올리지 않는다
     brand/                     logo.svg, logo-white.svg, logo-mark.svg
     icons/                     icon-192, icon-512, maskable-512
     media/                     영상과 이미지. 파일명에 버전
@@ -875,9 +882,9 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
     content/
       site.ts  zones.ts  faq.ts  media.ts  company.ts
     lib/
-      jsonld.ts  prune.ts  analytics.ts  launch.ts  phone.ts  fonts.ts  motion.ts
+      jsonld.ts  prune.ts  llms.ts  analytics.ts  launch.ts  phone.ts  fonts.ts  motion.ts
     styles/
-      tokens.css  fonts.css  motion.css  hero.css  film.css  zones.css  buddy.css
+      tokens.css  fonts.css  motion.css  hero.css  film.css  zones.css  faq.css  buddy.css
 ```
 
 ### 디자인 토큰
@@ -947,11 +954,12 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
   :root { --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), calc((100vw - 2 * var(--gutter)) / 6.9), 20.6svh, calc(var(--container) / 6.1)); }
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
+html { scroll-padding-top: var(--header-h); }
+html.js { scroll-behavior: smooth; }
 body { background: var(--cream); color: var(--ink-900); word-break: keep-all; overflow-wrap: break-word; }
 /* 이동과 확대를 끈다. 반복 횟수를 1로 두어 무한 반복이 아주 짧은 주기로 깜빡이지 않게 한다 */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html.js { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;
   }
@@ -992,7 +1000,7 @@ export const SITE = {
   launchDate: '2026-12-25',                    // KST 정식 오픈일
   ctaOverride: '' as '' | 'waitlist' | 'live', // 수동 전환. 비어 있으면 launchDate로 판단
   sameAs: [] as string[],                      // SNS 주소가 정해지면 채운다
-  store: { ios: '', android: '' },             // 오픈 후 채운다
+  store: { ios: '', android: '' },             // 오픈에 맞춰 채운다
 };
 // 같은 파일의 COPY에 헤더·히어로·푸터 문구를 둔다(후킹 'Coming Soon', D-day 라벨 '오픈까지' 포함)
 ```
@@ -1016,11 +1024,13 @@ import { launchFull, type CtaMode } from '@/lib/launch';
 
 export type FaqItem = { id: string; q: string; a: string; when?: CtaMode; hidden?: boolean };
 
+const stores = [SITE.store.ios && '앱스토어', SITE.store.android && '구글 플레이'].filter(Boolean).join('와 ');   // 주소가 있는 곳만 말한다
+
 export const FAQ: FaqItem[] = [
   { id: 'what', q: '스딩은 무엇인가요?', a: SITE.definition },
   { id: 'when', q: '언제부터 쓸 수 있나요?', when: 'waitlist',
     a: `스딩은 ${launchFull()} 정식 오픈 예정이에요. 출시 알림을 신청하면 오픈하는 날 문자로 알려 드려요.` },
-  { id: 'where', q: '어디서 쓸 수 있나요?', when: 'live', a: '스딩은 앱스토어와 구글 플레이에서 받을 수 있어요.' },
+  { id: 'where', q: '어디서 쓸 수 있나요?', when: 'live', a: `스딩은 ${stores}에서 받을 수 있어요.` },
   { id: 'fee', q: '이용 요금은 얼마인가요?', hidden: true, a: '' },   // 요금 정책이 정해지면 답을 채우고 hidden을 지운다
   // 나머지는 섹션별 상세 기획의 FAQ 표를 따른다. when이 있는 항목은 해당 CTA 상태에서만 보인다.
 ];
@@ -1244,7 +1254,7 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 | LCP | 2.5초 이하 | 포스터 이미지가 오기 전에는 첫 화면에서 가장 큰 글자인 후킹('Coming Soon')이 LCP 후보이고, 낮은 화면에서는 히어로 H1도 후보가 된다. 둘 다 등장은 투명도 0에서 시작하지 않고(이동만), 웹폰트 대기는 HTML 안의 스크립트가 최대 700ms로 맡는다. 후킹 글자가 든 글꼴 묶음(91번, 'Coming Soon'일 때 74번)은 preload한다. 포스터가 오면 첫 화면에 보이는 윗부분도 LCP 후보가 되므로 `preload`와 `fetchpriority='high'`를 걸고, 영상 파일은 포스터가 그려진 뒤에 붙인다 |
 | INP | 200ms 이하 | 공개 후 PageSpeed Insights의 실사용 데이터 |
 | CLS | 0.1 이하 | 모든 영상·이미지에 `aspect-ratio`를 지정한다 |
-| Lighthouse 모바일 | 성능 90 이상, 접근성 95 이상, SEO 100 | 배포 미리보기마다 실행 |
+| Lighthouse 모바일 | 성능 90 이상, 접근성 95 이상, SEO 100 | 성능과 접근성은 배포 미리보기마다 실행한다. SEO는 첫 공개 당일 `sding.kr`에서 잰다. 미리보기는 `noindex`이고 canonical이 다른 도메인이라 `is-crawlable`과 `canonical`이 실패하므로, 미리보기에서는 이 두 항목을 빼고 본다 |
 | 자체 JS | 170KB 이하(gzip) | Next 16의 `next build`는 크기를 출력하지 않는다. 빌드 뒤 `.next/diagnostics/route-bundle-stats.json`에서 `/`의 `firstLoadChunkPaths` 파일을 gzip으로 합산하거나, Lighthouse·DevTools의 스크립트 전송 크기로 확인한다. GA4와 Turnstile은 늦게 불러오므로 제외한다 |
 | JS 없이 보기 | 모든 문구가 HTML에 있다 | 등장 효과의 숨김 상태는 JS가 켜진 뒤에만 건다 |
 
@@ -1263,7 +1273,7 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 
 ### 아이콘과 공유 이미지
 
-로고 원본이 도착하면 아래 파일을 만든다. 원본이 오기 전에는 `--brand` 바탕에 흰색 '스'(Pretendard 800)를 임시 아이콘으로 쓰고 `TODO(logo)` 주석을 남긴다.
+로고 원본이 도착하면 아래 파일을 만든다. 원본이 오기 전에는 `--brand` 바탕에 흰색 '스'(Pretendard 800)를 임시 아이콘으로 쓰고 `TODO(logo)` 주석을 남긴다. 임시 아이콘은 `scripts/icons.mjs`가 한 윤곽에서 만든다.
 
 | 파일 | 크기 | 용도 | 원본 |
 | --- | --- | --- | --- |
@@ -1392,11 +1402,11 @@ const nextConfig: NextConfig = {
 
 - 10월 28일\~11월 4일, **결정과 골격**: 자료 표의 11월 4일 항목을 확정하고, Claude Code 1\~2단계(골격, 히어로와 영상 시스템)를 만든다.
 - 11월 5일\~12일, **콘텐츠·SEO·폼·법적 페이지**: 3\~6단계를 만들고 변호사 검토를 받는다. 검토가 끝나야 첫 공개를 할 수 있다.
-- 11월 13일, **첫 공개(D-42)**: 포스터 이미지 상태로 공개한다. Google Search Console, 네이버 서치어드바이저, Bing에 등록하고 사이트맵을 제출한다.
+- 11월 13일, **첫 공개(D-42)**: 포스터 이미지 상태로 공개한다. Google Search Console, 네이버 서치어드바이저, Bing에 등록하고 사이트맵을 제출한다. IndexNow로 세 주소를 알린다.
 - 12월 4일, **영상 납품(D-21)**: 늦어도 이 날까지 영상을 받아 `public/media/`에 넣고 `media.ts`의 주소를 바꾼다. 영상이 있어야 사전 신청 홍보에 쓸 수 있다.
 - 12월 11일, **사전 신청 홍보(D-14)**: 사전 신청 모집을 본격적으로 알린다. 채널은 아직 정해지지 않았다 \[확인 필요\].
 - 12월 18일, **최종 점검(D-7)**: 성능·접근성 기준 표와 테스트 매트릭스를 다시 통과시키고, 오픈 안내 문자의 문구와 발송 대행사를 확인한다.
-- 12월 25일, **정식 오픈(D-0)**: CTA를 오픈 상태로 바꾸고 스토어 주소를 넣는다. JSON-LD에 앱 노드를 더하고, 오픈 안내 문자를 보내고, 보도자료를 낸다.
+- 12월 25일, **정식 오픈(D-0)**: CTA를 오픈 상태로 바꾸고 스토어 주소를 넣는다. JSON-LD에 앱 노드를 더하고, IndexNow로 홈 주소를 다시 알리고, 공유 이미지가 바뀐 것을 확인한 뒤 카카오 공유 캐시를 지우고, 오픈 안내 문자를 보내고, 보도자료를 낸다.
 
 ## Claude Code 핸드오프
 
@@ -1472,8 +1482,8 @@ docs/PLAN.md와 CLAUDE.md를 먼저 끝까지 읽어 줘.
 | 3. 소개와 존 4개 | `Intro`, `Zone` 4개, `ProgressDots`, 앵커 | 앵커로 이동하고, 존이 보일 때만 영상이 재생되며, 합성·시뮬레이션 존에 `badge`와 `notice`가 있다 |
 | 4. FAQ와 검색 대응 | `Faq`, 메타 태그와 소유확인 메타, JSON-LD, `robots.ts`, `sitemap.ts`, `llms.txt`, `manifest.ts`, `opengraph-image.tsx`, IndexNow 키 파일, 임시 아이콘 | 페이지 소스에 `h1` 하나와 JSON-LD(Organization, WebSite, WebPage, FAQPage, DefinedTermSet, 영상이 오면 VideoObject)가 보이고, JSON으로 파싱된다 |
 | 5. 사전 신청 | `CtaButton`(`ctaMode()` 연결), `WaitlistDialog`, `WaitlistForm`, `CtaSection`, `/api/waitlist` | Supabase에 저장되고, 중복 번호도 같은 성공 화면이 뜨며, 잘못된 번호는 오류 문구가 뜬다. JS를 끄면 마지막 섹션으로 이동한다 |
-| 6. 법적 페이지 | `/privacy`, `/terms` 초안 | 푸터에서 연결되고, 변호사 검토 전 초안이라는 점이 `docs/OPEN_ITEMS.md`에 적혀 있다 |
-| 7. 분석과 점검 | `analytics.ts`의 이벤트 8개, Lighthouse, 접근성, 테스트 매트릭스 | 성능과 접근성 기준 표를 통과한다 |
+| 6. 법적 페이지 | `/privacy`, `/terms` 초안, `not-found.tsx` | 푸터에서 연결되고, 변호사 검토 전 초안이라는 점이 `docs/OPEN_ITEMS.md`에 적혀 있다. 없는 주소는 한국어 안내와 홈 링크를 보인다 |
+| 7. 분석과 점검 | `analytics.ts`의 이벤트 8개, Lighthouse, 접근성, 테스트 매트릭스 | 성능과 접근성 기준 표를 통과한다(SEO는 첫 공개 당일 `sding.kr`에서 잰다) |
 | 8. 자료 반영 | 로고 SVG, 연락처, 영상, SNS 주소, 스토어 주소 | 운영 빌드에서 `assertCompany()`가 통과하고, `docs/OPEN_ITEMS.md`에는 의도한 항목만 남는다 |
 
 ### 완료 기준

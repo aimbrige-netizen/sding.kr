@@ -10,6 +10,7 @@ export function Zone({ zone, flip }: { zone: ZoneData; flip: boolean }) {
   const kind = spec.kind === 'phone' || spec.kind === 'compare' ? spec.kind : 'wide';
   // 모바일 4:5 컷이 있을 때만 모바일 프레임을 4:5로 바꾼다. 없으면 16:9를 폭 가득 보인다
   const cut = spec.kind === 'video' && Boolean(spec.src && spec.srcMobile);
+  // TODO(poster-ai-label): 파일이 오기 전에는 AI가 만들지 않은 포스터 위에 라벨이 붙는다. 변호사 검토에서 함께 본다
   const badge = zone.badge
     ? <span className="ai-badge" data-strong={kind === 'compare' || undefined}>{zone.badge}</span>
     : null;

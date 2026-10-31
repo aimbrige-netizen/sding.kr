@@ -45,3 +45,6 @@ next-env.d.ts
 
 # local preview config
 .claude/launch.json
+
+# generated before each build
+/public/llms.txt

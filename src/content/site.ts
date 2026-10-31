@@ -9,7 +9,7 @@ export const SITE = {
   launchDate: '2026-12-25',                    // KST 정식 오픈일
   ctaOverride: '' as '' | 'waitlist' | 'live', // 수동 전환. 비어 있으면 launchDate로 판단
   sameAs: [] as string[],                      // TODO(sns): SNS 주소가 정해지면 채운다
-  store: { ios: '', android: '' },             // TODO(store): 오픈 후 채운다
+  store: { ios: '', android: '' },             // TODO(store): 오픈에 맞춰 채운다
 };
 
 // 화면 문구. 날짜가 들어가는 부분은 lib/launch.ts의 도우미로 만들어 붙인다.
@@ -40,6 +40,9 @@ export const COPY = {
   },
   zones: { nav: '존 바로가기' },
   compare: { label: '원본과 AI 합성 비교', before: '원본', after: 'AI 합성' },
+  faq: { title: '자주 묻는 질문' },
+  terms: '스딩 기능 용어',   // 구조화 데이터의 DefinedTermSet 이름
+  llms: { launch: '정식 오픈일', features: '기능', company: '회사 정보', legalName: '법인명', address: '주소', links: '링크', home: '홈' },
   sound: {
     label: '영상 소리',
     turnOn: '소리 켜기',
