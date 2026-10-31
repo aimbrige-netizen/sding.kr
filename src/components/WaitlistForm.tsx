@@ -231,7 +231,8 @@ export function WaitlistForm() {
             />
           </div>
 
-          <button type="submit" disabled={!hydrated} aria-disabled={pending ? true : undefined} className="btn-primary wl-submit">
+          {/* Firefox는 새로 고침 때 풀린 disabled까지 되살려 하이드레이션 전에도 눌린다. autocomplete가 그 복원을 끈다. React 타입에 없어 펼쳐서 넘긴다 */}
+          <button type="submit" {...{ autoComplete: 'off' }} disabled={!hydrated} aria-disabled={pending ? true : undefined} className="btn-primary wl-submit">
             <span>{pending ? copy.sending : COPY.cta.waitlist}</span>
             <span className="btn-orb" aria-hidden="true">
               <Sparkle />

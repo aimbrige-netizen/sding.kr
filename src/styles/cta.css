@@ -262,7 +262,7 @@
      배경이 없어 키보드가 뜬 뒤 라벨이 올라와도 입력칸 모서리를 가리지 않는다. 포커스 링은 잘리지 않게 안쪽에 그린다(.faq-q와 같다) */
   .wl-close {
     position: sticky;
-    top: 0;
+    top: calc(var(--wl-pad) * -1);   /* sticky는 패딩 안쪽 기준이다. 이 값이어야 멈춰 있을 때 margin대로 제목 줄에 놓이고, 스크롤되면 카드 위 끝에 붙는다 */
     z-index: 1;
     display: grid;
     place-items: center;

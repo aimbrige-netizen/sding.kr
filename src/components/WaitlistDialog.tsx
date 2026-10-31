@@ -12,7 +12,7 @@ let open: ((from: HTMLElement | null) => boolean) | null = null;
 export const openWaitlist = (from: HTMLElement | null) => open?.(from) ?? false;
 
 // 키보드가 올라오면 고정 요소는 그 뒤에 가려진다. 지원 하한에서 키보드를 알 수 있는 값은 visualViewport뿐이다.
-// 이 값은 창의 여백과 바깥을 눌렀을 때의 판단에만 쓰므로, 값이 틀려도 공간이 남거나 창이 닫힐 뿐 폼을 가리지 않는다
+// 이 값은 창의 여백으로만 쓰므로, 값이 틀려도 공간이 남을 뿐 폼을 가리지 않는다
 function trackViewport(dialog: HTMLDialogElement) {
   const viewport = window.visualViewport;
   if (!viewport) return () => {};
@@ -55,6 +55,7 @@ export function WaitlistDialog({ title, description, children }: { title: string
   const pressedOutside = useRef(false);
   const typing = useRef(false);
   const openedAt = useRef(0);
+  const pressedAt = useRef(0);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -93,17 +94,23 @@ export function WaitlistDialog({ title, description, children }: { title: string
       aria-labelledby="wl-title"
       aria-describedby="wl-desc"
       className="wl-dialog"
+      onMouseDownCapture={(event) => {
+        // 두 번 누른 CTA의 두 번째 누름은 버린다. 포커스가 입력칸을 떠나거나, 창이 바로 닫히거나, 읽지 않은 동의가 체크되지 않게 한다
+        if (event.timeStamp - openedAt.current < DOUBLE_PRESS) event.preventDefault();
+      }}
       onClickCapture={(event) => {
-        // 두 번 누른 CTA의 두 번째 누름은 버린다. 창이 바로 닫히거나 읽지 않은 동의가 체크되지 않게 한다
-        if (event.timeStamp - openedAt.current >= DOUBLE_PRESS) return;
+        // click은 손을 뗄 때 오므로 누른 시각으로 잰다. 키보드로 낸 click에는 누름이 없다
+        if ((event.detail ? pressedAt.current : event.timeStamp) - openedAt.current >= DOUBLE_PRESS) return;
         event.preventDefault();
         event.stopPropagation();
       }}
       onPointerDown={(event) => {
+        pressedAt.current = event.timeStamp;
         pressedOutside.current = !(event.target as Element).closest('.wl-card');
-        // 누르는 순간에 본다. click 때는 브라우저가 이미 포커스를 풀었다. 키보드를 내려도 포커스는 남으므로 높이도 본다
+        // 누르는 순간에 본다. click 때는 브라우저가 이미 포커스를 풀었다.
+        // 키보드를 재지 않는다. WebView는 화면째 줄어 높이로 알 수 없고, 잘못 닫는 것보다 한 번 더 누르는 편이 낫다
         const field = document.activeElement;
-        typing.current = field instanceof HTMLInputElement && field.type === 'tel' && parseInt(event.currentTarget.style.getPropertyValue('--kb')) > 0;
+        typing.current = coarse() && field instanceof HTMLInputElement && field.type === 'tel';
       }}
       onClick={(event) => {
         // 카드를 걸친 드래그로는 닫지 않는다. click의 좌표가 손을 뗀 자리다. 키보드로 낸 click은 좌표가 0이라 대상도 본다
