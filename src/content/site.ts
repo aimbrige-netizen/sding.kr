@@ -33,6 +33,13 @@ export const COPY = {
     transcript: '영상 내용 글로 보기',
     captions: '한국어',
   },
+  intro: {
+    kicker: '스딩이란',
+    keep: ['정찰제로 투명하게', '플래닝·드레스·웨딩홀을', '미리 경험하게 하는', '웨딩 플랫폼이에요.'],   // SITE.definition에서 줄바꿈으로 가르지 않는 구절
+    hl: ['정찰제로 투명하게', '미리 경험하게'],   // keep 구절 안에서 형광펜을 칠하는 부분
+  },
+  zones: { nav: '존 바로가기' },
+  compare: { label: '원본과 AI 합성 비교', before: '원본', after: 'AI 합성' },
   sound: {
     label: '영상 소리',
     turnOn: '소리 켜기',

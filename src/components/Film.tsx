@@ -11,8 +11,8 @@ export function Film() {
   return (
     <section id="film" aria-labelledby="film-title" className="px-(--gutter) pb-(--section-y)">
       <h2 id="film-title" tabIndex={-1} className="sr-only">{COPY.film.title}</h2>
-      <div className="film-shell">
-        <div className="film-core">
+      <div className="frame film-shell">
+        <div className="frame-core film-core">
           <MediaSlot id="hero" />
         </div>
       </div>

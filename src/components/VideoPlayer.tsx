@@ -67,7 +67,8 @@ export function VideoPlayer({
     // 포스터를 기다리는 동안 눌린 사운드 버디의 허락도 받도록 소리 영상을 미리 알린다
     const unannounce = hasAudio ? players.announce(video) : null;
 
-    // 포스터를 먼저 받고, 영상 주소는 포스터가 그려진 뒤에 붙인다(PLAN '소개 영상 로딩')
+    // 포스터를 먼저 받고, 영상 주소는 포스터가 그려진 뒤에 붙인다(PLAN '소개 영상 로딩').
+    // 존 포스터는 지연 로드라 화면에 가까워지면 받고, 그때 영상을 붙인다
     const img = posterRef.current;
     if (img && !img.complete) {
       img.addEventListener('load', attach, { once: true });
@@ -122,6 +123,7 @@ export function VideoPlayer({
         preload={preload}
         aria-label={alt}
         aria-hidden={!started || undefined}
+        tabIndex={-1}   // Firefox는 video도 Tab으로 들른다. 키보드는 작은 재생 버튼을 쓴다
       >
         {captions ? <track kind="captions" src={captions} srcLang="ko" label={captionsLabel} /> : null}
       </video>
@@ -135,6 +137,7 @@ export function VideoPlayer({
           alt={alt}
           aria-hidden={started || undefined}
           data-hide={started || undefined}
+          loading={priority ? undefined : 'lazy'}
           decoding="async"
           fetchPriority={priority ? 'high' : undefined}
         />

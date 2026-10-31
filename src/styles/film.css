@@ -1,34 +1,39 @@
 /* 영상 섹션, 미디어 슬롯, 브랜드 포스터 카드(시안 B)와 라이드(시안 A) */
 @layer components {
-  /* 프레임: 데스크톱 16:9, 모바일 4:5. 폭은 --film-w(낮은 화면에서 줄어 첫 화면 노출 36%를 지킨다) */
-  .film-shell {
+  /* 영상 프레임: 흰 매트 안의 파크 지도 바탕. 소개 영상과 존 03·04가 같이 쓴다. --frame-inset은 프레임 안 조작과 라벨의 여백이다 */
+  .frame {
     position: relative;
-    width: min(100%, calc(var(--film-w) + var(--sp-4) + 2px));
-    margin-inline: auto;
     padding: var(--sp-2);
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
     background: color-mix(in srgb, var(--white) 72%, transparent);
     box-shadow: var(--shadow-lift);
   }
-  .js .film-shell { animation: frame-in 700ms var(--ease) 560ms both; }
-  .film-core {
+  .frame-core {
+    --frame-inset: var(--sp-4);
     position: relative;
     overflow: hidden;
     container-type: inline-size;
-    aspect-ratio: 4 / 5;
     border-radius: var(--r-md);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--white) 70%, transparent);
+  }
+  @media (min-width: 768px) { .frame-core { --frame-inset: var(--sp-6); } }
+  .frame-core, .stage {
     background:
       radial-gradient(56% 62% at 50% 50%, color-mix(in srgb, var(--white) 88%, transparent), transparent 72%),
       radial-gradient(48% 34% at 50% 104%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 100%),
       radial-gradient(circle at 1px 1px, var(--line) 1.3px, transparent 1.8px) 0 0 / 22px 22px,
       var(--peach);
-    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--white) 70%, transparent);
   }
+
+  /* 소개 영상: 데스크톱 16:9, 모바일 4:5. 폭은 --film-w(낮은 화면에서 줄어 첫 화면 노출 36%를 지킨다) */
+  .film-shell { width: min(100%, calc(var(--film-w) + var(--sp-4) + 2px)); margin-inline: auto; }
+  .js .film-shell { animation: frame-in 700ms var(--ease) 560ms both; }
+  .film-core { aspect-ratio: 4 / 5; }
   @media (min-width: 768px) { .film-core { aspect-ratio: 16 / 9; } }
 
   /* 미디어 슬롯은 부모를 가득 채운다 */
-  .player, .ride, .park, .zone-poster, .media-fill, .phone { position: absolute; inset: 0; }
+  .player, .ride, .park, .zone-poster, .media-fill { position: absolute; inset: 0; }
   .media-fill, .player-video, .player-cover { width: 100%; height: 100%; object-fit: cover; }
   .player-video, .player-cover { position: absolute; inset: 0; }
   .player-cover { transition: opacity 400ms var(--ease), visibility 0s; }
@@ -144,8 +149,8 @@
   /* 늘 보이는 재생·정지. 프레임 위쪽 모서리라 첫 화면 노출분 안에 보이고 사운드 버디와 겹치지 않는다 */
   .play-ctrl {
     position: absolute;
-    left: var(--sp-4);
-    top: var(--sp-4);
+    left: var(--frame-inset);
+    top: var(--frame-inset);
     z-index: 3;
     width: var(--ctrl);
     height: var(--ctrl);
@@ -163,7 +168,7 @@
   .play-ctrl svg { width: 40%; height: 40%; }
   @media (hover: hover) { .play-ctrl:hover { scale: 1.03; } }
   .play-ctrl:active { scale: .98; transition-duration: 100ms; }
-  @media (min-width: 768px) { .play-ctrl { left: var(--sp-6); top: var(--sp-6); } }
+  html:not(.js) .play-big, html:not(.js) .play-ctrl { display: none; }   /* JS가 없으면 재생할 수 없다 */
 
   /* 대본: '영상 내용 글로 보기' */
   .transcript { max-width: calc(var(--film-max) + var(--sp-4)); margin: var(--sp-6) auto 0; text-align: center; }
@@ -200,13 +205,6 @@
   }
   .transcript-body ol { display: grid; gap: var(--sp-2); padding-left: 1.4em; list-style: decimal; }
   .transcript-body b { margin-right: var(--sp-2); color: var(--ink-900); font-weight: 700; }
-
-  /* 존 포스터 카드와 폰 프레임(3단계 Zone에서 다듬는다) */
-  .zone-poster { display: grid; place-content: center; justify-items: center; background: var(--peach); }
-  .phone { padding: var(--sp-2); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--white); box-shadow: var(--shadow-lift); }
-  .phone-screen { position: relative; height: 100%; overflow: hidden; border-radius: var(--r-md); background: var(--peach); }
-  .compare { display: grid; grid-template-columns: 1fr 1fr; }
-  .compare img { width: 100%; height: 100%; object-fit: cover; }
 
   @media (prefers-reduced-motion: reduce) {
     .js .film-shell { animation: none; }   /* 지연 뒤 96%→100%로 튀지 않게 확대를 끈다 */
