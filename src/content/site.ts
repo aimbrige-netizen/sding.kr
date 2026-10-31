@@ -21,8 +21,25 @@ export const COPY = {
     kicker: '정식 오픈',                                 // 앞에 launchDotted()
     hook: { waitlist: 'Coming Soon', live: 'Now Open' }, // TODO(live-hook): 'Now Open'은 승인 전 제안값
     ddayLabel: '오픈까지',
-    h1: '웨딩 준비, 스딩에서 놀듯이',
-    sub: '가격은 한눈에, 드레스는 미리, 웨딩홀은 걸어본 듯이.',
+    ddayPrefix: 'D-',                                  // 실링의 'D-58'. 숫자는 daysToLaunch()
+    ddaySr: ['오픈까지 ', '일'],                         // 스크린리더용 '오픈까지 58일'. 숫자 앞뒤 문구
+    h1: '웨딩 준비, 스딩에서 놀듯이',                     // 모바일은 쉼표 뒤에서 두 줄로 나눈다
+    sub: '가격은 한눈에, 드레스는 미리, 웨딩홀은 걸어본 듯이.',   // 쉼표로 나눈 구절은 줄바꿈으로 가르지 않는다
+  },
+  film: {
+    title: '스딩 소개 영상',
+    play: '영상 재생',
+    pause: '영상 일시정지',
+    transcript: '영상 내용 글로 보기',
+    captions: '한국어',
+  },
+  sound: {
+    label: '영상 소리',
+    turnOn: '소리 켜기',
+    turnOff: '소리 끄기',
+    waiting: '영상이 보이면 소리가 나요',
+    stopped: '영상을 재생하면 소리가 나요',   // 켜짐·대기 중 소리 영상이 화면에 있지만 멈춰 있을 때
+    bubble: '소리 켜 볼까요?',
   },
   footer: {
     labels: {

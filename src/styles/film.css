@@ -1,0 +1,231 @@
+/* 영상 섹션, 미디어 슬롯, 브랜드 포스터 카드(시안 B)와 라이드(시안 A) */
+@layer components {
+  /* 프레임: 데스크톱 16:9, 모바일 4:5. 폭은 --film-w(낮은 화면에서 줄어 첫 화면 노출 36%를 지킨다) */
+  .film-shell {
+    position: relative;
+    width: min(100%, calc(var(--film-w) + var(--sp-4) + 2px));
+    margin-inline: auto;
+    padding: var(--sp-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: color-mix(in srgb, var(--white) 72%, transparent);
+    box-shadow: var(--shadow-lift);
+  }
+  .js .film-shell { animation: frame-in 700ms var(--ease) 560ms both; }
+  .film-core {
+    position: relative;
+    overflow: hidden;
+    container-type: inline-size;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--r-md);
+    background:
+      radial-gradient(56% 62% at 50% 50%, color-mix(in srgb, var(--white) 88%, transparent), transparent 72%),
+      radial-gradient(48% 34% at 50% 104%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 100%),
+      radial-gradient(circle at 1px 1px, var(--line) 1.3px, transparent 1.8px) 0 0 / 22px 22px,
+      var(--peach);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--white) 70%, transparent);
+  }
+  @media (min-width: 768px) { .film-core { aspect-ratio: 16 / 9; } }
+
+  /* 미디어 슬롯은 부모를 가득 채운다 */
+  .player, .ride, .park, .zone-poster, .media-fill, .phone { position: absolute; inset: 0; }
+  .media-fill, .player-video, .player-cover { width: 100%; height: 100%; object-fit: cover; }
+  .player-video, .player-cover { position: absolute; inset: 0; }
+  .player-cover { transition: opacity 400ms var(--ease), visibility 0s; }
+  .player-cover[data-hide] { opacity: 0; visibility: hidden; transition: opacity 400ms var(--ease), visibility 0s 400ms; }
+
+  /* 브랜드 포스터 카드: 파크 지도 위의 길과 존 4개 */
+  .park { --ring: clamp(50px, 16.4cqw, 64px); }
+  @media (min-width: 768px) { .park { --ring: clamp(52px, 7.6cqw, 84px); } }
+  .road { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .road-edge { stroke: var(--line); }
+  .road-lane { stroke: var(--white); }
+  .road-dots { stroke: color-mix(in srgb, var(--brand) 50%, transparent); }
+  .road-edge, .road-lane, .road-dots { vector-effect: non-scaling-stroke; }
+  .road-wide { display: none; }
+  .road-tall .road-edge { stroke-width: 24px; }
+  .road-tall .road-lane { stroke-width: 17px; }
+  .road-tall .road-dots { stroke-width: 3.5px; stroke-dasharray: 0 11; }
+  .road-wide .road-edge { stroke-width: 34px; }
+  .road-wide .road-lane { stroke-width: 25px; }
+  .road-wide .road-dots { stroke-width: 4.5px; stroke-dasharray: 0 15; }
+  @media (min-width: 768px) {
+    .road-wide { display: block; }
+    .road-tall { display: none; }
+  }
+
+  .st {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    translate: -50% calc(var(--ring) / -2);
+  }
+  @media (min-width: 768px) { .st { left: var(--dx); top: var(--dy); } }
+  .st-ring {
+    display: grid;
+    place-items: center;
+    width: var(--ring, 64px);
+    height: var(--ring, 64px);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--brand);
+    box-shadow: var(--shadow-soft);
+  }
+  .st-ring svg { width: 46%; height: 46%; }
+  .st-name {
+    margin-top: var(--sp-2);
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--r-pill);
+    background: var(--white);
+    color: var(--ink-900);
+    font-size: var(--fs-cap);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+    box-shadow: var(--shadow-soft);
+  }
+  .park-spark { position: absolute; color: var(--brand-deep); }
+  .park-spark-1 { left: 84%; top: 8%; width: 18px; height: 18px; }
+  .park-spark-2 { left: 11%; top: 46%; width: 13px; height: 13px; }
+  .park-spark-3 { display: none; }
+  @media (min-width: 768px) {
+    .park-spark-1 { left: 8%; top: 13%; width: 26px; height: 26px; }
+    .park-spark-2 { left: 56.5%; top: 14%; width: 16px; height: 16px; }
+    .park-spark-3 { display: block; left: 91%; top: 60%; width: 20px; height: 20px; }
+  }
+
+  /* 라이드: 재생을 누르면 길이 존 순서대로 그려지고, 존에 닿을 때 존이 튀어 오른다 */
+  .leg {
+    fill: none;
+    stroke: var(--brand-deep);
+    stroke-linecap: round;
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  .road-tall .leg { stroke-width: 14px; }
+  .road-wide .leg { stroke-width: 12px; }
+  .ride[data-ride] .leg { opacity: 1; animation: draw var(--dur, 1s) linear var(--delay, 0s) both; }
+  .ride[data-ride] .st { animation: station-pop 640ms var(--ease) var(--at, 0s) both; }
+  .ride[data-ride="paused"] .leg,
+  .ride[data-ride="paused"] .st { animation-play-state: paused; }
+
+  /* 재생 버튼 */
+  .play-big {
+    position: absolute;
+    left: 50%;
+    top: 51%;
+    z-index: 2;
+    width: clamp(76px, 22cqw, 92px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--brand);
+    color: var(--white);
+    box-shadow: var(--shadow-lift), 0 0 0 10px color-mix(in srgb, var(--white) 70%, transparent);
+    cursor: pointer;
+    translate: -50% -50%;
+    transition: scale 200ms var(--ease), opacity 300ms var(--ease), visibility 0s;
+  }
+  .play-big svg { width: 34%; height: 34%; margin-left: 7%; }
+  @media (hover: hover) { .play-big:hover { scale: 1.03; } }
+  .play-big:active { scale: .98; transition-duration: 100ms; }
+  .play-big[data-off] { opacity: 0; visibility: hidden; transition: opacity 300ms var(--ease), visibility 0s 300ms; }
+  @media (min-width: 768px) { .play-big { top: 50%; width: clamp(80px, 9.6cqw, 104px); } }
+
+  /* 늘 보이는 재생·정지. 프레임 위쪽 모서리라 첫 화면 노출분 안에 보이고 사운드 버디와 겹치지 않는다 */
+  .play-ctrl {
+    position: absolute;
+    left: var(--sp-4);
+    top: var(--sp-4);
+    z-index: 3;
+    width: var(--ctrl);
+    height: var(--ctrl);
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--ink-900);
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
+    transition: scale 200ms var(--ease);
+  }
+  .play-ctrl svg { width: 40%; height: 40%; }
+  @media (hover: hover) { .play-ctrl:hover { scale: 1.03; } }
+  .play-ctrl:active { scale: .98; transition-duration: 100ms; }
+  @media (min-width: 768px) { .play-ctrl { left: var(--sp-6); top: var(--sp-6); } }
+
+  /* 대본: '영상 내용 글로 보기' */
+  .transcript { max-width: calc(var(--film-max) + var(--sp-4)); margin: var(--sp-6) auto 0; text-align: center; }
+  .transcript summary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: var(--tap);
+    padding: var(--sp-2) var(--sp-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    background: var(--white);
+    color: var(--ink-900);
+    font-size: var(--fs-body);
+    font-weight: 600;
+    line-height: 1.4;
+    list-style: none;
+    cursor: pointer;
+    transition: box-shadow 200ms var(--ease);
+  }
+  .transcript summary::-webkit-details-marker { display: none; }
+  @media (hover: hover) { .transcript summary:hover { box-shadow: var(--shadow-soft); } }
+  .transcript summary svg { width: 16px; height: 16px; color: var(--brand); transition: rotate 400ms var(--ease); }
+  .transcript[open] summary svg { rotate: 45deg; }
+  .transcript-body {
+    max-width: 36em;
+    margin: var(--sp-3) auto 0;
+    padding: var(--sp-4) var(--sp-6);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--white);
+    color: var(--ink-600);
+    text-align: left;
+  }
+  .transcript-body ol { display: grid; gap: var(--sp-2); padding-left: 1.4em; list-style: decimal; }
+  .transcript-body b { margin-right: var(--sp-2); color: var(--ink-900); font-weight: 700; }
+
+  /* 존 포스터 카드와 폰 프레임(3단계 Zone에서 다듬는다) */
+  .zone-poster { display: grid; place-content: center; justify-items: center; background: var(--peach); }
+  .phone { padding: var(--sp-2); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--white); box-shadow: var(--shadow-lift); }
+  .phone-screen { position: relative; height: 100%; overflow: hidden; border-radius: var(--r-md); background: var(--peach); }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; }
+  .compare img { width: 100%; height: 100%; object-fit: cover; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js .film-shell { animation: none; }   /* 지연 뒤 96%→100%로 튀지 않게 확대를 끈다 */
+    .ride[data-ride] .leg { animation: none; stroke-dashoffset: 0; }
+    .ride[data-ride] .st { animation: none; }
+    .play-big:hover, .play-big:active, .play-ctrl:hover, .play-ctrl:active { scale: none; }
+  }
+}
+
+@keyframes frame-in {
+  from { transform: scale(.96); }
+  to { transform: none; }
+}
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes station-pop {
+  0% { transform: none; }
+  35% { transform: scale(1.16) rotate(-4deg); }
+  70% { transform: scale(.97); }
+  100% { transform: none; }
+}

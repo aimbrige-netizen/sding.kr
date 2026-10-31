@@ -10,15 +10,21 @@
   --r-sm: 12px;  --r-md: 24px;  --r-lg: 32px;  --r-pill: 999px;
   --shadow-soft: 0 12px 32px -12px rgb(255 84 22 / .28);
   --shadow-lift: 0 24px 60px -20px rgb(255 84 22 / .38);
+  --shadow-seal: 14px 4px 16px -12px rgb(255 84 22 / .32);    /* D-day 실링. 오른쪽으로만 져 'Soon'의 'n' 옆 크림을 물들이지 않는다 */
   --glow-hero: radial-gradient(60% 50% at 50% 0%, #FFE2D0, rgb(255 250 246 / 0));
 
-  --fs-display: clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem);   /* 'Coming Soon' 후킹 전용. 390px 96px, 1440px 184px */
+  /* 'Coming Soon' 후킹 전용. 390px 96px, 1440px 184px.
+     낮은 화면에서는 높이에 맞춰 줄여 영상 노출을 지킨다(844px 높이 96px, 667px 높이 66px). 가로로 눕힌 폰은 56px에서 멈춘다 */
+  --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), max(3.5rem, 16.95svh - 47px));
   --fs-h1: clamp(2.5rem, 1.796rem + 3.005vw, 4.5rem);
   --fs-h2: clamp(1.875rem, 1.479rem + 1.690vw, 3rem);
   --fs-h3: clamp(1.375rem, 1.243rem + 0.563vw, 1.75rem);
   --fs-lead: clamp(1.125rem, 1.037rem + 0.376vw, 1.375rem);
   --fs-body: clamp(1rem, 0.956rem + 0.188vw, 1.125rem);
   --fs-cap: clamp(0.8125rem, 0.790rem + 0.094vw, 0.875rem);
+  --fs-seal-label: max(12px, 9.6cqw);   /* D-day 실링 안 글자. cqw는 실링 폭 기준이다 */
+  --fs-seal-num: 26cqw;
+  --seal-min: 68px;   /* D-day 실링 최소 폭. 낮은 화면에서도 12px 라벨이 점선 고리 안에 든다 */
 
   /* 간격 단계: --sp-N = N x 4px = Tailwind 간격 N */
   --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;  --sp-6: 24px;
@@ -30,6 +36,11 @@
   --header-h: 60px;
   --header-blur: 12px;
   --peek: clamp(170px, 25vh, 250px);   /* 첫 화면 아래에 보이는 영상 프레임 높이 */
+  --hero-gap: clamp(8px, 5.6svh - 24px, 24px);   /* 히어로의 세로 간격. 900px 높이 24px, 667px 높이 13px */
+  --glow-h: clamp(220px, 30svh, 300px);   /* --glow-hero를 그리는 높이. 'Soon' 위에서 끝나 대비 3:1을 지킨다 */
+  --film-max: 1080px;                     /* 소개 영상 최대 폭 */
+  /* 소개 영상 폭. 첫 화면 노출(--peek)만으로 영상이 36% 넘게 보이도록 낮은 화면에서는 폭을 줄인다. 모바일은 4:5 */
+  --film-w: min(var(--film-max), calc((var(--peek) - var(--sp-3)) / .45));
   --tap: 44px;                         /* 최소 터치 영역 */
   --btn-h: 60px;                       /* 주 버튼 높이 */
   --btn-fs: 1.25rem;                   /* 주 버튼 글자 20px. 오렌지 위 흰 글자 기준 */
@@ -38,11 +49,24 @@
   --ease: cubic-bezier(.22, 1, .36, 1);
 }
 @supports (height: 100svh) { :root { --peek: clamp(170px, 25svh, 250px); } }
-@media (min-width: 768px) { :root { --header-h: 72px; --btn-h: 64px; --buddy: 64px; --ctrl: 48px; } }
+@media (min-width: 768px) {
+  :root {
+    --header-h: 72px; --btn-h: 64px; --buddy: 64px; --ctrl: 48px;
+    --film-w: min(var(--film-max), calc((var(--peek) - var(--sp-3)) / .36 * 16 / 9));   /* 16:9 */
+  }
+}
+/* 1024px부터 후킹은 한 줄이다. 실링까지 여백 안에 들어오도록 폭으로도 줄인다.
+   마지막 값은 브라우저 글자 크기를 키워도 한 줄이 --container 안에 들게 한다(기본 글자 크기에서는 쓰이지 않는다) */
+@media (min-width: 1024px) {
+  :root { --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), calc((100vw - 2 * var(--gutter)) / 6.9), 20.6svh, calc(var(--container) / 6.1)); }
+}
 
 html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
 body { background: var(--cream); color: var(--ink-900); word-break: keep-all; overflow-wrap: break-word; }
+/* 이동과 확대를 끈다. 반복 횟수를 1로 두어 무한 반복이 아주 짧은 주기로 깜빡이지 않게 한다 */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;
+  }
 }

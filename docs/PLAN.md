@@ -1,8 +1,10 @@
-# 스딩 랜딩페이지 기획서 v1.1
+# 스딩 랜딩페이지 기획서 v1.2
 
 Oct 28, 2026 · @tae hyeung kwon
 
 **v1.1 변경(2026-10-28)**: 첫 화면을 'Coming Soon' 후킹(B안, 청첩장 느낌)으로 열고 영상은 바로 아래 섹션으로 옮겼다. 새 토큰, SEO 추가 항목 5개(소유확인 메타, IndexNow, 코드로 만드는 공유 이미지, DefinedTermSet, 오픈일 표기 통일), Next.js 16 기준 개발 사양을 반영했다. 시안은 `docs/design/`에 있다.
+
+**v1.2 변경(2026-10-29)**: 지원 하한을 iOS·Safari 16.4로 올리고, 폰트를 저자가 배포한 다이내믹 서브셋으로 바꿨다. 2단계(히어로와 영상 시스템)를 만들며 낮은 화면의 후킹·영상 크기, 동작 줄이기 규칙, 영상의 `autoplay` 속성을 정리했다. 교차 검토 뒤 D-day 실링의 최소 폭과 그림자(`--seal-min`, `--shadow-seal`), 기획서에 없던 영상·버디 경우(밖에서 멈춘 영상, 화면 폭이 바뀔 때의 컷, 소리 파일이 없을 때와 멈춘 소리 영상의 버디)를 더했다. 브라우저 글자 크기를 키워도 후킹이 한 줄이도록 `--fs-display`에 상한을 더했다.
 
 ## 요약
 
@@ -164,6 +166,7 @@ Oct 28, 2026 · @tae hyeung kwon
 | 역할 | 데스크톱 | 모바일 | 굵기 | 행간 | 자간 |
 | --- | --- | --- | --- | --- | --- |
 | 후킹 (Coming Soon) | 184px, 한 줄 | 96px, 두 줄 | 'Coming' 300, 'Soon' 900 | 0.9 | -0.035em |
+| D-day 실링 | 실링 폭의 26%(숫자), 9.6%(라벨, 최소 12px) | 같음 | 숫자 800, 라벨 700 | 1 | -0.03em, 0.02em |
 | 디스플레이 (H1) | 72px | 40px | 800 | 1.15 | -0.03em |
 | 제목 (H2) | 48px | 30px | 800 | 1.2 | -0.025em |
 | 소제목 (H3) | 28px | 22px | 700 | 1.3 | -0.02em |
@@ -171,7 +174,7 @@ Oct 28, 2026 · @tae hyeung kwon
 | 본문 | 18px | 16px | 400 | 1.7 | 0 |
 | 킥커·캡션 | 14px | 13px | 600 | 1.4 | 0.06em |
 
-375px에서 1440px 사이 크기는 `clamp()`로 잇는다. 정확한 값은 개발 사양의 토큰 블록에 둔다. 후킹은 `--fs-display` 하나만 쓰며 1024px부터 한 줄, 그 아래는 두 줄('Coming' / 'Soon')이다.
+375px에서 1440px 사이 크기는 `clamp()`로 잇는다. 정확한 값은 개발 사양의 토큰 블록에 둔다. 후킹은 `--fs-display` 하나만 쓰며 1024px부터 한 줄, 그 아래는 두 줄('Coming' / 'Soon')이다. 낮은 화면에서는 영상 노출을 지키려고 화면 높이에 맞춰 후킹을 줄이고(브라우저 창 안쪽 크기 375×667에서 66px, 1366×768에서 158px), 1024px부터는 실링까지 여백 안에 들어오도록 화면 폭으로도 줄인다.
 
 - 한글 줄바꿈은 `word-break: keep-all`을 쓰고, 제목에는 `text-wrap: balance`를 더한다.
 - 본문 폭은 최대 36em으로 제한한다. 한글 기준 한 줄 36자 안팎이다.
@@ -191,11 +194,16 @@ Oct 28, 2026 · @tae hyeung kwon
 | `--r-pill` | 999px | 버튼, 라벨, 진행 점 |
 | `--shadow-soft` | `0 12px 32px -12px rgb(255 84 22 / .28)` | 카드 기본 |
 | `--shadow-lift` | `0 24px 60px -20px rgb(255 84 22 / .38)` | hover, 영상 프레임 |
+| `--shadow-seal` | `14px 4px 16px -12px rgb(255 84 22 / .32)` | D-day 실링. 오른쪽으로만 져 'Soon'의 'n' 옆 크림을 물들이지 않는다(대비 3:1) |
 | `--glow-hero` | `radial-gradient(60% 50% at 50% 0%, #FFE2D0, rgb(255 250 246 / 0))` | 히어로 배경 한 곳에만 |
 | 간격 | 8px 격자 | 섹션 상하 `clamp(72px, 10vw, 140px)` |
 | 간격 단계 | `--sp-1`~`--sp-16` | `--sp-N` = N × 4px. Tailwind 간격 N과 같은 값이다(8px 격자, 4px는 반 단계) |
 | 컨테이너 | 최대 1200px | 좌우 `clamp(16px, 4vw, 40px)` |
 | `--peek` | `clamp(170px, 25svh, 250px)` | 첫 화면 아래에 보이는 영상 프레임 높이. 히어로 높이는 `calc(100svh - var(--peek))` |
+| `--hero-gap` | `clamp(8px, 5.6svh - 24px, 24px)` | 히어로의 세로 간격. 900px 높이 24px, 667px 높이 13px |
+| `--glow-h` | `clamp(220px, 30svh, 300px)` | `--glow-hero`를 그리는 높이. 'Soon' 위에서 끝나 대비 3:1을 지킨다 |
+| `--film-w` | 최대 1080px. 모바일 `(--peek - 12px) / .45`, 768px부터 `(--peek - 12px) / .36 × 16/9` | 소개 영상 폭. 첫 화면 노출만으로 영상이 36% 넘게 보이도록 낮은 화면에서 줄인다 |
+| `--seal-min` | 68px | D-day 실링의 최소 폭. 실링은 후킹 글자의 0.84배(1024px부터 0.72배)이고, 낮은 화면에서도 12px 라벨이 점선 고리 안에 들도록 이보다 작아지지 않는다 |
 | `--tap` | 44px | 최소 터치 영역 |
 | `--btn-h` | 60px, 768px부터 64px | 주 버튼 높이 |
 | `--btn-fs` | 1.25rem | 주 버튼 글자 20px·700 고정(오렌지 위 흰 글자 기준) |
@@ -231,12 +239,12 @@ Oct 28, 2026 · @tae hyeung kwon
 | 버튼 hover | 1.03배, `--shadow-lift` | 200ms |
 | 버튼 press | 0.98배 | 100ms |
 | 진행 점 활성 | 폭 8px에서 24px | 300ms |
-| 후킹 글자 등장 | 웹폰트가 준비되면(최대 700ms 대기) 글자가 차례로 24px 아래에서 올라온다. 후킹은 LCP 후보라 투명도 0에서 시작하지 않는다 | 600ms, 80ms 간격 |
+| 후킹 글자 등장 | 웹폰트가 준비되면(최대 700ms 대기) 글자가 차례로 24px 아래에서 올라온다. 후킹은 LCP 후보라 투명도 0에서 시작하지 않는다. 대기는 HTML 안의 짧은 스크립트가 맡아 JS 번들을 기다리지 않는다. 낮은 화면에서는 히어로 H1도 LCP 후보가 되므로 H1도 이동만 한다 | 600ms, 80ms 간격 |
 | D-day 실링 등장 | 글자가 다 나온 뒤 도장처럼 눌려 붙는다(1.4배 → 0.93배 → 1배) | 약 560ms |
 | 후킹 반복 | 눈 깜빡임, 반짝임 점, 실링 흔들림. 횟수를 정해 두고, 히어로가 화면 밖이면 멈추고 돌아오면 다시 시작한다 | 깜빡임 약 5초 간격 |
 | 눈동자 | 마우스가 있으면 커서를 따라본다. CTA에 키보드 포커스가 가거나 사운드 버디를 켜면 그쪽을 본다 | 420ms |
 
-`prefers-reduced-motion: reduce`에서는 이동과 확대를 모두 끄고 투명도 전환만 남긴다. 무한 반복은 사운드 버디만 쓰고, 나머지 반복 모션은 횟수를 정한다(WCAG 2.2.2). 사운드 버디의 움직임은 영상·미디어 시스템 절에서 정한다.
+`prefers-reduced-motion: reduce`에서는 이동과 확대를 모두 끈다. 토큰 블록의 전역 규칙이 애니메이션과 전환을 바로 끝내고 반복을 한 번으로 줄이므로, 투명도도 전환 없이 바로 바뀐다. 무한 반복은 사운드 버디만 쓰고, 나머지 반복 모션은 횟수를 정한다. 횟수를 정해도 5초를 넘게 자동으로 움직이면 WCAG 2.2.2(멈춤·정지·숨김)를 채우지 못하므로, 그 처리는 `docs/OPEN_ITEMS.md`의 `motion-222`에서 정한다. 사운드 버디의 움직임은 영상·미디어 시스템 절에서 정한다.
 
 ### 아이콘과 이미지
 
@@ -292,13 +300,13 @@ Oct 28, 2026 · @tae hyeung kwon
 | 순서 | 킥커(날짜 줄), 후킹, H1, 보조 문장, CTA. 영상은 바로 아래 영상 섹션이다 |
 | 킥커 | 가는 선 두 줄 사이에 반짝임 아이콘과 '2026.12.25 정식 오픈'(`--ink-900`). 청첩장의 날짜 줄 모양이다. 날짜는 `launchDate`에서 만든다 |
 | 후킹 | 'Coming'(300, `--ink-900`)과 'Soon'(900, `--brand`)을 `--fs-display`로 쓴다. 'Soon'의 oo는 흰자와 눈동자가 있는 두 눈이고 기본 시선은 아래 영상이다. 'Coming'의 i 점은 반짝임이다. 보이는 글자는 `aria-hidden`이고 스크린리더용 'Coming Soon'(`lang="en"`)을 따로 둔다. 후킹은 H1이 아니다 |
-| D-day | 'n' 오른쪽 위에 붙은 `--brand-deep` 왁스 실링 스티커. '오픈까지'와 'D-58'을 흰 글자로 쓴다(4.70:1). 값은 `launchDate`에서 계산하고, 정적 HTML에는 빌드 시점 값을 넣은 뒤 브라우저에서 다시 계산한다 |
+| D-day | 'n' 오른쪽 위에 붙은 `--brand-deep` 왁스 실링 스티커. '오픈까지'와 'D-58'을 흰 글자로 쓴다(4.70:1). 밝은 `--brand`는 왼쪽 위 가장자리에만 두고, 실링 폭은 `--seal-min`보다 작아지지 않는다. 값은 `launchDate`에서 계산하고, 정적 HTML에는 빌드 시점 값을 넣은 뒤 브라우저에서 다시 계산한다 |
 | H1 | 웨딩 준비, 스딩에서 놀듯이 |
 | 보조 문장 | 가격은 한눈에, 드레스는 미리, 웨딩홀은 걸어본 듯이. |
 | CTA | 출시 알림 받기. 주 버튼(오렌지 배경, 흰 글자 20px·700, 높이 `--btn-h`) |
 | 높이 | `min-height: calc(100svh - var(--peek))`. 내용은 세로 가운데에 둔다 |
 | 배경 | `--cream` 위에 `--glow-hero` 한 겹. 글로우는 위쪽에 한정해 'Soon'의 대비 3:1 이상을 지킨다 |
-| 첫 화면 기준 | 1440×900과 390×844에서 킥커, 후킹, D-day, H1, 보조 문장, CTA가 모두 첫 화면에 들어오고, 영상 프레임 윗부분이 아래에 보인다 |
+| 첫 화면 기준 | 1440×900과 390×844에서 킥커, 후킹, D-day, H1, 보조 문장, CTA가 모두 첫 화면에 들어오고, 영상 프레임 윗부분이 아래에 보인다. 브라우저 창 안쪽 크기가 1366×768, 1280×720, 1024×768, 375×667, 360×740이어도 영상이 첫 화면에 35% 넘게 보여 로드 때부터 자동 재생된다. 주소창과 도구 막대를 뺀 실제 창은 이보다 낮아서, iPhone SE 2·3과 iPhone 8의 Safari(약 375×550), 1366×768 노트북의 Chrome(약 1366×650), 1280×720 노트북(약 1280×610)은 노출이 약 19~33%라 조금 스크롤하면 재생된다 |
 | 모바일 줄바꿈 | 후킹은 'Coming' / 'Soon'과 실링의 두 줄이다. H1은 '웨딩 준비,' 와 '스딩에서 놀듯이' 두 줄로 균형 있게 나눈다 |
 | 오픈 후 | 후킹은 오픈 문구로 바뀐다. 제안은 'Now Open'(가는 'Now'와 굵은 'Open', O가 정면을 보는 큰 눈)이며 승인 전이다 \[확인 필요\]. 실링은 카운트다운을 멈추고 '2026.12.25'를 보인다 |
 
@@ -308,9 +316,9 @@ Oct 28, 2026 · @tae hyeung kwon
 | --- | --- |
 | 목적 | 소개 광고 영상을 보여 준다. 히어로 바로 아래의 자체 섹션이다 |
 | 앵커 | `#film` |
-| 프레임 | `--r-lg` 둥근 프레임과 `--shadow-lift`. 데스크톱 16:9(최대 1080px), 모바일 4:5. 자동 재생, 무음, 반복 |
-| 첫 화면 노출 | 기준 화면(1440×900, 390×844)에서 프레임 윗부분이 첫 화면 아래쪽에 `--peek`만큼 보인다. 1366×768이나 375×667처럼 낮은 화면에서는 히어로가 길어져 노출이 줄어드므로 2단계에서 낮은 화면용 크기를 따로 맞춘다. 노출만으로 35% 이상이 보이면 영상은 로드 때부터 자동 재생된다 |
-| 영상이 오기 전 | 브랜드 포스터 카드(존 4개를 잇는 길, 존 아이콘과 이름, 큰 재생 버튼). 회색 박스와 '준비 중'은 쓰지 않는다 |
+| 프레임 | `--r-lg` 둥근 프레임과 `--shadow-lift`. 데스크톱 16:9(최대 1080px), 모바일 4:5. 폭은 `--film-w`를 따라 낮은 화면에서 줄어든다. 자동 재생, 무음, 반복 |
+| 첫 화면 노출 | 기준 화면(1440×900, 390×844)에서 프레임 윗부분이 첫 화면 아래쪽에 `--peek`만큼 보인다. 낮은 화면에서는 후킹 크기와 간격(`--fs-display`, `--hero-gap`), 영상 폭(`--film-w`)이 화면 높이를 따라 줄어 노출을 지킨다. 노출만으로 35% 이상이 보이면 영상은 로드 때부터 자동 재생되고, 그보다 낮은 창은 히어로의 '첫 화면 기준'대로 조금 스크롤하면 재생된다 |
+| 영상이 오기 전 | 브랜드 포스터 카드(존 4개를 잇는 길, 존 아이콘과 이름, 큰 재생 버튼). 재생을 누르면 길이 존 순서대로 그려지는 '라이드'를 보여 준다. 회색 박스와 '준비 중'은 쓰지 않는다 |
 | 조작 | 재생·일시정지 버튼(`--ctrl`)은 프레임 위쪽 모서리에 두어 첫 화면 노출분 안에 보이게 한다. 사운드 버디와 겹치지 않는다 |
 | 대본 | 프레임 아래 '영상 내용 글로 보기'(`details`) |
 
@@ -444,29 +452,30 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 
 | 항목 | 규칙 |
 | --- | --- |
-| 속성 | `autoplay muted loop playsinline`. 소개 영상 외의 영상은 `preload="none"`으로 시작한다 |
+| 속성 | `muted loop playsinline`. `autoplay` 속성은 쓰지 않는다. 속성이 있으면 브라우저가 동작 줄이기·데이터 절약 확인 전에 재생하므로, 재생은 아래 규칙대로 JS가 `play()`로 시작한다. 소개 영상 외의 영상은 `preload="none"`으로 시작한다 |
 | 시작과 정지 | 화면에 35% 이상 보이면 `play()`, 15% 미만이면 `pause()`. `IntersectionObserver`로 판단한다 |
 | 소개 영상 로딩 | 포스터를 먼저 받고 영상은 포스터가 그려진 뒤에 시작한다. 포스터 윗부분이 첫 화면에 보이므로 포스터는 지연 로드하지 않는다 |
-| 소스 선택 | 화면 폭 767px 이하이면 모바일 컷을 쓴다. 선택은 JS의 `matchMedia`로 하고, 브라우저마다 지원이 다른 `video`의 `source media`는 쓰지 않는다 |
+| 소스 선택 | 화면 폭 767px 이하이면 모바일 컷을 쓴다. 선택은 JS의 `matchMedia`로 하고, 브라우저마다 지원이 다른 `video`의 `source media`는 쓰지 않는다. 폰을 돌리거나 창 폭을 바꿔 767px를 넘나들면 컷을 바꾸고, 재생 중이었으면 같은 시점에서 잇는다. 새 컷의 첫 프레임이 나올 때까지 포스터를 보인다 |
 | 대체 화면 | 포스터와 큰 재생 버튼. 동작 줄이기 설정, 데이터 절약 모드, iOS 저전력 모드, `play()` 거부일 때 보여 준다 |
-| 일시정지 | 모든 영상 프레임에 작은 재생·정지 버튼을 항상 보이게 둔다(WCAG 2.2.2). 소개 영상은 버튼을 프레임 위쪽 모서리에 두어 첫 화면 노출분 안에 보이게 한다. 방문자가 멈춘 영상은 자동으로 다시 재생하지 않는다 |
-| 탭 전환 | 탭이 숨겨지면 모두 멈춘다. 돌아오면 화면 안에 있고 방문자가 멈추지 않은 영상만 이어서 재생한다 |
+| 일시정지 | 모든 영상 프레임에 작은 재생·정지 버튼을 항상 보이게 둔다(WCAG 2.2.2). 소개 영상은 버튼을 프레임 위쪽 모서리에 두어 첫 화면 노출분 안에 보이게 한다. 버튼의 이름과 동작은 `play()`를 부른 순간(불러오는 중 포함)부터 '일시정지'다. 방문자가 멈춘 영상은 자동으로 다시 재생하지 않는다. 미디어 키나 잠금 화면처럼 페이지 밖에서 멈춘 영상도 방문자가 멈춘 것으로 보고 소리 설정은 그대로 둔다. 페이지 밖에서 다시 재생하면 멈춘 표시도 풀린다 |
+| 탭 전환 | 탭이 숨겨지면 모두 멈춘다. 돌아오면 화면 안(재생을 이어 가는 기준인 15% 이상)에 있고 방문자가 멈추지 않은 영상만 이어서 재생한다. 동작 줄이기에서 방문자가 직접 재생한 영상도 잇는다 |
 | 동시 재생 | 최대 2개 |
 | 접근성 | 영상에 `aria-label`로 장면 설명을 붙이고 포스터에는 `alt`를 쓴다. 영상 속 글자는 본문에도 같은 텍스트로 둔다 |
 | 서버 | MP4에 `+faststart`를 적용하고 HTTP Range 요청을 지원한다(iOS Safari 필수). 파일명에 버전을 넣고 `immutable`로 캐시한다 |
 
 ### 소리와 사운드 버디
 
-소리는 소개 영상에만 넣고, 켜고 끄는 일은 영상 프레임 밖으로 빼낸 사운드 버디가 맡는다. 방문자의 클릭이 곧 브라우저가 요구하는 사용자 동작이므로 클릭 처리 안에서 바로 `muted = false`로 바꾼다.
+소리는 소개 영상에만 넣고, 켜고 끄는 일은 영상 프레임 밖으로 빼낸 사운드 버디가 맡는다. 방문자의 클릭이 곧 브라우저가 요구하는 사용자 동작이므로 클릭 처리 안에서 바로 `muted = false`로 바꾼다. 그때 재생 중이 아닌 소리 영상도 클릭 안에서 소리를 한 번 켰다 꺼 둔다. iOS는 이렇게 허락받은 영상만 나중에 화면에 들어올 때 클릭 없이 소리와 함께 재생한다.
 
 | 항목 | 규칙 |
 | --- | --- |
+| 표시 | 소리 있는 소개 영상 파일(`MEDIA.hero`의 `src`와 `hasAudio`)이 있을 때만 그린다. 파일이 오기 전에는 켤 소리가 없으므로 버디와 말풍선을 숨긴다 |
 | 위치 | 화면 오른쪽 아래에 고정하고 영상 프레임 밖에 둔다. `right`·`bottom`은 16px과 안전 영역 중 큰 값이다 |
 | 크기 | 데스크톱 64px, 모바일 56px. 터치 영역은 44px 이상이다 |
 | 모양 | 오렌지(`--brand`) 몸통, 흰 얼굴, 스피커 모양 입. 영상에 마스코트가 있으면 그 마스코트로 바꾼다 |
-| 말풍선 | 첫 방문 2초 뒤에 '소리 켜 볼까요?'를 6초간 보여 주고 사라진다. 같은 세션에서는 다시 띄우지 않는다 |
+| 말풍선 | 첫 방문 2초 뒤에 '소리 켜 볼까요?'를 6초간 보여 주고 사라진다. 2초는 탭이 보이는 동안만 잰다. 같은 세션에서는 다시 띄우지 않는다 |
 | 반응 | hover하면 고개를 갸웃한다. 누르면 0.92배로 눌렸다가 통통 튄다 |
-| 접근성 | `button`, `aria-label="영상 소리"`, `aria-pressed`. 포커스 링은 3px `--ink-900`. 툴팁은 '소리 켜기' 또는 '소리 끄기' |
+| 접근성 | `button`, `aria-label="영상 소리"`, `aria-pressed`. 포커스 링은 3px `--ink-900`. 툴팁은 '소리 켜기' 또는 '소리 끄기'다. 툴팁은 hover할 수 있는 기기에서 hover로, 키보드 포커스로 열리고, 터치로 누르면 2.4초 보인다. 버디와 툴팁 사이 틈도 hover 영역이라 마우스를 옮겨도 닫히지 않고, Esc로 닫는다(WCAG 1.4.13) |
 | 상태 저장 | 저장하지 않는다. 방문마다 꺼짐으로 시작한다 |
 | 구현 | 전역 `useSound()` 컨텍스트. 소리를 낼 영상은 `hasAudio: true`인 영상 중 가장 많이 보이는 하나다 |
 | 재생 거부 | 소리를 켠 채 `play()`가 거부되면 `muted`로 다시 재생하고 버디를 꺼짐으로 되돌린다 |
@@ -478,7 +487,7 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 | --- | --- | --- | --- |
 | 꺼짐 | 첫 로드, 또는 방문자가 끔 | 눈을 감고 'zz'가 떠오른다. 숨 쉬듯 3초 주기로 커졌다 작아진다 | 모든 영상 무음 |
 | 켜짐·재생 | 켜져 있고 소리 있는 영상이 재생 중 | 눈웃음, 입 주변 음파가 번갈아 깜빡이고 통통 튄다. SVG로 그린 음표가 떠오른다 | 해당 영상만 소리 |
-| 켜짐·대기 | 켜져 있지만 소리 있는 영상이 화면에 없음 | 눈이 반짝이고 음파는 멈춘다. 툴팁은 '영상이 보이면 소리가 나요' | 재생되는 소리 없음 |
+| 켜짐·대기 | 켜져 있지만 소리 있는 영상이 화면에 없음 | 눈이 반짝이고 음파는 멈춘다. 툴팁은 '영상이 보이면 소리가 나요'. 소리 영상이 화면에(15% 이상) 있는데 멈춰 있으면(방문자가 멈춤, 동작 줄이기, 저전력 모드) 툴팁은 '영상을 재생하면 소리가 나요' | 재생되는 소리 없음 |
 
 ### 자막과 대본
 
@@ -818,9 +827,9 @@ AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형
 | 영역 | 선택 | 이유 |
 | --- | --- | --- |
 | 프레임워크 | Next.js 16(App Router), React 19, TypeScript, SSG. Cache Components는 끈다 | 문구가 HTML에 담겨 SEO·AEO에 유리하고, 스딩 업체 관리 도구와 같은 Next.js 계열이다. Cache Components를 켜면 `revalidate`를 쓸 수 없어 CTA 전환 방식과 맞지 않는다 |
-| 스타일 | Tailwind CSS 4(`@tailwindcss/turbopack`) + CSS 변수 토큰 | 토큰은 브랜드 시스템 절의 값을 그대로 쓴다. `globals.css`의 `@theme`에서 기본 색·글자 크기·둥글기·그림자를 끄고 토큰만 유틸리티로 잇는다. 투명도 수식어(`bg-cream/85` 등)는 `color-mix()`가 필요해 iOS 15.4에서 깨지므로 쓰지 않는다 |
+| 스타일 | Tailwind CSS 4(`@tailwindcss/turbopack`) + CSS 변수 토큰 | 토큰은 브랜드 시스템 절의 값을 그대로 쓴다. `globals.css`의 `@theme`에서 기본 색·글자 크기·둥글기·그림자를 끄고 토큰만 유틸리티로 잇는다. 지원 하한(Safari 16.4)에서 `color-mix()`, 투명도 수식어(`bg-white/70` 등), 컨테이너 단위(`cqw`), `:has()`를 쓸 수 있다 |
 | 검사 | ESLint 9(flat config, `eslint-config-next`), `next typegen && tsc --noEmit` | Next 16에서 `next lint`가 없어져 `npm run lint`는 `eslint`를 직접 실행한다 |
-| 폰트 | Pretendard Variable 자체 호스팅(`next/font/local`) | 외부 요청을 줄이고, 서브셋으로 용량을 줄인다 |
+| 폰트 | Pretendard Variable 1.3.9 다이내믹 서브셋 자체 호스팅. 저자가 배포한 CSS를 `src/styles/fonts.css`로, 글꼴 파일 92개를 `public/fonts/pretendard-1.3.9/`로 옮겼다 | 페이지에 쓰인 글자 묶음만 받아, 첫 로드에 받는 글꼴은 10개 묶음 약 255KB다(서브셋 전 단일 파일은 2MB). 영문·숫자 묶음(91번)은 preload하고, 후킹의 ı 묶음(74번)은 후킹이 'Coming Soon'일 때만 preload한다. 직접 서브셋을 만들면 OFL 예약 글꼴 이름 문제가 생겨 저자 배포본을 쓴다 |
 | 모션 | CSS와 `IntersectionObserver` | 애니메이션 라이브러리 없이 번들을 가볍게 둔다 |
 | 상태 | `useSound()`와 신청 창 상태만 | 외부 상태 라이브러리는 쓰지 않는다 |
 | 호스팅 | Vercel(서울 리전) 또는 Cloudflare Pages | 둘 중 하나. 기본 제안은 Vercel이다 |
@@ -847,7 +856,7 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
     icons/                     icon-192, icon-512, maskable-512
     media/                     영상과 이미지. 파일명에 버전
     captions/                  자막 .vtt
-    fonts/                     Pretendard Variable + 라이선스 파일
+    fonts/                     pretendard-1.3.9/(다이내믹 서브셋 92개) + 라이선스 파일
   src/
     app/
       layout.tsx  page.tsx  globals.css  not-found.tsx
@@ -857,14 +866,15 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
       icon.svg  favicon.ico  apple-icon.png
     components/
       Header  HeaderShell  Hero  Film  Intro  Zone  ProgressDots  Faq  CtaSection  Footer
-      MediaSlot  VideoProvider  SoundBuddy  Logo
+      MediaSlot  VideoProvider  VideoPlayer  PlayButtons  RidePreview  ParkMap  ZonePoster
+      HookMotion  InlineScript  SoundBuddy  RevealArmer  Logo
       WaitlistDialog  WaitlistForm  CtaButton  Icons
     content/
       site.ts  zones.ts  faq.ts  media.ts  company.ts
     lib/
-      jsonld.ts  prune.ts  analytics.ts  launch.ts  phone.ts
+      jsonld.ts  prune.ts  analytics.ts  launch.ts  phone.ts  fonts.ts
     styles/
-      tokens.css
+      tokens.css  fonts.css  motion.css  hero.css  film.css  buddy.css
 ```
 
 ### 디자인 토큰
@@ -883,15 +893,21 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
   --r-sm: 12px;  --r-md: 24px;  --r-lg: 32px;  --r-pill: 999px;
   --shadow-soft: 0 12px 32px -12px rgb(255 84 22 / .28);
   --shadow-lift: 0 24px 60px -20px rgb(255 84 22 / .38);
+  --shadow-seal: 14px 4px 16px -12px rgb(255 84 22 / .32);    /* D-day 실링. 오른쪽으로만 져 'Soon'의 'n' 옆 크림을 물들이지 않는다 */
   --glow-hero: radial-gradient(60% 50% at 50% 0%, #FFE2D0, rgb(255 250 246 / 0));
 
-  --fs-display: clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem);   /* 'Coming Soon' 후킹 전용 */
+  /* 'Coming Soon' 후킹 전용. 390px 96px, 1440px 184px.
+     낮은 화면에서는 높이에 맞춰 줄여 영상 노출을 지킨다(844px 높이 96px, 667px 높이 66px). 가로로 눕힌 폰은 56px에서 멈춘다 */
+  --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), max(3.5rem, 16.95svh - 47px));
   --fs-h1: clamp(2.5rem, 1.796rem + 3.005vw, 4.5rem);
   --fs-h2: clamp(1.875rem, 1.479rem + 1.690vw, 3rem);
   --fs-h3: clamp(1.375rem, 1.243rem + 0.563vw, 1.75rem);
   --fs-lead: clamp(1.125rem, 1.037rem + 0.376vw, 1.375rem);
   --fs-body: clamp(1rem, 0.956rem + 0.188vw, 1.125rem);
   --fs-cap: clamp(0.8125rem, 0.790rem + 0.094vw, 0.875rem);
+  --fs-seal-label: max(12px, 9.6cqw);   /* D-day 실링 안 글자. cqw는 실링 폭 기준이다 */
+  --fs-seal-num: 26cqw;
+  --seal-min: 68px;   /* D-day 실링 최소 폭. 낮은 화면에서도 12px 라벨이 점선 고리 안에 든다 */
 
   /* 간격 단계: --sp-N = N x 4px = Tailwind 간격 N */
   --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;  --sp-6: 24px;
@@ -903,21 +919,39 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
   --header-h: 60px;
   --header-blur: 12px;
   --peek: clamp(170px, 25vh, 250px);   /* 첫 화면 아래에 보이는 영상 프레임 높이 */
+  --hero-gap: clamp(8px, 5.6svh - 24px, 24px);   /* 히어로의 세로 간격. 900px 높이 24px, 667px 높이 13px */
+  --glow-h: clamp(220px, 30svh, 300px);   /* --glow-hero를 그리는 높이. 'Soon' 위에서 끝나 대비 3:1을 지킨다 */
+  --film-max: 1080px;                     /* 소개 영상 최대 폭 */
+  /* 소개 영상 폭. 첫 화면 노출(--peek)만으로 영상이 36% 넘게 보이도록 낮은 화면에서는 폭을 줄인다. 모바일은 4:5 */
+  --film-w: min(var(--film-max), calc((var(--peek) - var(--sp-3)) / .45));
   --tap: 44px;                         /* 최소 터치 영역 */
   --btn-h: 60px;                       /* 주 버튼 높이 */
-  --btn-fs: 1.25rem;                   /* 주 버튼 글자 20px */
+  --btn-fs: 1.25rem;                   /* 주 버튼 글자 20px. 오렌지 위 흰 글자 기준 */
   --buddy: 56px;                       /* 사운드 버디 */
   --ctrl: 44px;                        /* 영상 재생·일시정지 버튼 */
   --ease: cubic-bezier(.22, 1, .36, 1);
 }
 @supports (height: 100svh) { :root { --peek: clamp(170px, 25svh, 250px); } }
-@media (min-width: 768px) { :root { --header-h: 72px; --btn-h: 64px; --buddy: 64px; --ctrl: 48px; } }
+@media (min-width: 768px) {
+  :root {
+    --header-h: 72px; --btn-h: 64px; --buddy: 64px; --ctrl: 48px;
+    --film-w: min(var(--film-max), calc((var(--peek) - var(--sp-3)) / .36 * 16 / 9));   /* 16:9 */
+  }
+}
+/* 1024px부터 후킹은 한 줄이다. 실링까지 여백 안에 들어오도록 폭으로도 줄인다.
+   마지막 값은 브라우저 글자 크기를 키워도 한 줄이 --container 안에 들게 한다(기본 글자 크기에서는 쓰이지 않는다) */
+@media (min-width: 1024px) {
+  :root { --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), calc((100vw - 2 * var(--gutter)) / 6.9), 20.6svh, calc(var(--container) / 6.1)); }
+}
 
 html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
 body { background: var(--cream); color: var(--ink-900); word-break: keep-all; overflow-wrap: break-word; }
+/* 이동과 확대를 끈다. 반복 횟수를 1로 두어 무한 반복이 아주 짧은 주기로 깜빡이지 않게 한다 */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;
+  }
 }
 ```
 
@@ -1011,6 +1045,9 @@ export const MEDIA = {
   zone1: { kind: 'phone', screen: { kind: 'video', src: '', poster: '', alt: '스딩 앱의 웨딩 가격표 화면', aspect: '9/19.5' } },
   // zone2~4도 같은 모양이다. 슬롯 사양은 영상·미디어 시스템 절의 표를 따른다.
 } satisfies Record<string, MediaSpec>;
+
+// 켤 소리가 있는지. 소리는 소개 영상에만 있으므로 그 파일이 올 때까지 사운드 버디를 그리지 않는다
+export const HAS_SOUND = Boolean(MEDIA.hero.src && MEDIA.hero.hasAudio);
 ```
 
 `src`나 이미지 주소가 비어 있으면 `MediaSlot`이 브랜드 포스터 카드(존 아이콘과 존 이름)를 그린다. 회색 박스와 '준비 중' 문구는 쓰지 않는다.
@@ -1201,11 +1238,11 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 
 | 항목 | 기준 | 확인 방법 |
 | --- | --- | --- |
-| LCP | 2.5초 이하 | 포스터 이미지가 오기 전에는 첫 화면에서 가장 큰 글자인 후킹('Coming Soon')이 LCP 후보다. 후킹 등장은 투명도 0에서 시작하지 않고(이동만), 웹폰트 대기는 최대 700ms로 둔다. 포스터가 오면 첫 화면에 보이는 윗부분도 LCP 후보가 되므로 `preload`와 `fetchpriority='high'`를 걸고, 영상 파일은 포스터가 그려진 뒤에 붙인다 |
+| LCP | 2.5초 이하 | 포스터 이미지가 오기 전에는 첫 화면에서 가장 큰 글자인 후킹('Coming Soon')이 LCP 후보이고, 낮은 화면에서는 히어로 H1도 후보가 된다. 둘 다 등장은 투명도 0에서 시작하지 않고(이동만), 웹폰트 대기는 HTML 안의 스크립트가 최대 700ms로 맡는다. 후킹 글자가 든 글꼴 묶음(91번, 'Coming Soon'일 때 74번)은 preload한다. 포스터가 오면 첫 화면에 보이는 윗부분도 LCP 후보가 되므로 `preload`와 `fetchpriority='high'`를 걸고, 영상 파일은 포스터가 그려진 뒤에 붙인다 |
 | INP | 200ms 이하 | 공개 후 PageSpeed Insights의 실사용 데이터 |
 | CLS | 0.1 이하 | 모든 영상·이미지에 `aspect-ratio`를 지정한다 |
 | Lighthouse 모바일 | 성능 90 이상, 접근성 95 이상, SEO 100 | 배포 미리보기마다 실행 |
-| 자체 JS | 170KB 이하(gzip) | `next build` 출력. GA4와 Turnstile은 늦게 불러오므로 제외한다 |
+| 자체 JS | 170KB 이하(gzip) | Next 16의 `next build`는 크기를 출력하지 않는다. 빌드 뒤 `.next/diagnostics/route-bundle-stats.json`에서 `/`의 `firstLoadChunkPaths` 파일을 gzip으로 합산하거나, Lighthouse·DevTools의 스크립트 전송 크기로 확인한다. GA4와 Turnstile은 늦게 불러오므로 제외한다 |
 | JS 없이 보기 | 모든 문구가 HTML에 있다 | 등장 효과의 숨김 상태는 JS가 켜진 뒤에만 건다 |
 
 접근성은 WCAG 2.2 AA를 기준으로 하며, 아래 항목을 출시 점검에 넣는다.
@@ -1304,7 +1341,7 @@ const nextConfig: NextConfig = {
 
 ### 테스트 매트릭스
 
-지원 하한은 iOS Safari 15.4(`dialog`와 `dvh`를 쓸 수 있는 첫 버전)이고, 그 밖의 브라우저는 최신 두 버전이다. 아래 환경을 실제 기기나 에뮬레이터로 확인한다.
+지원 하한은 iOS·Safari 16.4(Next.js 16과 Tailwind CSS 4가 지원하는 첫 버전)이고, 그 밖의 브라우저는 최신 두 버전이다. iOS 16.4 미만(그 버전의 카카오톡·네이버 인앱 포함)은 지원하지 않는다. 아래 환경을 실제 기기나 에뮬레이터로 확인한다.
 
 | 환경 | 확인할 것 |
 | --- | --- |

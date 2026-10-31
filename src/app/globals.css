@@ -1,5 +1,10 @@
 @import "tailwindcss" source("..");   /* src/만 읽는다. docs/의 기획서 문구가 CSS로 새지 않게 한다 */
 @import "../styles/tokens.css";
+@import "../styles/fonts.css";
+@import "../styles/motion.css";
+@import "../styles/hero.css";
+@import "../styles/film.css";
+@import "../styles/buddy.css";
 
 /* Tailwind 유틸리티는 tokens.css의 값만 쓴다. 기본 색, 글자 크기, 둥글기, 그림자는 끈다.
    그림자는 shadow-(--shadow-soft)처럼 토큰을 직접 읽는다. */
@@ -17,7 +22,7 @@
   --color-current: currentColor;
 
   --font-*: initial;
-  --font-sans: var(--font-pretendard), "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --font-sans: "Pretendard Variable", "Pretendard Fallback", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
 
   --text-*: initial;
   --text-display: var(--fs-display);

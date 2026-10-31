@@ -1,0 +1,183 @@
+/* 사운드 버디(PLAN '소리와 사운드 버디'). 상태는 data-sound: off(꺼짐), playing(켜짐·재생), waiting(켜짐·대기).
+   무한 반복은 버디에만 쓴다. TODO(motion-222): 반복 모션의 WCAG 2.2.2 처리는 docs/OPEN_ITEMS.md에서 정한다 */
+@layer components {
+  .buddy {
+    position: fixed;
+    z-index: 20;   /* 본문 위, 헤더(30)와 신청 창 아래 */
+    right: max(var(--sp-4), env(safe-area-inset-right));
+    bottom: max(var(--sp-4), env(safe-area-inset-bottom));
+    width: var(--buddy);
+    height: var(--buddy);
+  }
+  .buddy-btn {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .buddy-body { position: absolute; inset: 0; border-radius: 50%; box-shadow: var(--shadow-lift); transform-origin: 50% 85%; }
+  .buddy[data-sound="off"] .buddy-body { animation: breathe 3s ease-in-out infinite; }
+  .buddy[data-sound="playing"] .buddy-body { animation: hop 1.4s var(--ease) infinite; }
+  .buddy[data-boing] .buddy-body { animation: boing 520ms var(--ease); }
+  .buddy-btn:active .buddy-body { animation: none; transform: scale(.92); }
+  .buddy-svg { display: block; width: 100%; height: 100%; overflow: visible; transition: transform 320ms var(--ease); }
+  /* hover 반응은 마우스처럼 hover할 수 있는 기기에서만 건다. 터치는 누른 뒤에도 :hover가 남아 툴팁이 화면을 가린다 */
+  @media (hover: hover) {
+    .buddy-btn:hover .buddy-svg { transform: rotate(-10deg); }   /* 고개를 갸웃한다 */
+  }
+
+  .b-body { fill: var(--brand); }
+  .b-gloss { fill: color-mix(in srgb, var(--white) 38%, transparent); }
+  .b-face { fill: var(--white); }
+  .b-eyes path { fill: none; stroke: var(--ink-900); stroke-width: 2.4; stroke-linecap: round; }
+  .b-eyes-wait circle { fill: var(--ink-900); }
+  .b-eyes-wait .b-glint { fill: var(--white); transform-box: fill-box; transform-origin: center; }
+  .b-cheek { fill: color-mix(in srgb, var(--brand) 32%, transparent); }
+  .b-mouth { fill: var(--brand-deep); }
+  .b-waves path { fill: none; stroke: var(--brand-deep); stroke-width: 1.8; stroke-linecap: round; }
+  .b-eyes-on, .b-eyes-wait, .b-waves { display: none; }
+  .buddy:not([data-sound="off"]) .b-eyes-off { display: none; }
+  .buddy[data-sound="playing"] .b-eyes-on,
+  .buddy[data-sound="waiting"] .b-eyes-wait,
+  .buddy:not([data-sound="off"]) .b-waves { display: inline; }
+  /* 켜짐·재생: 음파가 번갈아 깜빡이고 음표가 떠오른다. 켜짐·대기: 눈이 반짝이고 음파는 멈춘다 */
+  .buddy[data-sound="playing"] .b-waves path { animation: wave 1.1s ease-in-out infinite; }
+  .buddy[data-sound="playing"] .b-waves path + path { animation-delay: .35s; }
+  .buddy[data-sound="waiting"] .b-glint { animation: glint 1.8s ease-in-out infinite; }
+
+  /* 꺼짐: 'zz'가 왼쪽 위로 떠오른다. 말풍선이나 툴팁이 보이는 동안은 숨긴다 */
+  .buddy-zz {
+    position: absolute;
+    left: calc(var(--sp-2) * -1);
+    top: calc(var(--sp-6) * -1);
+    width: var(--sp-6);
+    height: var(--sp-6);
+    overflow: visible;
+    color: var(--brand-deep);
+    pointer-events: none;
+    transition: opacity 200ms var(--ease);
+  }
+  .buddy-zz path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    animation: zz 2.8s ease-out infinite;
+  }
+  .buddy-zz path + path { animation-delay: 1.4s; }
+  .buddy:not([data-sound="off"]) .buddy-zz { display: none; }
+  .buddy[data-bubble] .buddy-zz,
+  .buddy[data-tip-flash] .buddy-zz,
+  .buddy:has(.buddy-btn:focus-visible) .buddy-zz { opacity: 0; }
+  @media (hover: hover) { .buddy:hover .buddy-zz { opacity: 0; } }
+
+  .buddy-notes {
+    position: absolute;
+    left: calc(var(--sp-4) * -1);
+    bottom: 55%;
+    display: none;
+    width: var(--sp-8);
+    height: var(--sp-10);
+    overflow: visible;
+    color: var(--brand-deep);
+    pointer-events: none;
+  }
+  .buddy[data-sound="playing"] .buddy-notes { display: block; }
+  .buddy-notes g { fill: currentColor; stroke: currentColor; stroke-width: 2; stroke-linecap: round; opacity: 0; animation: note 2.4s ease-out infinite; }
+  .buddy-notes path { fill: none; }
+  .buddy-notes g + g { animation-delay: 1.2s; }
+
+  /* 툴팁(hover·포커스, 터치는 누른 뒤 잠깐)과 첫 방문 말풍선 */
+  .buddy-tip,
+  .buddy-bubble {
+    position: absolute;
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    background: var(--white);
+    color: var(--ink-900);
+    font-size: var(--fs-cap);
+    font-weight: 700;
+    line-height: 1.3;
+    white-space: nowrap;
+    box-shadow: var(--shadow-soft);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 200ms var(--ease), translate 200ms var(--ease), visibility 0s 200ms;
+  }
+  .buddy-tip { right: calc(100% + var(--sp-3)); top: 50%; translate: 0 -50%; padding: var(--sp-2) var(--sp-3); }
+  /* 툴팁은 버디 안의 요소다. 버디와의 틈(--sp-3)도 툴팁의 일부로 이어 마우스를 툴팁으로 옮기는 동안 사라지지 않는다.
+     Esc로 닫는다(WCAG 1.4.13) */
+  .buddy-tip::after { content: ""; position: absolute; top: 0; bottom: 0; left: 100%; width: calc(var(--sp-3) + 2px); }
+  .buddy-btn:focus-visible ~ .buddy-tip,
+  .buddy[data-tip-flash] .buddy-tip { opacity: 1; visibility: visible; transition-delay: 0s; }
+  @media (hover: hover) {
+    .buddy:hover .buddy-tip { opacity: 1; visibility: visible; transition-delay: 0s; }
+  }
+  .buddy[data-tip-closed] .buddy-tip { opacity: 0; visibility: hidden; }
+  .buddy-bubble { right: var(--sp-1); bottom: calc(100% + var(--sp-4)); padding: var(--sp-3) var(--sp-4); translate: 0 6px; pointer-events: none; }
+  .buddy-bubble::after {
+    content: "";
+    position: absolute;
+    right: var(--sp-4);
+    bottom: -7px;
+    width: var(--sp-3);
+    height: var(--sp-3);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--white);
+    transform: rotate(45deg);
+  }
+  .buddy[data-bubble] .buddy-bubble { opacity: 1; visibility: visible; translate: none; transition-delay: 0s; }
+  .buddy:has(.buddy-btn:focus-visible) .buddy-bubble { opacity: 0; visibility: hidden; }
+  @media (hover: hover) { .buddy:hover .buddy-bubble { opacity: 0; visibility: hidden; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .buddy-zz path { animation: none; opacity: 1; }
+    .buddy-zz path + path { translate: -4px -6px; }
+    .buddy-notes g { animation: none; opacity: 1; }
+    .buddy-btn:hover .buddy-svg, .buddy-btn:active .buddy-body { transform: none; }
+  }
+  @media print { .buddy { display: none; } }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+@keyframes hop {
+  0%, 100% { transform: none; }
+  30% { transform: translateY(-3px) scale(1.02, .98); }
+  55% { transform: translateY(0) scale(.98, 1.02); }
+}
+@keyframes boing {
+  0% { transform: scale(.92); }
+  45% { transform: scale(1.1); }
+  70% { transform: scale(.97); }
+  100% { transform: scale(1); }
+}
+@keyframes wave {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .25; }
+}
+@keyframes glint {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+}
+@keyframes zz {
+  0% { opacity: 0; transform: translate(0, 4px) scale(.8); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-12px, -22px) scale(1.15); }
+}
+@keyframes note {
+  0% { opacity: 0; transform: translate(0, 8px) rotate(-8deg); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-10px, -26px) rotate(6deg); }
+}
