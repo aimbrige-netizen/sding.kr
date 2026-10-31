@@ -11,7 +11,7 @@ export const FAQ: FaqItem[] = [
   { id: 'what', q: '스딩은 무엇인가요?', a: SITE.definition },
   { id: 'price-rule', q: '웨딩 가격 정찰제는 무엇인가요?', a: price.definition },
   { id: 'planner', q: 'AI 웨딩 플래너는 무엇을 해 주나요?', a: planner.definition },
-  { id: 'dress', q: '드레스 AI 합성은 어떻게 쓰나요?',
+  { id: 'dress', q: '드레스 AI 합성은 어떻게 쓰나요?',   // TODO(zone3-photo-policy): 사용자 사진의 처리·보관·삭제 정책이 정해지면 답에 더한다
     a: `${dress.definition} 결과는 AI 합성 이미지라 실제 착용 모습과 다를 수 있어요.` },
   { id: 'hall', q: 'AI 웨딩홀 시뮬레이션은 실제 웨딩홀과 같나요?',
     a: 'AI 웨딩홀 시뮬레이션은 실제 웨딩홀과 같지 않아요. AI가 만든 시뮬레이션이라 실제와 다를 수 있어요. 방문 전에 분위기와 동선을 확인하는 용도로 써 주세요.' },

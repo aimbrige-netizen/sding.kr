@@ -1,4 +1,4 @@
-import { Fragment, type CSSProperties } from 'react';
+import { Fragment } from 'react';
 import Link from 'next/link';
 import { HookMotion } from './HookMotion';
 import { Sparkle } from './Icons';
@@ -6,9 +6,7 @@ import { InlineScript } from './InlineScript';
 import { COPY } from '@/content/site';
 import { FONT_SUBSET, hookGateScript, preloadFontSubset } from '@/lib/fonts';
 import { ctaMode, daysToLaunch, launchDotted } from '@/lib/launch';
-
-// 등장 순서. 80ms 간격으로 올라온다(PLAN '모션')
-const order = (i: number) => ({ '--i': i }) as CSSProperties;
+import { order } from '@/lib/motion';
 
 // 쉼표 뒤에서 나눈 구절. 구절 안에서는 줄을 바꾸지 않는다
 const phrases = (text: string) => text.split(/(?<=,)\s+/);

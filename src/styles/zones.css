@@ -1,0 +1,373 @@
+/* 소개와 존 4개, 비교 슬라이더, 진행 점(PLAN '소개', '존 공통 틀'). 소개 시안은 docs/design/hero-b.html */
+@layer components {
+  /* 킥커와 존 라벨: 작은 알약 한 줄(PLAN '서체'의 킥커·캡션) */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    padding: calc(var(--sp-2) - 1px) var(--sp-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    background: var(--white);
+    color: var(--brand-deep);
+    font-size: var(--fs-cap);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: .06em;
+    font-variant-numeric: tabular-nums;
+  }
+  .hl {
+    --hl: color-mix(in srgb, var(--brand) 20%, transparent);
+    background: linear-gradient(transparent 58%, var(--hl) 58%, var(--hl) 90%, transparent 90%);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  /* 줄바꿈으로 가르지 않는 구절. nowrap과 달리 200% 확대로 폭이 모자라면 구절 안에서 줄을 바꿔 가로 스크롤을 만들지 않는다 */
+  .nb { display: inline-block; max-width: 100%; }
+
+  /* 소개 */
+  .intro { padding: 0 var(--gutter) var(--section-y); scroll-margin-top: var(--sp-6); text-align: center; }
+  .intro-in { max-width: var(--container); margin-inline: auto; }
+  .definition {
+    max-width: 21em;
+    margin: var(--sp-6) auto 0;
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.38;
+    letter-spacing: -.025em;
+    text-wrap: balance;
+  }
+  .intro-zones {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-3);
+    margin-top: clamp(calc(var(--sp-8) + var(--sp-1)), 5vw, var(--sp-14));
+  }
+  @media (max-width: 359px) { .intro-zones { grid-template-columns: minmax(0, 1fr); } }   /* '시뮬레이터'가 알약을 넘지 않게 */
+  @media (min-width: 768px) { .intro-zones { display: flex; flex-wrap: wrap; justify-content: center; } }
+  .intro-pill {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-height: var(--sp-16);
+    padding: var(--sp-2) var(--sp-4) var(--sp-2) var(--sp-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    background: var(--white);
+    color: var(--ink-900);
+    font-size: var(--fs-body);
+    font-weight: 700;
+    letter-spacing: -.01em;
+    transition: scale 200ms var(--ease), box-shadow 200ms var(--ease);
+  }
+  @media (min-width: 768px) { .intro-pill { padding-right: var(--sp-6); } }
+  @media (hover: hover) { .intro-pill:hover { scale: 1.03; box-shadow: var(--shadow-lift); } }
+  .intro-pill:active { scale: .98; transition-duration: 100ms; }
+  .intro-ico {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: var(--sp-12);
+    height: var(--sp-12);
+    border-radius: 50%;
+    background: var(--peach);
+    color: var(--brand-deep);
+  }
+  .intro-ico svg { width: var(--sp-6); height: var(--sp-6); }
+
+  /* 존 구간. 화면 높이로 스테이지를 정해 폰과 4:5 프레임이 헤더 아래에 통째로 들어온다.
+     진행 점 레일이 sticky이므로 조상에 overflow hidden·auto를 주면 안 된다(clip은 괜찮다) */
+  .zone-run {
+    --stage-max: 640px;
+    --stage-h: clamp(320px, calc(100svh - var(--header-h) - var(--sp-12)), var(--stage-max));
+    --stage-pad: clamp(var(--sp-4), 5svh, var(--sp-10));
+    --bezel: calc(var(--sp-2) + 1px);    /* 폰: 테두리 + 안쪽 여백 */
+    --mat: calc(var(--sp-2) + 1px);      /* 프레임: 테두리 + 안쪽 여백 */
+    --screen-h: calc(var(--stage-h) - 2 * var(--stage-pad) - 2 * var(--bezel));
+    --phone-w: calc(var(--screen-h) * 9 / 19.5 + 2 * var(--bezel));
+    --frame-h: calc(var(--stage-h) - var(--sp-8));   /* 고지 문구 한 줄까지 더해 스테이지와 같은 높이다 */
+    --frame-45: min(100%, calc((var(--frame-h) - 2 * var(--mat)) * .8 + 2 * var(--mat)));
+    --zone-gap: clamp(var(--sp-6), 4vw, var(--sp-12));
+    --zone-land: var(--sp-14);           /* 앵커로 왔을 때 헤더 아래 여백. 모바일은 진행 점을 비킨다 */
+    --badge-h: var(--sp-8);
+    --dots-inset: clamp(var(--sp-1), calc(var(--gutter) - var(--sp-6) - 1px), var(--sp-3));
+    position: relative;
+  }
+  @media (min-width: 768px) {
+    .zone-run {
+      --stage-max: 720px;
+      --zone-land: clamp(0px, calc((100svh - var(--header-h) - var(--stage-h)) / 2), var(--sp-6));
+    }
+  }
+  @media (max-height: 480px) {
+    .zone-run {
+      --stage-pad: var(--sp-2);
+      --bezel: calc(var(--sp-1) + 1px);
+      --frame-h: calc(var(--stage-h) - var(--sp-14));   /* 프레임이 좁아져 고지 문구가 두 줄이 된다 */
+    }
+  }
+
+  .zone {
+    --ring: clamp(var(--sp-16), 40cqi, 136px);
+    padding: 0 var(--gutter) var(--section-y);
+    scroll-margin-top: var(--zone-land);
+  }
+  .zone[data-kind="compare"] { --ring: clamp(var(--sp-16), 30cqi, 136px); }
+  .zone[data-kind="wide"] { --ring: clamp(var(--sp-16), 22cqi, 136px); }
+  .zone-in {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--sp-8);
+    max-width: var(--container);
+    margin-inline: auto;
+  }
+  .zone-text { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .zone-title {
+    margin-top: var(--sp-6);
+    border-radius: var(--r-sm);
+    font-size: var(--fs-h2);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -.025em;
+  }
+  .zone-body { max-width: 36em; margin-top: var(--sp-3); color: var(--ink-600); text-wrap: balance; }
+  .zone-media { min-width: 0; }
+
+  @media (min-width: 768px) {
+    .zone-in {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--zone-gap);
+      align-items: center;
+    }
+    .zone-text { grid-row: 1; grid-column: 1 / span 6; align-items: flex-start; text-align: left; }
+    .zone-media { grid-row: 1; grid-column: 7 / span 6; }
+    .zone[data-flip] .zone-text { grid-column: 7 / span 6; }
+    .zone[data-flip] .zone-media { grid-column: 1 / span 6; }
+    .zone-body { margin-top: var(--sp-4); }
+  }
+  /* 기획서의 7:5. 이보다 좁으면 스크롤 막대가 있는 창에서 설명이 세 줄이 되어 6:6으로 둔다 */
+  @media (min-width: 900px) {
+    .zone-text { grid-column: 1 / span 5; }
+    .zone-media { grid-column: 6 / span 7; }
+    .zone[data-flip] .zone-text { grid-column: 8 / span 5; }
+    .zone[data-flip] .zone-media { grid-column: 1 / span 7; }
+  }
+
+  /* 폰 스테이지(존 01·02). 그림자는 폰에만 두어 한 존에 떠 있는 것이 하나다 */
+  .stage {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    height: var(--stage-h);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+  }
+  .phone {
+    position: relative;
+    width: var(--phone-w);
+    max-width: calc(100% - 2 * var(--sp-4));
+    padding: calc(var(--bezel) - 1px);
+    border: 1px solid var(--line);
+    border-radius: calc(var(--r-md) + var(--bezel) - 1px);   /* 화면과 같은 중심의 모서리 */
+    background: var(--white);
+    box-shadow: var(--shadow-lift);
+  }
+  .phone-screen {
+    --frame-inset: var(--sp-2);
+    position: relative;
+    aspect-ratio: 9 / 19.5;   /* 비율은 화면의 것이다. 앱 화면 영상이 잘리지 않는다 */
+    overflow: hidden;
+    container-type: inline-size;
+    border-radius: var(--r-md);
+    background: var(--cream);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  /* 4:5 비교(존 03)와 16:9 영상(존 04) */
+  .zone[data-kind="compare"] .zone-media { width: var(--frame-45); justify-self: center; }
+  .zone[data-kind="compare"] .frame-core { aspect-ratio: 4 / 5; }
+  .zone[data-kind="wide"] .frame-core { aspect-ratio: 16 / 9; }
+  @media (min-width: 768px) {
+    .zone[data-kind="compare"] .zone-media { justify-self: end; }   /* 존 01 스테이지와 바깥선을 맞춘다 */
+  }
+  @media (max-width: 767px) {
+    .zone[data-cut] .zone-media { width: var(--frame-45); justify-self: center; }
+    .zone[data-cut] .frame-core { aspect-ratio: 4 / 5; }
+  }
+
+  /* 큰 재생 버튼: 좁은 화면의 프레임에서도 'AI' 라벨을 비킨다 */
+  .zone .play-big {
+    width: clamp(var(--sp-14), 18cqw, 92px);
+    box-shadow: var(--shadow-lift), 0 0 0 var(--sp-2) color-mix(in srgb, var(--white) 70%, transparent);
+  }
+
+  /* 존 포스터 카드: 소개 영상 포스터의 존을 크게 당겼다. 고리 중심이 화면 가운데다 */
+  .zone-poster { --x: 50%; --y: 50%; --dx: 50%; --dy: 50%; }
+  .zone-poster .st-ring { position: relative; }
+  .zone-poster .st-ring::before {   /* 왁스 실링의 점선 고리를 흰 면에 뒤집어 쓴다 */
+    content: "";
+    position: absolute;
+    inset: var(--sp-1);
+    border: 2px dotted color-mix(in srgb, var(--brand) 45%, transparent);
+    border-radius: 50%;
+  }
+  .zone-poster .st-ring svg { width: 52%; height: 52%; }
+  .zone-poster .st-ring path { stroke-width: 2px; vector-effect: non-scaling-stroke; }
+  .zone-poster .st-name {
+    padding: var(--sp-1) var(--sp-4);
+    border: 1px solid var(--line);
+    font-size: var(--fs-body);
+  }
+  .zone[data-kind="phone"] .zone-poster .st-name { font-size: var(--fs-cap); }
+  .js .player .zone-poster .st-ring { visibility: hidden; }   /* 포스터 이미지 없는 영상: 큰 재생 버튼이 고리 자리에 온다 */
+
+  /* 프레임 위 라벨: 조작은 왼쪽 위, 고지는 오른쪽 위. 재생 버튼과 중심선을 맞춘다 */
+  .ai-badge, .cmp-tag {
+    position: absolute;
+    z-index: 3;
+    top: calc(var(--frame-inset) + (var(--ctrl) - var(--badge-h)) / 2);
+    display: inline-flex;
+    align-items: center;
+    height: var(--badge-h);
+    padding-inline: var(--sp-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    background: var(--white);
+    font-size: var(--fs-cap);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: .06em;
+    white-space: nowrap;
+    box-shadow: var(--shadow-soft);
+    pointer-events: none;
+  }
+  .ai-badge { right: var(--frame-inset); color: var(--brand-deep); }
+  /* 드레스 합성은 실제와 구분하기 어려워 가장 눈에 띄게 표시한다(PLAN 'AI 서비스 고지') */
+  .ai-badge[data-strong] { border-color: var(--brand-deep); background: var(--brand-deep); color: var(--white); }
+  .cmp-tag { left: var(--frame-inset); color: var(--ink-900); }
+
+  .zone-notice {
+    margin-top: var(--sp-3);
+    padding-inline: var(--sp-2);
+    color: var(--ink-600);
+    font-size: var(--fs-cap);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: .06em;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  /* 비교 슬라이더. touch-action이 세로 스크롤과 손가락 확대를 브라우저에 남긴다 */
+  .compare { position: absolute; inset: 0; --pos: 50%; touch-action: pan-y pinch-zoom; user-select: none; }
+  .js .compare { cursor: ew-resize; }
+  /* 길게 누를 때 이미지 메뉴가 떠 드래그가 끊기지 않게 이미지는 포인터를 받지 않는다 */
+  .compare img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-touch-callout: none; -webkit-user-drag: none; }
+  .cmp-stack, .cmp-before { position: absolute; inset: 0; }
+  .cmp-before { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+  .cmp-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--pos);
+    width: 2px;
+    translate: -50% 0;
+    border-radius: var(--r-pill);
+    background: var(--brand-deep);
+    box-shadow: 0 0 0 1px var(--white);   /* 흰 드레스 위에서도 보인다 */
+    pointer-events: none;
+  }
+  .cmp-range { display: none; position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; pointer-events: none; }
+  .js .cmp-range { display: block; }
+  .cmp-knob {
+    position: absolute;
+    top: 86%;   /* 사진의 얼굴과 상체를 비킨다 */
+    left: clamp(calc(var(--ctrl) / 2 + var(--sp-1)), var(--pos), calc(100% - var(--ctrl) / 2 - var(--sp-1)));
+    display: grid;
+    place-items: center;
+    width: var(--ctrl);
+    height: var(--ctrl);
+    border-radius: 50%;
+    background: var(--brand-deep);
+    color: var(--white);
+    box-shadow: var(--shadow-lift), 0 0 0 var(--sp-1) color-mix(in srgb, var(--white) 70%, transparent);
+    translate: -50% -50%;
+    pointer-events: none;
+    transition: scale 200ms var(--ease);
+  }
+  .cmp-knob svg { width: 60%; height: 60%; }
+  html:not(.js) .cmp-knob { display: none; }
+  @media (hover: hover) { .js .compare:hover .cmp-knob { scale: 1.03; } }
+  .js .compare:active .cmp-knob { scale: .98; transition-duration: 100ms; }
+  .cmp-range:focus-visible ~ .cmp-knob { outline: 3px solid var(--ink-900); outline-offset: var(--sp-1); }
+
+  /* 진행 점: 레일이 존 구간에만 있어 sticky로 함께 나타나고 사라진다. 버디(20)와 헤더(30) 아래다 */
+  .dots-rail {
+    position: absolute;
+    inset: calc((var(--section-y) + var(--tap)) / -2) 0 0;   /* 모바일은 소개 아래 여백 가운데에서 시작한다 */
+    z-index: 10;
+    pointer-events: none;
+  }
+  .dots {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-2) - (var(--tap) - var(--sp-8)) / 2);
+    width: max-content;
+    margin-inline: auto;
+    pointer-events: auto;
+  }
+  .dots::before {   /* 모바일 알약. 불투명해야 글자가 지나가도 대비를 지킨다 */
+    content: "";
+    position: absolute;
+    inset: calc((var(--tap) - var(--sp-8)) / 2) 0;
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    background: var(--white);
+    box-shadow: var(--shadow-soft);
+  }
+  .dots-list { position: relative; display: flex; }
+  .pd-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    border-radius: var(--r-pill);
+  }
+  .pd-link:focus-visible { outline-offset: -3px; }   /* 창 가장자리에서 링이 잘리지 않게 */
+  .pd-mark {
+    display: block;
+    width: var(--sp-2);
+    height: var(--sp-2);
+    border-radius: var(--r-pill);
+    background: var(--ink-600);
+    transition: width 300ms var(--ease), background-color 300ms var(--ease);
+  }
+  .pd-link[aria-current] .pd-mark { width: var(--sp-6); background: var(--brand-deep); }
+  @media (hover: hover) { .pd-link:hover .pd-mark { background: var(--brand-deep); } }
+
+  @media (min-width: 768px) {
+    .dots-rail { inset: 0; }
+    .dots {
+      top: max(calc(var(--header-h) + var(--sp-2)), calc(50svh - 2 * var(--tap)));
+      width: var(--tap);
+      margin: 0 0 0 auto;
+    }
+    .dots::before { display: none; }
+    .dots-list { flex-direction: column; }
+    .pd-link { justify-content: flex-end; padding-right: var(--dots-inset); }
+  }
+  @media (forced-colors: active) {
+    .pd-mark { forced-color-adjust: none; background: CanvasText; }
+    .pd-link[aria-current] .pd-mark { background: Highlight; }
+    .cmp-line { forced-color-adjust: none; background: Highlight; box-shadow: 0 0 0 1px Canvas; }
+    .cmp-knob { border: 2px solid CanvasText; }
+  }
+  @media print { .dots-rail { display: none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .intro-pill:hover, .intro-pill:active { scale: none; }
+    .js .compare:hover .cmp-knob, .js .compare:active .cmp-knob { scale: none; }
+  }
+}

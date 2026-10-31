@@ -20,7 +20,9 @@ export const MEDIA = {
   // TODO(zone-media): 존 영상과 이미지
   zone1: { kind: 'phone', screen: { kind: 'video', src: '', poster: '', alt: '스딩 앱의 웨딩 가격표 화면. 상품별 가격이 목록으로 보인다', aspect: '9/19.5' } },
   zone2: { kind: 'phone', screen: { kind: 'video', src: '', poster: '', alt: '스딩 앱의 AI 플래너 화면. 결혼 준비 일정이 시간순으로 이어진다', aspect: '9/19.5' } },
+  // TODO(zone3-rights): 모델 초상권 동의와 드레스 브랜드 사용 허락을 확인하기 전에는 파일을 넣지 않는다
   zone3: { kind: 'compare', before: '', after: '', alt: '같은 인물의 원본 사진과 드레스를 합성한 사진을 좌우로 비교하는 화면', aspect: '4/5' },
+  // TODO(zone4-hall): 대상 웨딩홀의 실존 여부, 촬영·사용 허락, 재현 방식을 확인하기 전에는 파일을 넣지 않는다
   zone4: { kind: 'video', src: '', srcMobile: '', poster: '', alt: '웨딩홀 입구에서 버진로드까지 1인칭으로 걸어가는 AI 시뮬레이션 영상', aspect: '16/9' },
 } satisfies Record<string, MediaSpec>;
 

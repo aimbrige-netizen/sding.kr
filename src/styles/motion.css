@@ -11,6 +11,9 @@
     transition-delay: calc(var(--i, 0) * 80ms);
   }
   .js [data-reveal].is-armed:not(.is-in) { opacity: 0; transform: translateY(24px); }
+  /* 영상 프레임: 96%→100%, 700ms. 투명해지지 않아 'AI' 라벨이 이미지보다 늦게 나오는 일이 없다 */
+  .js [data-reveal="frame"].is-armed { transition: transform 700ms var(--ease); transition-delay: 0s; }
+  .js [data-reveal="frame"].is-armed:not(.is-in) { opacity: 1; transform: scale(.96); }
 
   /* 동작 줄이기: 이동을 끄고 투명도만 바꾼다 */
   @media (prefers-reduced-motion: reduce) {
@@ -19,7 +22,7 @@
     .js [data-reveal].is-armed:not(.is-in) { transform: none; }
   }
   @media print {
-    .js .rise, .js .rise-move, .js [data-reveal].is-armed { opacity: 1; transform: none; animation: none; }
+    .js .rise, .js .rise-move, .js [data-reveal].is-armed, .js [data-reveal].is-armed:not(.is-in) { opacity: 1; transform: none; animation: none; }
   }
 }
 
