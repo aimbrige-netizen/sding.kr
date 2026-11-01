@@ -51,6 +51,7 @@
   }
 
   /* 후킹: 가는 'Coming'과 굵은 'Soon'. 1024px 미만은 두 줄, 그 위는 한 줄 */
+  /* TODO(text-spacing): 1024px 미만에서 글자 간격을 넓힌 사용자 설정이면 'Coming'의 끝이 화면에서 잘린다 */
   .hook {
     margin-top: var(--hero-gap);
     font-size: var(--fs-display);
@@ -241,6 +242,7 @@
   .btn-primary:active { scale: .98; transition-duration: 100ms; }
   .btn-orb {
     display: grid;
+    flex: none;
     place-items: center;
     width: var(--sp-12);
     height: var(--sp-12);

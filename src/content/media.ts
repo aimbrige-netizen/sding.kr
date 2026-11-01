@@ -15,7 +15,7 @@ const M = process.env.NEXT_PUBLIC_MEDIA_BASE || '/media';
 export const mediaUrl = (file: string) => `${M}/${file}`;
 
 export const MEDIA = {
-  // TODO(hero-film): 영상 파일(데스크톱 16:9, 모바일 4:5), 포스터, 자막, 대본, 업로드일, 길이, 유튜브 주소
+  // TODO(hero-film): 영상 파일(데스크톱 16:9, 모바일 4:5), 포스터, 자막, 대본, 설명, 업로드일, 길이, 유튜브 주소
   hero: { kind: 'video', src: '', srcMobile: '', poster: '', alt: '스딩 소개 영상', aspect: '16/9', hasAudio: true },
   // TODO(zone-media): 존 영상과 이미지
   zone1: { kind: 'phone', screen: { kind: 'video', src: '', poster: '', alt: '스딩 앱의 웨딩 가격표 화면. 상품별 가격이 목록으로 보인다', aspect: '9/19.5' } },

@@ -1,4 +1,4 @@
-# 스딩 랜딩페이지 기획서 v1.3
+# 스딩 랜딩페이지 기획서 v1.6
 
 Oct 28, 2026 · @tae hyeung kwon
 
@@ -7,6 +7,12 @@ Oct 28, 2026 · @tae hyeung kwon
 **v1.2 변경(2026-10-29)**: 지원 하한을 iOS·Safari 16.4로 올리고, 폰트를 저자가 배포한 다이내믹 서브셋으로 바꿨다. 2단계(히어로와 영상 시스템)를 만들며 낮은 화면의 후킹·영상 크기, 동작 줄이기 규칙, 영상의 `autoplay` 속성을 정리했다. 교차 검토 뒤 D-day 실링의 최소 폭과 그림자(`--seal-min`, `--shadow-seal`), 기획서에 없던 영상·버디 경우(밖에서 멈춘 영상, 화면 폭이 바뀔 때의 컷, 소리 파일이 없을 때와 멈춘 소리 영상의 버디)를 더했다. 브라우저 글자 크기를 키워도 후킹이 한 줄이도록 `--fs-display`에 상한을 더했다.
 
 **v1.3 변경(2026-10-31)**: 3단계(소개와 존 4개)를 만들며 기획서끼리 어긋나던 곳을 정리했다. 768~899px의 존은 설명 두 줄을 지키려고 텍스트와 미디어를 6열씩 쓴다. 고지 문구는 ZONE 03 표대로 미디어 바로 아래에 두고 ZONE 04도 같게 한다. 진행 점은 존 구간에 있을 때만 보인다. JS가 꺼져 있으면 재생 버튼을 숨긴다.
+
+**v1.4 변경(2026-10-31)**: 4단계(FAQ와 검색 대응)를 만들며 기획서에 없던 값을 정했다. FAQ 제목은 '자주 묻는 질문'이고 질문 글자는 서체 표에 더했다. 공유 이미지는 후킹이 'Coming Soon'일 때 히어로의 눈을 함께 그리고, `next/og`가 woff2와 가변 폰트를 읽지 못해 고정 굵기 폰트를 `assets/fonts/`에 둔다. IndexNow 키는 미리 만들어 두었다. 해시 주소로 바로 들어오면 로드가 끝날 때까지 부드러운 스크롤을 끄고, JS가 꺼져 있으면 부드러운 스크롤을 쓰지 않는다. 스테이징과 프리뷰의 `noindex`는 메타 태그 코드에도 적었다. canonical과 `og:url`은 `'./'`로 써서 페이지마다 제 주소를 가리키고, `og:title`과 `og:description`은 페이지의 `title`, `description`을 따른다. Lighthouse SEO는 미리보기가 `noindex`라 `sding.kr`에서 잰다. IndexNow 전송을 첫 공개와 정식 오픈 일정에 넣었고, 만드는 단계가 없던 `not-found.tsx`는 6단계에 넣었다. FAQ의 스토어 답은 주소가 있는 곳만 말한다.
+
+**v1.5 변경(2026-11-01)**: '가상 피팅'은 드레스 AI 합성을 풀어 쓴 말로 보고, 정의 문장 안에서 쓰도록 규칙을 고쳤다. 기획서에 없던 AI 웨딩홀 시뮬레이션의 정의 문장은 ZONE 04 설명의 말로 정했다. 두 문구는 임시이며 사용자가 나중에 직접 고친다(`docs/OPEN_ITEMS.md` '나중에 직접 고칠 문구').
+
+**v1.6 변경(2026-11-01)**: 5단계(사전 신청)를 만들기 전에 공식 문서와 소스로 사양을 확인하고, 기획서의 코드대로면 실패하는 곳을 고쳤다. 번호 처리는 `+82` 자동 완성에서 끝자리가 잘려 저장되던 문제와 형식(010 + 2~9로 시작하는 8자리)을 바로잡았다. Supabase는 표 권한을 직접 주고, 중복 번호는 `upsert`로 넘겨 번호가 Postgres 로그에 남지 않게 했으며, 키 이름을 `SUPABASE_SECRET_KEY`로 바꿨다. Turnstile은 서버 검증에 시간 제한과 hostname·action 확인을 넣고 장애를 봇 실패와 나누었으며, 위젯은 제출한 폼에서만 그때 만든다. 서울 리전은 `vercel.json`으로 고정했다. 동의 고지는 체크박스 옆에 접지 않고 보이게 했고, 허니팟 칸, JS 끔, 'App Store'·'Google Play' 표기, QR(`uqr`, 하나만)을 정했다. 구현 뒤 교차 검토에서 전송 중 입력 잠금, 전송 시간 제한, 하이드레이션 전 입력 보존, 두 번 누른 CTA, iOS의 뒤 페이지 잠금, 로그의 HTTP 상태를 더했고, 코드 블록을 실제 파일에 다시 맞췄다.
 
 ## 요약
 
@@ -31,11 +37,11 @@ Oct 28, 2026 · @tae hyeung kwon
 
 ### 확정 필요 항목
 
-본문의 \[확인 필요\]는 이 목록의 항목이거나 변호사·세무사 확인이 필요한 항목에 달았다. 정해지기 전에도 기본값으로 개발은 시작할 수 있으며, 항목별 쓰임과 기본값은 자료 체크리스트와 일정 절의 표에 있다.
+본문의 \[확인 필요\]는 이 목록의 항목이거나 변호사·세무사 확인이 필요한 항목에 달았다. 정해지기 전에도 기본값으로 개발은 시작할 수 있으며, 항목별 쓰임과 기본값은 자료 체크리스트와 일정 절의 표와 `docs/OPEN_ITEMS.md`에 있다.
 
 - **개발 시작 전(11월 4일까지)**: 로고 SVG 원본(받은 값은 `Layer 2` 위치뿐이다), 영문 표기(Sding 또는 SDING), 도메인 등록처와 DNS 위치, 사전 신청 수집 항목(휴대폰 번호 또는 이메일).
-- **첫 공개 전(11월 12일까지)**: 전화번호·대표 이메일·개인정보보호책임자, 웨딩 가격 정찰제의 실제 규칙과 문구, 변호사 검토(끝나야 첫 공개를 할 수 있다), 법인 설립등기일, IndexNow 키.
-- **영상과 오픈**: 영상 제작 도구의 상업 이용 조건(납품 전), 영상 파일(12월 4일), 12월 25일 오픈의 의미와 스토어 주소, 오픈 후 후킹 문구(12월 11일).
+- **첫 공개 전(11월 12일까지)**: 전화번호·대표 이메일·개인정보보호책임자, 웨딩 가격 정찰제의 실제 규칙과 문구, 변호사 검토(끝나야 첫 공개를 할 수 있다), 법인 설립등기일, 출시 알림 번호 보관 기간, 구글·네이버 소유확인 값, GA4 ID, Turnstile 키, Supabase 프로젝트와 요금제, Vercel 요금제, AI 웨딩홀 시뮬레이션 정의 문장과 '가상 피팅' 표현(임시로 넣었고 사용자가 직접 고친다).
+- **영상과 오픈**: 영상 제작 도구의 상업 이용 조건(납품 전), 영상 파일(12월 4일), ZONE 02 입력 항목, ZONE 03 모델 초상권과 드레스 브랜드 사용 허락, ZONE 04 웨딩홀 사용 허락(납품 전), 12월 25일 오픈의 의미, 스토어 주소와 지원 기기, 오픈 후 후킹 문구(12월 11일), 공식 스토어 배지와 Apple 크레딧 줄(12월 11일), 사용자 사진 처리 정책(오픈 전).
 - **정해지면**: 서비스 지역과 요금 정책, SNS 계정 주소, 통신판매업 신고 시점. 위디 영상 사용 방식의 직접 확인은 선택이다.
 
 ## 프로젝트 개요
@@ -174,6 +180,7 @@ Oct 28, 2026 · @tae hyeung kwon
 | 소제목 (H3) | 28px | 22px | 700 | 1.3 | -0.02em |
 | 리드 | 22px | 18px | 500 | 1.6 | -0.01em |
 | 본문 | 18px | 16px | 400 | 1.7 | 0 |
+| FAQ 질문 | 18px | 16px | 700 | 1.4 | -0.01em |
 | 킥커·캡션 | 14px | 13px | 600 | 1.4 | 0.06em |
 
 375px에서 1440px 사이 크기는 `clamp()`로 잇는다. 정확한 값은 개발 사양의 토큰 블록에 둔다. 후킹은 `--fs-display` 하나만 쓰며 1024px부터 한 줄, 그 아래는 두 줄('Coming' / 'Soon')이다. 낮은 화면에서는 영상 노출을 지키려고 화면 높이에 맞춰 후킹을 줄이고(브라우저 창 안쪽 크기 375×667에서 66px, 1366×768에서 158px), 1024px부터는 실링까지 여백 안에 들어오도록 화면 폭으로도 줄인다.
@@ -250,7 +257,7 @@ Oct 28, 2026 · @tae hyeung kwon
 
 ### 아이콘과 이미지
 
-- 아이콘은 24px 격자, 선 두께 2px, 끝과 모서리 둥글게, `currentColor`로 그린다. 존 아이콘 4개와 반짝임 1개만 만들고 이모지는 쓰지 않는다. 재생·일시정지·펼침 화살표 같은 조작용 글리프는 같은 격자의 기능 글리프로 따로 허용한다.
+- 아이콘은 24px 격자, 선 두께 2px, 끝과 모서리 둥글게, `currentColor`로 그린다. 존 아이콘 4개와 반짝임 1개만 만들고 이모지는 쓰지 않는다. 재생·일시정지·펼침 화살표 같은 조작용 글리프는 같은 격자의 기능 글리프로 따로 허용한다. 푸터의 SNS 아이콘은 채널이 정해지면 더한다.
 - 사진과 영상은 밝은 하이키 톤, 따뜻한 자연광, 약한 피부 보정을 기준으로 한다. 과한 필터와 어두운 장면은 피한다.
 - 드레스·웨딩홀 합성 이미지에는 화면에 보이는 'AI 합성' 라벨을 붙인다. 표기 규칙은 회사정보·법적 표기 절에서 정한다.
 
@@ -266,6 +273,7 @@ Oct 28, 2026 · @tae hyeung kwon
 - 로고는 `/#top`으로 이동하고, JS 없이 CTA를 눌렀을 때는 `/#waitlist`로 이동한다. 헤더가 모든 페이지에 있으므로 `/`를 붙이고, 홈에서는 같은 문서 안에서 스크롤만 한다.
 - 고정 헤더에 제목이 가려지지 않도록 `scroll-padding-top`을 쓴다. 값은 디자인 토큰에 있다.
 - 앵커로 이동한 뒤 키보드 포커스가 따라가도록 섹션 제목에 `tabindex='-1'`을 둔다.
+- 해시 주소로 바로 들어오면 로드가 끝날 때까지 부드러운 스크롤을 끈다. 스크롤하는 동안 글꼴이 바뀌어 위쪽 높이가 줄면 목적지를 지나치기 때문이다. JS가 꺼져 있으면 부드러운 스크롤을 쓰지 않는다.
 
 ## 섹션별 상세 기획
 
@@ -395,7 +403,7 @@ Oct 28, 2026 · @tae hyeung kwon
 
 ### FAQ
 
-FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 있게 한다. 질문은 8개이며 요금 항목은 정책이 정해질 때까지 숨긴다. 답변의 첫 문장이 곧 답이고 질문의 주제어를 되풀이한다. 같은 데이터에서 FAQPage JSON-LD를 만든다.
+FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 있게 한다. 제목은 '자주 묻는 질문'이다. 질문은 8개이며 요금 항목은 정책이 정해질 때까지 숨긴다. 답변의 첫 문장이 곧 답이고 질문의 주제어를 되풀이한다. 같은 데이터에서 FAQPage JSON-LD를 만든다.
 
 | 질문 | 답변 초안 | 확정 필요 |
 | --- | --- | --- |
@@ -408,21 +416,23 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 | 이용 요금은 얼마인가요? | 요금 정책이 정해진 뒤에 쓴다. 정해지기 전에는 이 항목을 노출하지 않는다. | 요금 정책 |
 | 출시 알림에 남긴 번호는 어떻게 쓰이나요? | 출시 알림에 남긴 번호는 오픈 안내 문자를 보내는 데만 쓰고, 목적이 끝나면 파기해요. | 보관 기간 |
 
-오픈 후에는 '언제부터 쓸 수 있나요?'가 '어디서 쓸 수 있나요?'('스딩은 앱스토어와 구글 플레이에서 받을 수 있어요.')로 바뀌고, '출시 알림에 남긴 번호' 질문은 사라진다. 항목의 `when`·`hidden` 필드와 `faqFor()`가 이 전환을 처리한다(개발 사양 절 참고).
+오픈 후에는 '언제부터 쓸 수 있나요?'가 '어디서 쓸 수 있나요?'('스딩은 App Store와 Google Play에서 받을 수 있어요.', 스토어 주소가 하나면 그곳만 말한다)로 바뀌고, '출시 알림에 남긴 번호' 질문은 사라진다. 항목의 `when`·`hidden` 필드와 `faqFor()`가 이 전환을 처리한다(개발 사양 절 참고).
 
 ### 마지막 CTA
 
 | 항목 | 내용 |
 | --- | --- |
 | 목적 | 방문자가 가장 쉬운 방법으로 출시 알림을 신청하게 한다 |
-| 구성 | 오렌지 패널 하나 안에 헤드라인(흰색 H2), 한 줄 설명(`--ink-900`), 폼 카드, 제휴 문의 링크 |
+| 구성 | 오렌지 패널 하나 안에 헤드라인(흰색 H2), 한 줄 설명(`--ink-900`), 폼 카드. 제휴 문의 링크는 패널 아래에 둔다 |
+| 배치 | 피치는 FAQ부터 푸터까지 이어지고 패널 하나만 뜬다. 흰 카드가 페이지 세로줄에 놓이고 오렌지가 그 밖으로 8px 나온다. `--r-lg`에서 `--r-md`를 빼면 `--sp-2`라 두 곡선의 중심이 같다. 제목, 설명, 라벨, 고지, 체크가 왼쪽 선 하나를 쓰고, 날짜는 혼자 한 줄을 쓴다. 1024px부터 두 칸이고 카드 폭은 480px이다. 눈은 번호, 체크, 버튼 순서로 내려가고, 누른 뒤에 생기는 것(상태 문구, Turnstile)은 모두 버튼 아래에 나온다. 패널은 아래로만 자라 위의 내용이 움직이지 않는다. 신청 창은 카드가 가운데에 있어 자란 만큼 위아래로 나뉜다 |
 | 헤드라인 | 12월 25일, 스딩이 문을 열어요 (오픈 후: 지금 스딩을 시작해 보세요) |
 | 설명 | 전화번호를 남기면 오픈하는 날 문자로 알려 드려요. 로그인은 필요 없어요. |
-| 폼 카드 | 패널 안의 흰 카드. 전화번호 한 칸(`inputmode=tel`, `autocomplete=tel`), 필수 동의 체크, 주 버튼. 작은 글자가 모두 흰 바탕 위에 놓인다 |
-| 동의 문구 | 개인정보 수집·이용에 동의해요(필수). 목적은 출시 안내 문자 발송, 항목은 휴대폰 번호, 보관 기간은 발송 후 30일(제안) \[확인 필요\]. 광고성 정보 수신 동의 문구는 변호사 검토 뒤에 더한다 \[확인 필요\]. 자세히 보기는 /privacy로 연결한다 |
-| 상태 | 입력, 전송 중, 성공, 오류. 성공 문구는 '신청이 완료됐어요. 오픈하는 날 문자로 알려 드릴게요.'다 |
+| 폼 카드 | 패널 안의 흰 카드. 전화번호 한 칸(`type=tel`, `inputmode=tel`, `autocomplete=tel`), 동의 고지, 필수 동의 체크, 주 버튼. 작은 글자가 모두 흰 바탕 위에 놓인다 |
+| 동의 고지 | 체크박스 바로 옆에 접지 않고 보인다. 대법원 2014두2638은 고지 전부를 명확히 게재하고 동의 표시와 밀접하게 배치하라고 했으므로 링크나 접기 뒤에 두지 않는다. 항목은 휴대폰 번호, 목적은 정식 오픈 안내 문자 발송, 보유 기간은 '안내 문자를 보낸 뒤 30일 안에 파기'(제안, 굵게) \[확인 필요\], 거부 권리와 불이익, '만 14세 미만은 신청할 수 없어요.' \[확인 필요\]. 체크 라벨은 '개인정보 수집·이용에 동의해요 (필수)'이고 기본은 해제다. 자세히 보기는 /privacy를 새 탭으로 연다. 입력한 번호를 지키고, 신청 창이 열린 채 페이지가 바뀌지 않게 하기 위해서다. 광고성 정보 수신 동의는 변호사 검토 뒤에 별도 항목으로 더한다 \[확인 필요\] |
+| 상태 | 입력, 전송 중, 성공, 오류. 성공 문구는 '신청이 완료됐어요. 오픈하는 날 문자로 알려 드릴게요.'다. Turnstile이 사람 확인을 요구하면 위젯이 카드 안에 나타나고 '확인을 마치면 신청이 끝나요.'를 보인다. JS가 꺼져 있으면 제출 버튼이 꺼지고 'JavaScript를 켜야 신청할 수 있어요.'를 보인다. 전송 중에는 번호와 체크를 잠가 보낸 값과 화면이 어긋나지 않게 하고, 버튼의 반짝임이 4.9초까지 돌고, 성공하면 폼 자리에 반짝임이 D-day 실링처럼 찍힌다(신청 창에서는 페이드). 패널은 성공해도 높이를 지켜 아래가 뛰지 않는다 |
 | 중복 번호 | 이미 있는 번호도 같은 성공 문구를 보여 준다. 번호가 등록돼 있는지 드러내지 않는다 |
-| 오픈 후 | 폼 대신 앱스토어·구글 플레이 배지와 QR 코드를 보여 준다 |
+| 오픈 후 | 폼 대신 App Store·Google Play 링크와 QR 코드를 보여 준다. 설명은 FAQ의 '어디서 쓸 수 있나요?' 답과 같다. 주소가 있는 곳만 보이고 App Store를 앞에 둔다. 공식 배지 파일을 받기 전에는 'App Store에서 받기' 같은 글자 링크를 쓴다. 로고를 그린 자체 버튼은 만들지 않는다. 배지와 QR은 그림을 바꾸면 안 되거나 코드가 만드는 그림이라 `MediaSlot`을 쓰지 않는다 |
+| QR | 스토어가 둘이어도 하나만 둔다. `https://sding.kr/#waitlist`를 담아 폰에서 이 자리의 링크를 누르게 한다. 기기를 판별하는 리다이렉트 라우트나 외부 업체가 필요 없다. 1024px 이상이면서 hover와 정밀 포인터가 있는 화면에서만 보인다. 자기 화면의 코드는 찍을 수 없다 |
 | 제휴 문의 | 패널 아래 작은 글씨로 '웨딩 업체이신가요? 제휴 문의' `mailto:` 링크를 둔다 |
 
 ### 푸터
@@ -439,7 +449,7 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 
 - 사운드 버디는 화면 오른쪽 아래에 고정되는 소리 켜기·끄기 버튼이다. 동작은 영상·미디어 시스템 절에서 정한다.
 - 진행 점은 존 4개를 가리키는 점이다. 존 구간에 있을 때만 보이며, 위치와 동작은 컨셉 절을 따른다.
-- 신청 창은 헤더와 히어로 CTA가 여는 `dialog`다. 안의 폼은 마지막 CTA의 폼과 같은 컴포넌트다.
+- 신청 창은 헤더와 히어로 CTA가 여는 `dialog`다. 안의 폼은 마지막 CTA의 폼과 같은 컴포넌트다. 어느 페이지에서나 열리도록 레이아웃에 하나만 두고, 제목은 CTA 문구, 설명은 마지막 CTA의 설명과 같다. 오픈 후에는 같은 창이 스토어 선택 창이 된다. 닫기 버튼, Esc, 바깥 누르기로 닫히고 입력값은 남는다. 키보드가 떠 있을 때 바깥을 누르면 키보드만 내린다. 바깥 누르기는 누른 곳과 손을 뗀 곳이 모두 카드 밖일 때만 닫는다. 창을 연 뒤 0.4초 안의 누름은 버린다. CTA를 두 번 눌렀을 때 창이 바로 닫히거나 읽지 않은 동의가 체크되지 않게 하기 위해서다. 다시 열면 카드는 맨 위에서 시작한다. 데스크톱은 입력칸에서, 터치 기기는 제목에서 포커스가 시작한다. 터치 기기에서 입력칸을 바로 잡으면 키보드가 동의 고지와 버튼을 가린다. 카드는 키보드에 가려지지 않게 가운데에 두고 안에서 세로로 스크롤한다. iOS는 주소창이 접혔거나 키보드가 떠 있으면 `overflow: hidden`을 넘어 뒤 페이지를 움직이므로 창의 `touchmove`를 직접 막는다. 카드 스크롤, 두 손가락 확대, 확대한 화면의 이동은 막지 않는다.
 
 ## 영상·미디어 시스템
 
@@ -534,7 +544,7 @@ SEO·GEO·AEO는 따로 하지 않고 같은 기반 위에서 한꺼번에 처�
 ### 기본 원칙
 
 1. 정의 문장 하나를 메타 설명, 소개, 구조화 데이터, llms.txt, 보도자료에 같은 뜻으로 쓴다.
-2. 기능 이름 4개를 고정하고 모든 채널에서 똑같이 쓴다. 동의어는 FAQ 답변에서 풀어 쓸 때만 쓴다.
+2. 기능 이름 4개를 고정하고 모든 채널에서 똑같이 쓴다. 동의어는 정의 문장 안에서 풀어 쓸 때만 쓴다.
 3. 모든 카피는 서버가 만든 HTML에 넣는다(SSG). 영상이나 이미지 안에만 있는 정보는 두지 않는다.
 4. FAQ 답변은 첫 문장이 곧 답이다. 질문의 주제어를 그 문장에 다시 써서, 문장만 떼어 가도 뜻이 통하게 한다.
 5. 구조화 데이터의 값은 화면에 보이는 내용과 같아야 한다. 근거 없는 후기·평점·가격은 넣지 않는다.
@@ -546,10 +556,12 @@ SEO·GEO·AEO는 따로 하지 않고 같은 기반 위에서 한꺼번에 처�
 | --- | --- | --- |
 | 웨딩 가격 정찰제 | 가격 고정제, 정가제 | 정의는 적용 범위가 정해진 뒤 확정 \[확인 필요\] |
 | 웨딩 AI 플래너 | AI 웨딩 매니저, AI 플래닝 서비스 | 정의 문장 안의 '플래닝'은 예외다 |
-| 드레스 AI 합성 | AI 드레스 피팅, 가상 드레스 | FAQ 답변에서만 '가상 피팅'으로 풀어 쓴다 |
+| 드레스 AI 합성 | AI 드레스 피팅, 가상 드레스 | 이름 자리에는 쓰지 않고, 정의 문장 안에서만 '가상 피팅'으로 풀어 쓴다 |
 | AI 웨딩홀 시뮬레이션 | 웨딩홀 VR, 메타버스 웨딩홀 | 실제 제작 방식이 확정되면 그에 맞춰 고친다 |
 
 정의 문장과 용어별 한 줄 설명은 `src/content/`에 한 번만 쓴다. 메타 태그, 구조화 데이터, llms.txt가 같은 값을 읽는다.
+
+기능별 한 줄 정의는 FAQ 표의 답변 첫 문장이다. AI 웨딩홀 시뮬레이션은 FAQ 질문이 달라서 정의를 따로 둔다: 'AI 웨딩홀 시뮬레이션은 입장부터 버진로드까지, 방문 전에 분위기와 동선을 먼저 걸어 보는 기능이에요.' ZONE 04 설명의 말만 쓴 임시 문장이다.
 
 ### 메타 태그
 
@@ -561,15 +573,13 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://sding.kr'),
   title: SITE.title,              // 스딩 Sding | 웨딩 가격 정찰제 · AI 웨딩 플래너
   description: SITE.description,  // 정의 문장, 합니다체
-  alternates: { canonical: '/' },
-  robots: {
-    index: true, follow: true,
-    googleBot: { 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
-  },
+  alternates: { canonical: './' },   // 페이지마다 제 주소가 된다
+  robots: process.env.NEXT_PUBLIC_SITE_ENV === 'production'   // 스테이징·프리뷰는 색인 금지
+    ? { index: true, follow: true, googleBot: { 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } }
+    : { index: false, follow: false },
   openGraph: {
-    type: 'website', locale: 'ko_KR', siteName: '스딩', url: '/',
-    title: SITE.title, description: SITE.description,
-    // og:image는 src/app/opengraph-image.tsx가 만든다
+    type: 'website', locale: 'ko_KR', siteName: '스딩', url: './',
+    // og:title과 og:description은 페이지의 title, description을 따른다. og:image는 src/app/opengraph-image.tsx가 만든다
   },
   twitter: { card: 'summary_large_image' },
   verification: {                 // 값이 비어 있으면 태그를 넣지 않는다
@@ -586,7 +596,7 @@ export const viewport: Viewport = {
 };
 ```
 
-- 공유 이미지는 `src/app/opengraph-image.tsx`가 1200×630 PNG로 만든다. 로고 텍스트, 정의 문장, 후킹 문구(`COPY.hero.hook[ctaMode()]`)와 `launchDotted()` 날짜를 담고, 로고 SVG가 오면 이 파일 안에서 바꾼다. alt는 `SITE.ogAlt`다. 페이지와 같은 `revalidate = 3600`으로 다시 만들어 오픈일에 오픈 후 문구로 바뀌게 하고, 오픈일에 카카오 공유 캐시를 지운다.
+- 공유 이미지는 `src/app/opengraph-image.tsx`가 1200×630 PNG로 만든다. 로고 텍스트, 정의 문장, 후킹 문구(`COPY.hero.hook[ctaMode()]`)와 `launchDotted()` 날짜를 담고, 후킹이 'Coming Soon'일 때는 히어로의 눈을 함께 그린다. 로고 SVG가 오면 이 파일 안에서 바꾼다. `next/og`는 woff2와 가변 폰트를 읽지 못해 Pretendard 고정 굵기 woff 3개를 `assets/fonts/`에 둔다. 방문자에게는 내려가지 않는다. 문구를 바꾸면 글자가 이 폰트에 있는지 확인한다. 없으면 `next/og`가 렌더링 때 외부에서 글꼴을 받는다. alt는 `SITE.ogAlt`다. 페이지와 같은 `revalidate = 3600`으로 다시 만들어 오픈일에 오픈 후 문구로 바뀌게 한다. 다시 만들기는 요청이 와야 시작하고 그 요청은 이전 이미지를 받으므로, 오픈일 1시(KST)가 지나 `/opengraph-image`를 열어 새 문구를 확인한 뒤 카카오 공유 캐시를 지운다.
 - 소유확인 메타 태그는 환경 변수 `NEXT_PUBLIC_GOOGLE_VERIFICATION`, `NEXT_PUBLIC_NAVER_VERIFICATION`에서 읽는다. 구글은 DNS TXT 인증을 기본으로 하고 메타 태그는 보조로 둔다. 네이버 서치어드바이저는 메타 태그로 인증한다.
 
 `www.sding.kr`은 `sding.kr`로 301 이동한다. 네이버 서치어드바이저에서도 대표 도메인을 `sding.kr`로 지정한다. 카카오톡 미리보기는 OG 태그를 읽으므로, 이미지나 문구를 바꾸면 카카오 공유 디버거에서 캐시를 지운다.
@@ -624,37 +634,76 @@ export default function robots(): MetadataRoute.Robots {
 
 학습용 봇만 막고 싶으면 GPTBot, ClaudeBot, Google-Extended 규칙의 `allow`를 `disallow: '/'`로 바꾼다. 검색과 사용자 요청 봇은 계속 허용한다. 사이트맵에는 `/`, `/privacy`, `/terms` 세 주소만 넣는다.
 
-IndexNow 키 파일을 `public/{키}.txt`로 둔다. 키는 공개 값이며 빙 웹마스터 도구에 등록할 때 정한다 \[확인 필요\]. 배포 뒤에는 IndexNow로 바뀐 주소를 알린다.
+IndexNow 키 파일을 `public/{키}.txt`로 둔다. 키는 소유자가 정하는 공개 값이라 무작위로 만들어 두었고, 빙 웹마스터 도구에 같은 값을 등록한다. 다른 키를 쓰게 되면 파일과 아래 요청의 `key`를 함께 바꾼다. 배포 뒤에는 IndexNow로 바뀐 주소를 알린다. 첫 공개 날에는 세 주소를, 정식 오픈 날에는 홈 주소를 보낸다. 응답이 200이나 202면 접수된 것이다.
+
+```bash
+curl -i -X POST https://api.indexnow.org/indexnow -H "Content-Type: application/json; charset=utf-8" -d '{"host":"sding.kr","key":"9c7495293e61b2ab93f040374f6033e7","urlList":["https://sding.kr/","https://sding.kr/privacy","https://sding.kr/terms"]}'
+```
 
 ### 구조화 데이터
 
-JSON-LD는 `@graph` 하나에 노드 6개를 담고 `@id`로 서로 잇는다. `DefinedTermSet`은 고정 용어 4개의 정의를 담아 정의형 질문에서 인용될 근거를 준다. 값은 content 파일에서 읽고, 빈 문자열과 빈 배열은 `prune()`으로 뺀다.
+JSON-LD는 `@graph` 하나에 노드 5개를 담고 `@id`로 서로 잇는다. 소개 영상이 오면 `VideoObject`가, 오픈 후에는 `MobileApplication`이 더해진다. `DefinedTermSet`은 고정 용어 4개의 정의를 담아 정의형 질문에서 인용될 근거를 준다. 값은 content 파일에서 읽고, 빈 문자열과 빈 배열은 `prune()`으로 뺀다.
 
 ```ts
 // src/lib/jsonld.ts
+import { ctaMode } from './launch';
+import { prune } from './prune';
+import { COMPANY } from '@/content/company';
+import { faqFor } from '@/content/faq';
+import { MEDIA, type MediaSpec } from '@/content/media';
+import { COPY, SITE } from '@/content/site';
+import { ZONES } from '@/content/zones';
+
+const home = `${SITE.url}/`;
+const org = `${SITE.url}/#org`;
+const site = `${SITE.url}/#website`;
+const terms = `${SITE.url}/#terms`;
+const absolute = (url = '') => (url ? new URL(url, SITE.url).href : '');
+
+// 업로드일과 썸네일이 채워진 뒤에만 영상 노드를 낸다(PLAN '구조화 데이터')
+function film() {
+  const spec: MediaSpec = MEDIA.hero;
+  if (spec.kind !== 'video' || !spec.uploadDate || !spec.poster) return null;
+  return {
+    '@type': 'VideoObject', '@id': `${SITE.url}/#film`, name: COPY.film.title, description: spec.description,
+    thumbnailUrl: [absolute(spec.poster)], uploadDate: spec.uploadDate, duration: spec.duration,
+    contentUrl: absolute(spec.src), embedUrl: spec.youtube, inLanguage: 'ko-KR',
+  };
+}
+
+// ctaMode()는 스토어 주소가 있어야 'live'가 되므로 이 노드는 앱이 나온 뒤에만 나간다(PLAN 'CTA 전환')
+function app() {
+  const { ios, android } = SITE.store;
+  return {
+    '@type': 'MobileApplication', '@id': `${SITE.url}/#app`, name: COMPANY.brandName,
+    operatingSystem: [ios && 'iOS', android && 'Android'].filter(Boolean).join(', '),
+    installUrl: [ios, android], publisher: { '@id': org },
+  };
+}
+
+// 노드를 @graph 하나에 담아 @id로 잇는다. 값은 화면과 같은 content 파일에서 읽는다
 export const graph = () => {
-  const org = 'https://sding.kr/#org', site = 'https://sding.kr/#website';
+  const mode = ctaMode();
   return prune({
     '@context': 'https://schema.org',
     '@graph': [
-      { '@type': 'Organization', '@id': org, name: '스딩', alternateName: 'Sding', legalName: COMPANY.legalName,
-        url: 'https://sding.kr/', logo: 'https://sding.kr/icons/icon-512.png', description: SITE.description,
+      { '@type': 'Organization', '@id': org, name: COMPANY.brandName, alternateName: COMPANY.brandNameEn, legalName: COMPANY.legalName,
+        url: home, logo: `${SITE.url}/icons/icon-512.png`, description: SITE.description,
         foundingDate: COMPANY.openedAt, taxID: COMPANY.bizRegNo,
         address: { '@type': 'PostalAddress', streetAddress: COMPANY.street, addressLocality: COMPANY.locality,
           addressRegion: COMPANY.region, addressCountry: 'KR' },
         sameAs: SITE.sameAs },
-      { '@type': 'WebSite', '@id': site, url: 'https://sding.kr/', name: '스딩', inLanguage: 'ko-KR', publisher: { '@id': org } },
-      { '@type': 'WebPage', '@id': 'https://sding.kr/#webpage', url: 'https://sding.kr/', name: SITE.title,
+      { '@type': 'WebSite', '@id': site, url: home, name: COMPANY.brandName, inLanguage: 'ko-KR', publisher: { '@id': org } },
+      { '@type': 'WebPage', '@id': `${SITE.url}/#webpage`, url: home, name: SITE.title,
         isPartOf: { '@id': site }, about: { '@id': org }, inLanguage: 'ko-KR',
-        primaryImageOfPage: { '@type': 'ImageObject', url: 'https://sding.kr/opengraph-image' } },
-      { '@type': 'DefinedTermSet', '@id': 'https://sding.kr/#terms', name: '스딩 기능 용어', inLanguage: 'ko-KR',
-        hasDefinedTerm: ZONES.map((z) => ({ '@type': 'DefinedTerm', name: z.feature, description: z.definition,
-          inDefinedTermSet: { '@id': 'https://sding.kr/#terms' } })) },
-      { '@type': 'VideoObject', '@id': 'https://sding.kr/#film', name: '스딩 소개 영상', description: MEDIA.hero.description,
-        thumbnailUrl: [MEDIA.hero.poster], uploadDate: MEDIA.hero.uploadDate, duration: MEDIA.hero.duration,
-        contentUrl: MEDIA.hero.src, embedUrl: MEDIA.hero.youtube, inLanguage: 'ko-KR' },
-      { '@type': 'FAQPage', '@id': 'https://sding.kr/#faq',
-        mainEntity: faqFor(ctaMode()).map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+        primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE.url}/opengraph-image` } },
+      { '@type': 'DefinedTermSet', '@id': terms, name: COPY.terms, inLanguage: 'ko-KR',
+        hasDefinedTerm: ZONES.map((zone) => ({ '@type': 'DefinedTerm', name: zone.feature, description: zone.definition,
+          inDefinedTermSet: { '@id': terms } })) },
+      film(),
+      mode === 'live' ? app() : null,
+      { '@type': 'FAQPage', '@id': `${SITE.url}/#faq`,
+        mainEntity: faqFor(mode).map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })) },
     ],
   });
 };
@@ -767,10 +816,10 @@ AI 기능은 생성형 AI를 활용하며 결과는 실제와 다를 수 있어�
 | 이용 목적 | 정식 오픈 안내 문자 발송 |
 | 보유 기간 | 오픈 안내 발송 후 30일 이내 파기(제안). 동의를 철회하면 즉시 파기 \[확인 필요\] |
 | 거부 권리 | 동의를 거부할 수 있고, 거부하면 출시 알림을 받을 수 없다고 적는다 |
-| 광고성 정보 | 오픈 안내 문자는 광고성 정보로 볼 수 있다. 동의 문구에 수신 동의를 넣고 문자 앞에 '(광고)'와 수신 거부 방법을 붙인다 \[확인 필요\] |
-| 위탁·국외 이전 | 문자 발송 대행사와 해외 서버(DB·호스팅)를 쓰면 처리방침에 수탁자와 이전 항목을 적는다 \[확인 필요\] |
+| 광고성 정보 | 오픈 안내 문자는 광고성 정보로 볼 수 있다. 요청한 사람에게 보내는 1회 안내는 예외로 볼 여지가 있어 변호사가 정한다. 광고로 처리하면 '광고성 정보 수신동의'를 개인정보 동의와 별도 항목으로 받고, 문자 첫머리에 (광고)·전송자 명칭·연락처, 끝에 무료 수신 거부 방법을 쓰고, 08~21시에 도달하게 보내고, 14일 안에 처리 결과를 알린다 \[확인 필요\] |
+| 위탁·국외 이전 | 문자 발송 대행사와 해외 서버(DB·호스팅)를 쓰면 처리방침에 수탁자와 이전 항목을 적는다 \[확인 필요\]. Supabase를 서울에 두어도 로그는 EU에 저장되고, 싱가포르·미국으로 이전되며, 주 처리자는 Supabase Pte. Ltd.다. Vercel도 해외 사업자다 |
 | 동의 기록 | 동의 시각과 약관 버전을 번호와 함께 저장한다. IP는 저장하지 않는다 |
-| 스팸 방지 | 허니팟 필드와 Cloudflare Turnstile. 로그인은 두지 않는다 |
+| 스팸 방지 | 허니팟 필드와 Cloudflare Turnstile. 로그인은 두지 않는다. 스딩 서버는 IP를 받지 않지만 Turnstile은 봇 확인을 위해 방문자의 IP, TLS 지문, User-Agent, 페이지 주소를 Cloudflare로 보내고, 쿠키와 로컬 저장소에 기대어 동작한다. 처리방침에 '쿠키가 없다'고 쓰지 않는다 \[확인 필요\] |
 | 책임자 | 개인정보보호책임자의 이름과 연락처를 처리방침에 적는다 \[확인 필요\] |
 
 ### AI 서비스 고지
@@ -816,8 +865,8 @@ AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형
 ### 변호사 검토 요청 목록
 
 1. 통신판매업·통신판매중개업 신고 필요 여부와 시점.
-2. 출시 알림 문자의 광고성 정보 해당 여부와 동의 문구.
-3. 처리방침의 위탁·국외 이전 기재 방식.
+2. 출시 알림 문자의 광고성 정보 해당 여부와 동의 문구. 1회 안내를 요청 정보 예외로 볼 수 있는지, 광고로 보면 수신 동의를 신청 조건으로 둘 수 있는지(개인정보 보호법 제22조⑤), 근거를 제15조①1호 동의로 할지 ①4호 고지로 할지, 번호 소유 확인 없는 입력으로 동의를 입증할 수 있는지, 만 14세 미만 처리, 문자 대행사 위탁의 개별 고지(제26조③)와 전송자격인증(정보통신망법 제50조의3①).
+3. 처리방침의 위탁·국외 이전 기재 방식. Supabase(로그 EU 저장, 싱가포르·미국 이전, 지원팀 접근), Vercel, Cloudflare(Turnstile이 처리하는 신호와 쿠키, Privacy Addendum) 기재. 로그 보관 기간은 요금제 값을 기한으로 적지 않는다.
 4. 'AI 합성' 표기의 문구·위치·파일 내 표시 방식.
 5. 영상 생성 도구 약관과 가상 인물 표기.
 
@@ -830,16 +879,17 @@ AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형
 | 영역 | 선택 | 이유 |
 | --- | --- | --- |
 | 프레임워크 | Next.js 16(App Router), React 19, TypeScript, SSG. Cache Components는 끈다 | 문구가 HTML에 담겨 SEO·AEO에 유리하고, 스딩 업체 관리 도구와 같은 Next.js 계열이다. Cache Components를 켜면 `revalidate`를 쓸 수 없어 CTA 전환 방식과 맞지 않는다 |
-| 스타일 | Tailwind CSS 4(`@tailwindcss/turbopack`) + CSS 변수 토큰 | 토큰은 브랜드 시스템 절의 값을 그대로 쓴다. `globals.css`의 `@theme`에서 기본 색·글자 크기·둥글기·그림자를 끄고 토큰만 유틸리티로 잇는다. 지원 하한(Safari 16.4)에서 `color-mix()`, 투명도 수식어(`bg-white/70` 등), 컨테이너 단위(`cqw`), `:has()`를 쓸 수 있다 |
+| 스타일 | Tailwind CSS 4(`@tailwindcss/turbopack`) + CSS 변수 토큰 | 토큰은 브랜드 시스템 절의 값을 그대로 쓴다. `globals.css`의 `@theme`에서 기본 색·글자 크기·둥글기·그림자를 끄고 토큰만 유틸리티로 잇는다. 지원 하한(Safari 16.4)에서 `color-mix()`, 투명도 수식어(`bg-white/70` 등), 컨테이너 단위(`cqw`), `:has()`, `dialog`와 `::backdrop`을 쓸 수 있다. `closedby`, `requestClose()`, `command`, `@starting-style`, VirtualKeyboard API는 쓸 수 없고, `scrollbar-gutter`는 Safari 18.2부터이며, `::backdrop`은 Safari 17.4 미만에서 `:root` 토큰을 읽지 못해 토큰을 `::backdrop`에도 선언한다 |
 | 검사 | ESLint 9(flat config, `eslint-config-next`), `next typegen && tsc --noEmit` | Next 16에서 `next lint`가 없어져 `npm run lint`는 `eslint`를 직접 실행한다 |
-| 폰트 | Pretendard Variable 1.3.9 다이내믹 서브셋 자체 호스팅. 저자가 배포한 CSS를 `src/styles/fonts.css`로, 글꼴 파일 92개를 `public/fonts/pretendard-1.3.9/`로 옮겼다 | 페이지에 쓰인 글자 묶음만 받아, 첫 로드에 받는 글꼴은 10개 묶음 약 255KB다(서브셋 전 단일 파일은 2MB). 영문·숫자 묶음(91번)은 preload하고, 후킹의 ı 묶음(74번)은 후킹이 'Coming Soon'일 때만 preload한다. 직접 서브셋을 만들면 OFL 예약 글꼴 이름 문제가 생겨 저자 배포본을 쓴다 |
+| 폰트 | Pretendard Variable 1.3.9 다이내믹 서브셋 자체 호스팅. 저자가 배포한 CSS를 `src/styles/fonts.css`로, 글꼴 파일 92개를 `public/fonts/pretendard-1.3.9/`로 옮겼다 | 페이지에 쓰인 글자 묶음만 받아, 첫 로드에 받는 글꼴은 11개 묶음 약 282KB이고 FAQ 답을 열면 한 묶음이 더 온다(서브셋 전 단일 파일은 2MB). 영문·숫자 묶음(91번)은 preload하고, 후킹의 ı 묶음(74번)은 후킹이 'Coming Soon'일 때만 preload한다. 직접 서브셋을 만들면 OFL 예약 글꼴 이름 문제가 생겨 저자 배포본을 쓴다 |
 | 모션 | CSS와 `IntersectionObserver` | 애니메이션 라이브러리 없이 번들을 가볍게 둔다 |
 | 상태 | `useSound()`와 신청 창 상태만 | 외부 상태 라이브러리는 쓰지 않는다 |
-| 호스팅 | Vercel(서울 리전) 또는 Cloudflare Pages | 둘 중 하나. 기본 제안은 Vercel이다 |
+| 호스팅 | Vercel(서울 리전 `icn1`) 또는 Cloudflare Pages | 둘 중 하나. 기본 제안은 Vercel이다. 기본 리전은 미국이라 `vercel.json`의 `regions`로 고정한다. Hobby는 상업적 사용을 금지하므로 법인 사이트는 Pro가 필요하다 \[확인 필요\] |
 | 미디어 | 1단계 `public/media/`(같은 도메인), 2단계 Cloudflare R2 | 처음에는 DNS 변경과 CORS 설정 없이 시작하고, 영상이 늘면 옮긴다 |
-| 저장소 | Supabase(Postgres) | 사전 신청 번호 저장. 스딩 업체 관리 도구의 DB와 섞이지 않게 별도 프로젝트로 만든다 |
+| 저장소 | Supabase(Postgres), `@supabase/supabase-js` 2.118.0 | 사전 신청 번호 저장. 스딩 업체 관리 도구의 DB와 섞이지 않게 별도 프로젝트로 만든다. 리전은 'Northeast Asia (Seoul)' `ap-northeast-2`를 특정해 고른다. 만든 뒤에는 옮길 수 없다. 요금제는 Pro를 권한다. Free는 활동이 적으면 멈추고, 멈추면 신청이 모두 실패하며, 자동 백업이 없다 \[확인 필요\] |
 | 스팸 방지 | 허니팟 + Cloudflare Turnstile | 로그인 없이 봇을 거른다 |
 | 분석 | GA4(`@next/third-parties`) | 이벤트는 아래 표를 따른다 |
+| QR | `uqr` 0.1.3 | 오픈 후 QR을 서버 컴포넌트에서 SVG로 그린다. 의존성이 없고 브라우저 번들에 들어가지 않는다 |
 
 ### 저장소 구조
 
@@ -847,14 +897,15 @@ AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형
 sding.kr/                      GitHub aimbrige-netizen/sding.kr
   CLAUDE.md  AGENTS.md         AGENTS.md는 Next.js가 만들고 next dev가 다시 채운다
   .env.example
-  next.config.ts  eslint.config.mjs  tsconfig.json
+  next.config.ts  eslint.config.mjs  tsconfig.json  vercel.json
   docs/
     PLAN.md                    이 기획서
     OPEN_ITEMS.md              정해지지 않은 값과 질문
     design/                    히어로 시안(B안 확정)과 비교 이미지
-  scripts/                     llms.txt 생성 스크립트(4단계)
+  assets/fonts/                공유 이미지 전용 Pretendard 고정 굵기 woff 3개 + 라이선스 파일
+  scripts/                     llms.mjs(빌드 직전 실행), icons.mjs(임시 아이콘, 손으로 실행)
   public/
-    llms.txt                   빌드 직전에 생성
+    llms.txt                   빌드 직전에 생성. 저장소에 올리지 않는다
     brand/                     logo.svg, logo-white.svg, logo-mark.svg
     icons/                     icon-192, icon-512, maskable-512
     media/                     영상과 이미지. 파일명에 버전
@@ -871,13 +922,13 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
       Header  HeaderShell  Hero  Film  Intro  Zone  ProgressDots  Faq  CtaSection  Footer
       MediaSlot  VideoProvider  VideoPlayer  PlayButtons  RidePreview  ParkMap  ZonePoster  CompareSlider
       HookMotion  InlineScript  SoundBuddy  RevealArmer  AnchorFocus  Logo
-      WaitlistDialog  WaitlistForm  CtaButton  Icons
+      WaitlistDialog  WaitlistForm  CtaButton  StoreChoice  QrCode  Spans  Icons
     content/
       site.ts  zones.ts  faq.ts  media.ts  company.ts
     lib/
-      jsonld.ts  prune.ts  analytics.ts  launch.ts  phone.ts  fonts.ts  motion.ts
+      jsonld.ts  prune.ts  llms.ts  analytics.ts  launch.ts  phone.ts  turnstile.ts  fonts.ts  motion.ts
     styles/
-      tokens.css  fonts.css  motion.css  hero.css  film.css  zones.css  buddy.css
+      tokens.css  fonts.css  motion.css  hero.css  film.css  zones.css  faq.css  cta.css  buddy.css
 ```
 
 ### 디자인 토큰
@@ -932,6 +983,13 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
   --btn-fs: 1.25rem;                   /* 주 버튼 글자 20px. 오렌지 위 흰 글자 기준 */
   --buddy: 56px;                       /* 사운드 버디 */
   --ctrl: 44px;                        /* 영상 재생·일시정지 버튼 */
+  --ts-w: 300px;                       /* Turnstile flexible 위젯의 최소 폭 */
+  --qr: 165px;                         /* QR 한 변. 33칸 x 5px이라 칸이 화소에 맞는다 */
+  --scrim-flat: color-mix(in srgb, var(--ink-900) 56%, var(--cream));   /* --scrim을 크림 위에 겹친 색 */
+}
+/* 신청 창 뒤를 어둡게 하는 값과 그 페이드가 읽는 값. Safari 17.4 미만의 ::backdrop은 :root를 상속하지 않아 함께 선언한다 */
+:root, ::backdrop {
+  --scrim: rgb(42 26 20 / .56);
   --ease: cubic-bezier(.22, 1, .36, 1);
 }
 @supports (height: 100svh) { :root { --peek: clamp(170px, 25svh, 250px); } }
@@ -947,12 +1005,13 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
   :root { --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), calc((100vw - 2 * var(--gutter)) / 6.9), 20.6svh, calc(var(--container) / 6.1)); }
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
+html { scroll-padding-top: var(--header-h); }
+html.js { scroll-behavior: smooth; }
 body { background: var(--cream); color: var(--ink-900); word-break: keep-all; overflow-wrap: break-word; }
 /* 이동과 확대를 끈다. 반복 횟수를 1로 두어 무한 반복이 아주 짧은 주기로 깜빡이지 않게 한다 */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
+  html.js { scroll-behavior: auto; }
+  *, *::before, *::after, *::backdrop {
     animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;
   }
 }
@@ -969,6 +1028,7 @@ export const COMPANY = {
   ceo: '정원창', bizRegNo: '590-86-03810', corpRegNo: '110111-0970668', openedAt: '2026-09-18',
   region: '서울특별시', locality: '강남구', street: '압구정로46길 5-10, 3층 302호 (신사동, 압구정로데오스타)',
   mailOrderNo: '',                          // 통신판매업 신고번호. 신고 완료 전까지 반드시 빈 값
+  showMailOrderLabel: true,                 // 번호가 비어 있어도 라벨은 보인다. 숨기려면 false
   phone: '', email: '', privacyOfficer: '',   // 전달받아 채운다
 };
 export const ADDRESS = `${COMPANY.region} ${COMPANY.locality} ${COMPANY.street}`;
@@ -992,7 +1052,7 @@ export const SITE = {
   launchDate: '2026-12-25',                    // KST 정식 오픈일
   ctaOverride: '' as '' | 'waitlist' | 'live', // 수동 전환. 비어 있으면 launchDate로 판단
   sameAs: [] as string[],                      // SNS 주소가 정해지면 채운다
-  store: { ios: '', android: '' },             // 오픈 후 채운다
+  store: { ios: '', android: '' },             // 오픈에 맞춰 채운다
 };
 // 같은 파일의 COPY에 헤더·히어로·푸터 문구를 둔다(후킹 'Coming Soon', D-day 라벨 '오픈까지' 포함)
 ```
@@ -1003,7 +1063,7 @@ export const ZONES = [
   { id: 'zone-1', no: '01', name: '매표소', feature: '웨딩 가격 정찰제',
     definition: '웨딩 가격 정찰제는 상담을 받기 전에 가격을 공개하고, 같은 기준으로 보여 주는 방식이에요.',
     headline: '가격은 한눈에, 정찰제로', hl: '정찰제로',   // hl은 headline의 뒤쪽 구절. 형광펜을 칠하고, 한 줄에 안 들어가면 여기서 줄을 바꾼다
-    body: '상담을 받아야 알 수 있던 웨딩 가격을 처음부터 보여드려요. 같은 기준으로 놓고 비교해 보세요.', media: 'zone1' },
+    body: '상담을 받아야 알 수 있던 웨딩 가격을 처음부터 보여드려요. 같은 기준으로 놓고 비교해 보세요.', media: 'zone1', icon: 'ticket' },
   // 02~04는 섹션별 상세 기획의 표를 그대로 옮긴다. 합성·시뮬레이션 존은 badge와 notice를 함께 둔다.
   // definition은 고정 용어의 한 줄 정의다. FAQ 답변, DefinedTermSet, llms.txt가 같은 값을 읽는다.
 ];
@@ -1016,11 +1076,14 @@ import { launchFull, type CtaMode } from '@/lib/launch';
 
 export type FaqItem = { id: string; q: string; a: string; when?: CtaMode; hidden?: boolean };
 
+const stores = [SITE.store.ios && 'App Store', SITE.store.android && 'Google Play'].filter(Boolean).join('와 ');   // 주소가 있는 곳만 말한다. Apple은 App Store를 음차하지 말라고 한다
+export const STORE_LINE = `스딩은 ${stores}에서 받을 수 있어요.`;   // FAQ 답과 오픈 후 마지막 CTA의 설명
+
 export const FAQ: FaqItem[] = [
   { id: 'what', q: '스딩은 무엇인가요?', a: SITE.definition },
   { id: 'when', q: '언제부터 쓸 수 있나요?', when: 'waitlist',
     a: `스딩은 ${launchFull()} 정식 오픈 예정이에요. 출시 알림을 신청하면 오픈하는 날 문자로 알려 드려요.` },
-  { id: 'where', q: '어디서 쓸 수 있나요?', when: 'live', a: '스딩은 앱스토어와 구글 플레이에서 받을 수 있어요.' },
+  { id: 'where', q: '어디서 쓸 수 있나요?', when: 'live', a: STORE_LINE },
   { id: 'fee', q: '이용 요금은 얼마인가요?', hidden: true, a: '' },   // 요금 정책이 정해지면 답을 채우고 hidden을 지운다
   // 나머지는 섹션별 상세 기획의 FAQ 표를 따른다. when이 있는 항목은 해당 CTA 상태에서만 보인다.
 ];
@@ -1042,10 +1105,13 @@ export type MediaSpec =
   | { kind: 'phone'; screen: Video | Image }
   | { kind: 'compare'; before: string; after: string; alt: string; aspect: Aspect };
 
-const M = process.env.NEXT_PUBLIC_MEDIA_BASE || '/media';   // 파일이 오면 M + '/hero-film.v1.mp4'처럼 버전이 든 주소를 쓴다
+const M = process.env.NEXT_PUBLIC_MEDIA_BASE || '/media';
+// 파일이 오면 mediaUrl('hero-film.v1.mp4')처럼 버전이 든 파일명으로 주소를 만든다
+export const mediaUrl = (file: string) => `${M}/${file}`;
+
 export const MEDIA = {
   hero: { kind: 'video', src: '', srcMobile: '', poster: '', alt: '스딩 소개 영상', aspect: '16/9', hasAudio: true },
-  zone1: { kind: 'phone', screen: { kind: 'video', src: '', poster: '', alt: '스딩 앱의 웨딩 가격표 화면', aspect: '9/19.5' } },
+  zone1: { kind: 'phone', screen: { kind: 'video', src: '', poster: '', alt: '스딩 앱의 웨딩 가격표 화면. 상품별 가격이 목록으로 보인다', aspect: '9/19.5' } },
   // zone2~4도 같은 모양이다. 슬롯 사양은 영상·미디어 시스템 절의 표를 따른다.
 } satisfies Record<string, MediaSpec>;
 
@@ -1064,15 +1130,17 @@ export const HAS_SOUND = Boolean(MEDIA.hero.src && MEDIA.hero.hasAudio);
 | `NEXT_PUBLIC_SITE_ENV` | 공개 | `production` 또는 `preview` | `production`일 때만 색인을 허용하고 `assertCompany()`를 실행한다 |
 | `NEXT_PUBLIC_MEDIA_BASE` | 공개 | 영상·이미지 주소의 앞부분 | 운영은 `https://sding.kr/media`처럼 절대 주소. 로컬은 비워 두면 `/media` |
 | `NEXT_PUBLIC_GA_ID` | 공개 | GA4 측정 ID | 비어 있으면 분석 코드를 넣지 않는다 |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | 공개 | Turnstile 위젯 키 | 비어 있으면 폼이 전송 단계에서 오류를 낸다 |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | 공개 | Turnstile 위젯 키 | 비어 있으면 폼이 전송 단계에서 '잠시 후 다시 시도해 주세요.'를 보인다 |
 | `NEXT_PUBLIC_GOOGLE_VERIFICATION` | 공개 | 구글 서치 콘솔 소유확인 메타 값 | 비어 있으면 태그를 넣지 않는다. 구글은 DNS TXT 인증이 기본이다 |
 | `NEXT_PUBLIC_NAVER_VERIFICATION` | 공개 | 네이버 서치어드바이저 소유확인 메타 값 | 비어 있으면 태그를 넣지 않는다 |
-| `TURNSTILE_SECRET_KEY` | 비공개 | 토큰 검증 | 서버 코드에서만 읽는다 |
+| `TURNSTILE_SECRET_KEY` | 비공개 | 토큰 검증 | 서버 코드에서만 읽는다. 사이트 키와 한 쌍으로 같은 환경에 넣는다 |
 | `SUPABASE_URL` | 비공개 | DB 주소 | 미리보기 배포에는 운영 값을 넣지 않는다 |
-| `SUPABASE_SERVICE_ROLE_KEY` | 비공개 | 서버 전용 키 | 브라우저 번들에 들어가면 안 된다 |
+| `SUPABASE_SECRET_KEY` | 비공개 | 서버 전용 키(`sb_secret_`로 시작) | 브라우저 번들에 들어가면 안 된다. 구식 `service_role` 키는 2026년 말에 없어질 예정이라 쓰지 않는다 |
 
 - 저장소에는 이름만 적은 `.env.example`을 두고, `.env*` 파일은 `.gitignore`에 넣는다.
-- 미리보기 배포에는 운영 DB 키를 넣지 않는다. 키가 없으면 신청 API는 503을 돌려준다.
+- 미리보기 배포에는 운영 DB 키를 넣지 않는다. 키가 없으면 신청 API는 503을 돌려준다. 비공개 값은 Vercel의 Production 범위에 Secret으로만 넣는다. Supabase 프로젝트는 Vercel Marketplace가 아니라 Supabase에서 직접 만든다. Marketplace로 만들면 미리보기로 키가 퍼질 수 있고 주 처리자도 바뀐다.
+- Turnstile 키는 환경마다 다르다. 개발과 미리보기는 Cloudflare가 공개한 시험 키 한 쌍을, 운영은 실제 키 한 쌍을 쓴다. 시험 키와 실제 키를 섞으면 모든 신청이 실패한다. 실제 토큰을 시험 비밀 키로 검증하면 성공이 돌아와도 hostname이 `example.com`이라 운영의 확인에서 막힌다. Vercel 로그에는 `waitlist: turnstile mismatch`나 Cloudflare의 오류 코드로 보인다. 위젯은 Managed 모드, 허용 호스트는 `sding.kr` 하나로 만든다.
+- Vercel의 환경 변수는 다시 배포해야 적용된다.
 
 ### CTA 전환
 
@@ -1084,11 +1152,21 @@ import { SITE } from '@/content/site';
 
 export type CtaMode = 'waitlist' | 'live';
 
+const LAUNCH_AT = new Date(SITE.launchDate + 'T00:00:00+09:00').getTime();
+
 export function ctaMode(now: Date = new Date()): CtaMode {
-  const opened = now.getTime() >= new Date(SITE.launchDate + 'T00:00:00+09:00').getTime();
+  const opened = now.getTime() >= LAUNCH_AT;
   const want = SITE.ctaOverride || (opened ? 'live' : 'waitlist');
   const hasStore = Boolean(SITE.store.ios || SITE.store.android);
   return want === 'live' && hasStore ? 'live' : 'waitlist';
+}
+
+// 오픈일까지 남은 날수(KST 날짜 기준). 오픈일 당일과 그 뒤는 0
+export function daysToLaunch(now: Date = new Date()): number {
+  const DAY = 86_400_000;
+  const kstToday = Math.floor((now.getTime() + 9 * 3_600_000) / DAY);
+  const kstLaunch = Math.floor((LAUNCH_AT + 9 * 3_600_000) / DAY);
+  return Math.max(0, kstLaunch - kstToday);
 }
 
 // 날짜 문구는 SITE.launchDate 하나에서만 만든다
@@ -1096,20 +1174,14 @@ const ymd = () => SITE.launchDate.split('-').map(Number) as [number, number, num
 export const launchLabel = () => { const [, m, d] = ymd(); return `${m}월 ${d}일`; };        // 12월 25일
 export const launchFull = () => { const [y, m, d] = ymd(); return `${y}년 ${m}월 ${d}일`; };  // 2026년 12월 25일
 export const launchDotted = () => SITE.launchDate.replace(/-/g, '.');                         // 2026.12.25
-
-// 오픈일까지 남은 날수(KST 날짜 기준). 오픈일 당일과 그 뒤는 0. 히어로 D-day 실링이 쓴다
-export function daysToLaunch(now: Date = new Date()): number {
-  const DAY = 86_400_000, KST = 9 * 3_600_000;
-  const launchAt = new Date(SITE.launchDate + 'T00:00:00+09:00').getTime();
-  return Math.max(0, Math.floor((launchAt + KST) / DAY) - Math.floor((now.getTime() + KST) / DAY));
-}
 ```
 
 - 루트 레이아웃(`src/app/layout.tsx`)에 `export const revalidate = 3600;`을 둔다. 헤더 CTA가 모든 페이지에 있으므로 모든 페이지가 같은 주기로 다시 만들어져야 한다. 오픈일 0시(KST) 이후 첫 재생성에서 자동으로 `live`가 된다. 이 방식을 쓸 수 없는 호스팅이면 그 시각에 배포 훅을 호출한다.
 - 수동 전환은 `SITE.ctaOverride`를 바꾸고 배포한다.
 - 날짜가 들어가는 문구는 `launch.ts`의 도우미로 만들고, 문구에 날짜를 직접 쓰지 않는다. 히어로 킥커는 `launchDotted()`, 마지막 CTA 헤드라인은 `launchLabel()`, FAQ 답변은 `launchFull()`, 히어로 D-day 실링은 `daysToLaunch()`(KST 날짜 기준 남은 날수)를 쓴다.
-- CTA 버튼은 `a href="/#waitlist"`로 만들고, JS와 `dialog`를 쓸 수 있을 때만 신청 창을 연다. 그렇지 않으면 마지막 섹션의 폼으로 이동한다.
-- `live`가 되면 폼 대신 스토어 배지와 QR을 보이고, 헤더 버튼은 '앱 시작하기'로 바뀐다. JSON-LD에는 `MobileApplication` 노드가 더해지고, FAQ는 `faqFor(ctaMode())`로 오픈 후 항목만 남긴다.
+- CTA 버튼(`CtaButton`)은 `next/link`로 `/#waitlist`를 가리키고, 신청 창은 `onNavigate`에서 연다. `onNavigate`는 일반 클릭에서만 불리므로 Ctrl·Cmd 클릭, 하이드레이션 전 클릭, `dialog`가 없는 브라우저와 JS 끔은 마지막 섹션의 폼으로 이동한다. `data-cta` 속성은 후킹의 눈이 읽으므로 지우지 않는다.
+- `ctaMode()`는 서버 컴포넌트에서만 부르고 결과를 문구와 prop으로 넘긴다. 클라이언트 렌더링에서 `new Date()`를 부르면 자정 전후로 서버 HTML과 달라져 하이드레이션 오류가 난다.
+- `live`가 되면 폼 대신 스토어 링크와 QR을 보이고, 헤더 버튼은 '앱 시작하기'로 바뀐다. JSON-LD에는 `MobileApplication` 노드가 더해지고, FAQ는 `faqFor(ctaMode())`로 오픈 후 항목만 남긴다.
 
 ### 사전 신청 API
 
@@ -1118,7 +1190,7 @@ export function daysToLaunch(now: Date = new Date()): number {
 ```ts
 // 요청 본문
 type WaitlistBody = {
-  phone: string;     // '010-1234-5678'처럼 입력한 그대로
+  phone: string;     // '010-2345-6789'처럼 입력한 그대로
   consent: true;     // 필수 동의 체크
   token: string;     // Turnstile 토큰
   hp?: string;       // 허니팟. 사람은 비워 둔다
@@ -1129,71 +1201,131 @@ type WaitlistBody = {
 // src/app/api/waitlist/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { SITE } from '@/content/site';
 import { normalizePhone } from '@/lib/phone';
+import { TURNSTILE_ACTION } from '@/lib/turnstile';
+
+// 응답 표와 동작은 PLAN '사전 신청 API'를 따른다. 번호와 요청 본문은 어디에도 남기지 않는다.
+// 로그에는 오류 코드와 HTTP 상태만 쓴다. Supabase의 error.details에는 행의 값이 들어갈 수 있다
+export const maxDuration = 15;   // 확인 6초와 저장 5초를 넘기면 끊는다. 기본 300초로 두면 폼이 그만큼 기다린다
 
 const CONSENT_VERSION = '2026-10-v1';   // 동의 문구나 처리방침이 바뀌면 올린다
+const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const VERIFY_TIMEOUT = 3000;
+const HOSTNAME = new URL(SITE.url).hostname;
+
 const fail = (status: number, code: string) => NextResponse.json({ ok: false, code }, { status });
 
-async function humanOk(token: string): Promise<boolean> {
-  try {
-    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      body: new URLSearchParams({ secret: process.env.TURNSTILE_SECRET_KEY ?? '', response: token }),
-    });
-    return ((await res.json()) as { success?: boolean }).success === true;
-  } catch {
-    return false;
+// ok: 사람. bad: 토큰이 틀렸다. down: Cloudflare 장애나 키 설정 문제라 방문자 잘못이 아니다
+async function humanCheck(token: string): Promise<'ok' | 'bad' | 'down'> {
+  if (!token || token.length > 2048) return 'bad';
+  const body = new URLSearchParams({
+    secret: process.env.TURNSTILE_SECRET_KEY ?? '',
+    response: token,
+    idempotency_key: crypto.randomUUID(),   // 다시 보내도 같은 토큰이 '이미 쓴 토큰'이 되지 않는다
+  });
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(VERIFY_URL, { method: 'POST', body, signal: AbortSignal.timeout(VERIFY_TIMEOUT) });
+      const result = (await res.json()) as { success?: boolean; hostname?: string; action?: string; 'error-codes'?: string[] };
+      if (result.success === true) {
+        if (process.env.NEXT_PUBLIC_SITE_ENV !== 'production') return 'ok';   // 시험 키의 hostname과 action은 다른 값이다
+        if (result.hostname === HOSTNAME && result.action === TURNSTILE_ACTION) return 'ok';
+        console.error('waitlist: turnstile mismatch');   // www로 열렸거나 키 쌍이 어긋났다. 방문자는 다시 눌러도 통과하지 못한다
+        return 'bad';
+      }
+      const codes = result['error-codes'] ?? [];
+      if (codes.includes('internal-error')) continue;
+      if (codes.some((code) => code.endsWith('-input-secret'))) {
+        console.error('waitlist: turnstile secret');
+        return 'down';
+      }
+      console.error('waitlist: turnstile', codes.join());   // Cloudflare의 고정 문자열이다
+      return 'bad';
+    } catch {
+      // 시간 초과나 망 오류. 같은 idempotency_key로 한 번 더 보낸다
+    }
   }
+  console.error('waitlist: turnstile unavailable');
+  return 'down';
 }
 
 export async function POST(req: Request) {
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = process.env.SUPABASE_SECRET_KEY;
   if (!url || !key || !process.env.TURNSTILE_SECRET_KEY) return fail(503, 'server');
 
   const body = await req.json().catch(() => null);
-  if (!body || typeof body !== 'object') return fail(400, 'invalid');
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return fail(400, 'invalid');
   if (body.hp) return NextResponse.json({ ok: true });       // 봇: 저장하지 않고 성공처럼 답한다
   if (body.consent !== true) return fail(400, 'consent');
-  const phone = normalizePhone(String(body.phone ?? ''));
+  const phone = typeof body.phone === 'string' ? normalizePhone(body.phone) : null;
   if (!phone) return fail(400, 'phone');
-  if (!(await humanOk(String(body.token ?? '')))) return fail(400, 'challenge');
 
-  const db = createClient(url, key, { auth: { persistSession: false } });
-  const { error } = await db.from('waitlist').insert({
-    phone,
-    consent_at: new Date().toISOString(),
-    consent_version: CONSENT_VERSION,
-  });
-  if (error && error.code !== '23505') return fail(500, 'server');   // 23505: 이미 있는 번호. 성공과 같은 응답을 준다
-  return NextResponse.json({ ok: true });
+  const human = await humanCheck(typeof body.token === 'string' ? body.token : '');
+  if (human === 'down') return fail(503, 'server');
+  if (human === 'bad') return fail(400, 'challenge');
+
+  try {
+    const db = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      db: { timeout: 5000 },
+    });
+    // 이미 있는 번호는 첫 동의를 그대로 두고 조용히 넘어간다. insert로 23505를 받으면 번호가 Postgres 로그에 남는다
+    const { error, status } = await db.from('waitlist').upsert(
+      { phone, consent_at: new Date().toISOString(), consent_version: CONSENT_VERSION },
+      { onConflict: 'phone', ignoreDuplicates: true },
+    );
+    if (!error) return NextResponse.json({ ok: true });
+    console.error('waitlist: db', error.code, status);   // 게이트웨이 오류는 code가 없다. 잘못된 키, 멈춘 프로젝트, 시간 초과는 status로 가른다
+  } catch {
+    console.error('waitlist: db unavailable');
+  }
+  return fail(500, 'server');
 }
 ```
 
 ```ts
 // src/lib/phone.ts
-export function normalizePhone(raw: string): string | null {
-  const d = raw.replace(/\D/g, '').replace(/^82/, '0');   // +82 10… → 010…
-  return /^01[016789]\d{7,8}$/.test(d) ? d : null;
+// 화면과 API가 같은 함수를 쓴다(PLAN '사전 신청 API').
+// 브라우저 자동 완성은 +821023456789나 1023456789로 넣기도 하므로, 자르거나 검사하기 전에 국내 형식으로 바꾼다
+function toNational(raw: string): string {
+  const d = raw.normalize('NFKC').replace(/\D/g, '');
+  const intl = /^(?:00)?82(\d*)$/.exec(d);            // +82 10…, 82 10…, 0082 10…, +82 010…
+  const n = intl?.[1] ? (intl[1].startsWith('0') ? intl[1] : `0${intl[1]}`) : d;   // 82만 친 값은 다음 숫자가 올 때까지 둔다
+  return /^10[2-9]\d{7}$/.test(n) ? `0${n}` : n;      // 국가번호와 앞의 0이 함께 빠진 값
 }
 
-export function formatPhone(raw: string): string {        // 입력 중 표시용: 010-1234-5678
-  const d = raw.replace(/\D/g, '').slice(0, 11);
+// 전기통신번호관리세칙 제20조: 이동전화는 010-ABYY-YYYY(A=2~9)
+export function normalizePhone(raw: string): string | null {
+  if (raw.length > 32) return null;
+  const d = toNational(raw);
+  return /^010[2-9]\d{7}$/.test(d) ? d : null;
+}
+
+// 입력 중 표시용: 010-2345-6789. 자리가 넘쳐도 자르지 않고 그대로 보여 검증에서 막는다
+export function formatPhone(raw: string): string {
+  const d = toNational(raw);
   return [d.slice(0, 3), d.slice(3, 7), d.slice(7)].filter(Boolean).join('-');
 }
 ```
 
 ```sql
 -- Supabase SQL 편집기에서 한 번 실행한다
-create table waitlist (
+create table public.waitlist (
   id uuid primary key default gen_random_uuid(),
-  phone text not null unique,              -- 01012345678 형태로 정규화
+  phone text not null unique,              -- 01023456789 형태로 정규화
   consent_at timestamptz not null,         -- 동의 시각
   consent_version text not null,           -- 동의 문구 버전
   notified_at timestamptz,                 -- 오픈 안내를 보낸 시각
   created_at timestamptz not null default now()
 );
-alter table waitlist enable row level security;   -- 정책을 만들지 않는다. 서버(service role)만 읽고 쓴다
+alter table public.waitlist enable row level security;   -- 정책을 만들지 않는다. anon과 authenticated는 들어오지 못한다
+
+-- 새 프로젝트의 표에는 service_role 권한도 없다. 자동 노출 설정과 상관없이 같은 결과가 되도록 직접 정한다
+revoke all on table public.waitlist from anon, authenticated, service_role;
+grant insert on table public.waitlist to service_role;
+grant select (phone) on table public.waitlist to service_role;   -- ON CONFLICT (phone)에 필요하다
 ```
 
 응답은 아래 표를 따른다. 이미 있는 번호와 허니팟은 일부러 정상 신청과 같은 응답을 준다.
@@ -1206,14 +1338,22 @@ alter table waitlist enable row level security;   -- 정책을 만들지 않는�
 | 번호 형식 오류 | 400 | `code: 'phone'` | 휴대폰 번호를 다시 확인해 주세요. |
 | 동의하지 않음 | 400 | `code: 'consent'` | 개인정보 수집·이용에 동의해 주세요. |
 | 봇 확인 실패 | 400 | `code: 'challenge'` | 확인에 실패했어요. 다시 시도해 주세요. |
+| 요청 전에 Turnstile이 실패함(스크립트 차단, 위젯 오류, 시간 초과) | 요청 없음 | 없음 | 봇 확인 실패와 같다 |
 | 본문 오류 | 400 | `code: 'invalid'` | 번호 형식 오류와 같다 |
-| 서버·DB 오류, 키 없음 | 500, 503 | `code: 'server'` | 잠시 후 다시 시도해 주세요. |
+| 서버·DB 오류, 키 없음, Cloudflare 장애 | 500, 503 | `code: 'server'` | 잠시 후 다시 시도해 주세요. |
+| JSON이 아닌 응답(413, 504 등), 망 오류, 20초 안에 답이 없음, 사이트 키 없음 | 그대로, 요청 없음 | 없음 | 서버 오류와 같다 |
 
-- 폼 입력은 `type="tel"`, `inputmode="numeric"`, `autocomplete="tel"`로 두고 `formatPhone()`으로 보여 준다. 허니팟 칸은 화면 밖에 두고 `tabindex="-1"`, `aria-hidden`을 붙인다.
-- Turnstile 토큰은 한 번만 검증되고 5분 뒤 만료된다. 재시도할 때마다 새로 받는다. 스크립트는 폼이 화면에 가까워지거나 신청 창이 열릴 때 불러온다.
-- 번호와 요청 본문은 로그에 남기지 않는다.
-- 문자는 이 저장소에서 보내지 않는다. 오픈 당일 번호를 내려받아 문자 대행사로 보내고, 문구 앞에 '(광고)'와 수신 거부 방법을 붙인 뒤 `notified_at`을 채운다.
-- 보유 기간 제안은 발송 후 30일이다. 그 뒤 `delete from waitlist where notified_at < now() - interval '30 days';`를 실행한다 \[확인 필요\].
+- 폼 입력은 `type="tel"`, `inputmode="tel"`, `autocomplete="tel"`로 두고 `formatPhone()`으로 보여 준다. `maxlength`와 `pattern`은 두지 않는다. Chrome 자동 완성은 저장된 형식과 상관없이 `+821023456789`를 넣으므로 자르기 전에 국내 형식으로 바꾼다. 커서가 끝에 있을 때만 바로 다듬고, 중간을 고칠 때는 칸을 떠날 때 다듬는다. 하이드레이션 전에 넣은 번호와 체크는 넘겨받는다. 체크는 `autocomplete="off"`라 브라우저가 되살리지 않아, 기본 해제가 지켜진다.
+- 번호는 전기통신번호관리세칙 제20조의 010-ABYY-YYYY(A=2~9)만 받는다. 01X 번호는 서비스가 끝났다. `010-1234-5678` 같은 번호도 오류가 되므로 시험에는 쓰지 않는다. 시험 번호도 실제 가입자일 수 있으니 운영 표에 넣지 않는다.
+- 허니팟 칸은 `hidden` 안에 `name="sd_note"`로 둔다. 화면 밖에 두면 자동 완성이 채울 수 있고, 국내 사이트에서 `hp`는 휴대폰 칸의 이름으로 쓰인다. 요청 본문의 키는 `hp`다.
+- 폼은 `method="post"`, `action="/api/waitlist"`로 두어 번호가 주소에 남지 않게 한다. 제출 버튼은 하이드레이션 전까지 `disabled`이고, 전송 중에는 포커스가 남도록 `aria-disabled`를 쓴다. Firefox는 새로 고침 때 풀린 `disabled`까지 되살리므로 버튼에 `autocomplete="off"`를 둔다. 같은 이유로 번호 칸은 `readOnly`로 잠그고 체크는 눌러도 바뀌지 않게 한다. 요청은 20초가 지나면 끊는다. 서버 한도 15초보다 길고, 다시 눌러도 번호는 한 번만 저장된다.
+- Turnstile 토큰은 300초 안에 한 번만 검증된다. 위젯은 신청 버튼을 누른 폼에서 그 순간 `render()`로 만들고(`appearance: 'interaction-only'`), 토큰을 받으면 `remove()`로 없앤다. 재시도는 새 위젯이 새 토큰을 받는다. 쓴 위젯에 `execute()`를 다시 부르면 이미 쓴 토큰이 돌아온다. 그래서 닫힌 신청 창이나 쓰지 않는 폼에 위젯이 남지 않고, 신청하지 않는 방문자는 확인을 받지 않는다. 대신 Cloudflare가 권하는 '미리 실행'과 달리 버튼을 누른 뒤에 기다린다. 실기기에서 느리면 입력칸에 처음 포커스가 갈 때 시작하도록 바꾼다.
+- 스크립트(`api.js?render=explicit&onload=…`)는 폼이 화면에 가까워지거나 신청 창이 열릴 때 한 번만 불러오고, 제출 때 아직 없으면 그때 불러온다. 주입한 스크립트는 `async`가 되어 `turnstile.ready()`를 쓸 수 없다. 복사하거나 프록시하지 않는다.
+- 서버는 번호와 동의를 먼저 확인하고 토큰을 검증한다. 잘못된 입력에 토큰을 쓰지 않기 위해서다. 그 전에 DB를 건드리지 않으므로 Cloudflare 튜토리얼의 순서와 달라도 안전하다.
+- 번호와 요청 본문은 로그에 남기지 않는다. 오류는 코드와 HTTP 상태만 남긴다. Supabase의 `error.details`에는 행의 값이 들어갈 수 있다. 게이트웨이 오류에는 `code`가 없어, 잘못된 키나 멈춘 프로젝트, 시간 초과(상태 0)는 상태로 가른다. Turnstile은 Cloudflare의 고정 오류 코드와 hostname·action 불일치를 남긴다. `insert`로 23505를 받으면 `Key (phone)=(…)`가 Postgres 로그에 남아 EU로 가므로 `upsert`로 넘긴다. 다시 신청해도 첫 동의 시각과 버전이 그대로다. 이 방식은 `service_role`에 `phone` 읽기 권한이 있어야 해서, 비밀 키가 새면 번호를 읽을 수 있다.
+- 이 표의 쓰기는 Data API로, 내려받기와 삭제는 SQL 편집기로 한다. Data API에 번호로 거르면 주소에 번호가 남아 게이트웨이 로그에 쌓인다. SQL 편집기는 입력을 자동 저장하므로 번호를 통째로 적지 않고, 뒤 네 자리로 찾아 `id`로 지운다.
+- 문자는 이 저장소에서 보내지 않는다. 오픈 당일 번호를 내려받아 문자 대행사로 보내고 `notified_at`을 채운다. CTA는 0시에 바뀌지만 문자는 08~21시에 도달하게 보낸다. 광고로 처리하면 문자 형식은 '사전 신청의 개인정보' 표를 따른다. 대행사는 전송자격인증 업체여야 하고, 연락처(`contact`)가 비어 있으면 문자도 보낼 수 없다.
+- 보유 기간 제안은 발송 후 30일이다. 그 뒤 `delete from public.waitlist where notified_at < now() - interval '30 days';`를 실행한다 \[확인 필요\]. `notified_at`이 빈 행(발송 실패, 늦은 신청)은 이 문장으로 지워지지 않으므로 마지막 파기 때 함께 지운다. 프로젝트를 지워도 데이터는 30일 안에 삭제되므로 곧바로 사라지지는 않는다.
 - 동의 철회나 삭제 요청은 개인정보보호책임자 연락처로 받고, 해당 번호를 바로 지운다.
 
 ### 분석 이벤트
@@ -1229,7 +1369,7 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 | `video_fallback` | 자동 재생 대신 포스터와 재생 버튼을 보일 때 | `reason`: reduced\_motion, save\_data, low\_power, rejected |
 | `zone_view` | 존이 화면의 50% 이상 보일 때(존당 한 번) | `zone_id`: zone-1 \~ zone-4 |
 | `faq_open` | FAQ 항목을 열 때 | `faq_id`: what, price-rule, planner, dress, hall, when, where, fee, phone |
-| `form_submit` | 신청 요청의 결과가 나올 때 | `result`: success, phone, consent, challenge, invalid, server |
+| `form_submit` | 신청 요청의 결과가 나올 때. 요청 전에 Turnstile이 실패하면 `challenge`다 | `result`: success, phone, consent, challenge, invalid, server |
 
 - 번호와 입력값은 어떤 매개변수에도 넣지 않는다.
 - 이벤트 이름은 영문 소문자와 밑줄만 쓴다.
@@ -1244,7 +1384,7 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 | LCP | 2.5초 이하 | 포스터 이미지가 오기 전에는 첫 화면에서 가장 큰 글자인 후킹('Coming Soon')이 LCP 후보이고, 낮은 화면에서는 히어로 H1도 후보가 된다. 둘 다 등장은 투명도 0에서 시작하지 않고(이동만), 웹폰트 대기는 HTML 안의 스크립트가 최대 700ms로 맡는다. 후킹 글자가 든 글꼴 묶음(91번, 'Coming Soon'일 때 74번)은 preload한다. 포스터가 오면 첫 화면에 보이는 윗부분도 LCP 후보가 되므로 `preload`와 `fetchpriority='high'`를 걸고, 영상 파일은 포스터가 그려진 뒤에 붙인다 |
 | INP | 200ms 이하 | 공개 후 PageSpeed Insights의 실사용 데이터 |
 | CLS | 0.1 이하 | 모든 영상·이미지에 `aspect-ratio`를 지정한다 |
-| Lighthouse 모바일 | 성능 90 이상, 접근성 95 이상, SEO 100 | 배포 미리보기마다 실행 |
+| Lighthouse 모바일 | 성능 90 이상, 접근성 95 이상, SEO 100 | 성능과 접근성은 배포 미리보기마다 실행한다. SEO는 첫 공개 당일 `sding.kr`에서 잰다. 미리보기는 `noindex`이고 canonical이 다른 도메인이라 `is-crawlable`과 `canonical`이 실패하므로, 미리보기에서는 이 두 항목을 빼고 본다 |
 | 자체 JS | 170KB 이하(gzip) | Next 16의 `next build`는 크기를 출력하지 않는다. 빌드 뒤 `.next/diagnostics/route-bundle-stats.json`에서 `/`의 `firstLoadChunkPaths` 파일을 gzip으로 합산하거나, Lighthouse·DevTools의 스크립트 전송 크기로 확인한다. GA4와 Turnstile은 늦게 불러오므로 제외한다 |
 | JS 없이 보기 | 모든 문구가 HTML에 있다 | 등장 효과의 숨김 상태는 JS가 켜진 뒤에만 건다 |
 
@@ -1254,16 +1394,16 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 | --- | --- |
 | 대비 | 본문 4.5:1, 큰 글자 3:1 이상. 색 규칙은 브랜드 시스템 절을 따른다 |
 | 키보드 | 버튼·링크·FAQ·신청 창을 키보드만으로 쓸 수 있고, 포커스 링이 항상 보인다 |
-| 터치 영역 | 모든 버튼 44×44px 이상 |
+| 터치 영역 | 모든 버튼, 링크, 체크박스 줄이 44×44px 이상 |
 | 영상 | 일시정지 버튼 상시 노출, 자막, 대본 |
 | 모션 | `prefers-reduced-motion`을 따른다 |
-| 확대 | `maximum-scale`을 두지 않고, 200% 확대에서도 가로 스크롤이 없다 |
-| 폼 | 보이는 라벨, 오류 문구는 `aria-live='polite'`, 색만으로 오류를 알리지 않는다 |
+| 확대 | `maximum-scale`을 두지 않고, 200% 확대에서도 가로 스크롤이 없다. 신청 창은 높이를 고정하지 않고 카드 안에서 세로로 스크롤한다 |
+| 폼 | 보이는 라벨, 오류 문구와 전송 중 상태는 처음부터 있는 `aria-live='polite'` 영역에 넣고, 칸에 `aria-invalid`와 `aria-describedby`를 달고 포커스를 옮긴다. 색만으로 오류를 알리지 않는다 |
 | 구조 | `lang='ko'`, `h1` 하나, 제목 순서 유지, `header`·`main`·`footer`, 본문 바로가기 링크 |
 
 ### 아이콘과 공유 이미지
 
-로고 원본이 도착하면 아래 파일을 만든다. 원본이 오기 전에는 `--brand` 바탕에 흰색 '스'(Pretendard 800)를 임시 아이콘으로 쓰고 `TODO(logo)` 주석을 남긴다.
+로고 원본이 도착하면 아래 파일을 만든다. 원본이 오기 전에는 `--brand` 바탕에 흰색 '스'(Pretendard 800)를 임시 아이콘으로 쓰고 `TODO(logo)` 주석을 남긴다. 임시 아이콘은 `scripts/icons.mjs`가 한 윤곽에서 만든다.
 
 | 파일 | 크기 | 용도 | 원본 |
 | --- | --- | --- | --- |
@@ -1303,7 +1443,7 @@ export default function manifest(): MetadataRoute.Manifest {
 | 호스트 | 종류 | 값 | 비고 |
 | --- | --- | --- | --- |
 | `sding.kr` | A | Vercel 대시보드가 알려 주는 값 | 루트 도메인 |
-| `www` | CNAME | Vercel 대시보드가 알려 주는 값 | `sding.kr`로 301 이동하도록 Vercel에서 설정한다 |
+| `www` | CNAME | Vercel 대시보드가 알려 주는 값 | `sding.kr`로 301 이동하도록 Vercel에서 설정한다. Vercel이 권하는 'www를 기본으로, 루트를 이동으로' 설정을 고르지 않는다. 그러면 Turnstile의 hostname 확인에서 모든 신청이 실패한다 |
 | 그 밖의 레코드 | — | 건드리지 않는다 | 이미 메일을 쓰고 있다면 MX, SPF, DKIM, DMARC와 인증용 TXT를 그대로 둔다 |
 
 - 레코드 값은 Vercel 대시보드가 알려 주는 값을 그대로 넣는다. 프로젝트마다 다를 수 있어 이 문서에는 적지 않는다.
@@ -1348,15 +1488,18 @@ const nextConfig: NextConfig = {
 
 | 환경 | 확인할 것 |
 | --- | --- |
-| iOS Safari(저전력 모드 켬·끔) | 자동 재생과 대체 화면, 사운드 버디 켜기, 노치·홈 바 안전 영역, 영상 Range 재생 |
-| Android Chrome(데이터 절약 켬·끔) | 자동 재생과 대체 화면, 소리 켜기, 신청 창 |
-| 삼성 인터넷 | 자동 재생, 소리, 신청 창, 키보드가 올라올 때 입력칸이 가려지지 않는지 |
-| 카카오톡 인앱 브라우저 | 링크 공유 미리보기(OG), 자동 재생, 신청 창 |
-| 네이버 앱 인앱 브라우저 | 자동 재생, 신청 창 |
+| iOS Safari(저전력 모드 켬·끔) | 자동 재생과 대체 화면, 사운드 버디 켜기, 노치·홈 바 안전 영역, 영상 Range 재생, 신청 창, 자동 완성으로 넣은 번호 |
+| iOS 16.x(지원 하한) | 신청 창의 포커스 시작과 복귀, 배경 어둡게, 키보드 |
+| Android Chrome(데이터 절약 켬·끔) | 자동 재생과 대체 화면, 소리 켜기, 신청 창, 자동 완성으로 넣은 번호 |
+| 삼성 인터넷 | 자동 재생, 소리, 신청 창 |
+| 카카오톡 인앱 브라우저 | 링크 공유 미리보기(OG), 자동 재생, 신청 창, 실제 키로 신청 한 번(Turnstile), 새 탭으로 여는 자세히 보기 |
+| 네이버 앱 인앱 브라우저 | 자동 재생, 신청 창, 실제 키로 신청 한 번(Turnstile), 새 탭으로 여는 자세히 보기 |
+| 모든 모바일 환경 | 키보드가 올라와도 입력칸과 제출 버튼에 닿을 수 있고, 뒤 페이지가 움직이지 않고(iOS는 주소창이 접힌 때와 키보드가 뜬 때 둘 다, 최신 버전과 iOS 18에서), 닫으면 포커스가 돌아오는지 |
 | 데스크톱 Chrome·Safari·Whale·Edge | 1440·1920px 레이아웃, 키보드만으로 전체 조작, 소리 켜기 |
 | 화면 폭 | 360, 390, 430, 768, 1024, 1440, 1920px에서 깨짐과 가로 스크롤이 없는지 |
 | 느린 망 | 개발자 도구의 느린 4G에서 포스터가 먼저 보이고 영상이 이어서 재생되는지 |
-| JS 끔 | 문구 전체가 보이고 CTA가 마지막 섹션의 폼으로 이동하는지 |
+| JS 끔 | 문구 전체가 보이고 CTA가 마지막 섹션의 폼으로 이동하며, 제출 버튼이 꺼지고 안내 문구가 보이는지 |
+| 오픈 상태(`ctaOverride`) | 스토어 링크, 스토어가 하나일 때, 1440px의 QR을 iPhone과 Android로 찍기, 카카오톡·네이버·삼성 인터넷에서 링크 누르기 |
 
 ## 자료 체크리스트와 일정
 
@@ -1392,11 +1535,11 @@ const nextConfig: NextConfig = {
 
 - 10월 28일\~11월 4일, **결정과 골격**: 자료 표의 11월 4일 항목을 확정하고, Claude Code 1\~2단계(골격, 히어로와 영상 시스템)를 만든다.
 - 11월 5일\~12일, **콘텐츠·SEO·폼·법적 페이지**: 3\~6단계를 만들고 변호사 검토를 받는다. 검토가 끝나야 첫 공개를 할 수 있다.
-- 11월 13일, **첫 공개(D-42)**: 포스터 이미지 상태로 공개한다. Google Search Console, 네이버 서치어드바이저, Bing에 등록하고 사이트맵을 제출한다.
+- 11월 13일, **첫 공개(D-42)**: 포스터 이미지 상태로 공개한다. Google Search Console, 네이버 서치어드바이저, Bing에 등록하고 사이트맵을 제출한다. IndexNow로 세 주소를 알린다.
 - 12월 4일, **영상 납품(D-21)**: 늦어도 이 날까지 영상을 받아 `public/media/`에 넣고 `media.ts`의 주소를 바꾼다. 영상이 있어야 사전 신청 홍보에 쓸 수 있다.
 - 12월 11일, **사전 신청 홍보(D-14)**: 사전 신청 모집을 본격적으로 알린다. 채널은 아직 정해지지 않았다 \[확인 필요\].
-- 12월 18일, **최종 점검(D-7)**: 성능·접근성 기준 표와 테스트 매트릭스를 다시 통과시키고, 오픈 안내 문자의 문구와 발송 대행사를 확인한다.
-- 12월 25일, **정식 오픈(D-0)**: CTA를 오픈 상태로 바꾸고 스토어 주소를 넣는다. JSON-LD에 앱 노드를 더하고, 오픈 안내 문자를 보내고, 보도자료를 낸다.
+- 12월 18일, **최종 점검(D-7)**: 성능·접근성 기준 표와 테스트 매트릭스를 다시 통과시키고, 오픈 안내 문자의 문구와 발송 대행사(전송자격인증, 무료 수신 거부 제공)를 확인한다.
+- 12월 25일, **정식 오픈(D-0)**: CTA를 오픈 상태로 바꾸고 스토어 주소를 넣는다. JSON-LD에 앱 노드를 더하고, IndexNow로 홈 주소를 다시 알리고, 공유 이미지가 바뀐 것을 확인한 뒤 카카오 공유 캐시를 지우고, 오픈 안내 문자를 보내고(08~21시 도달), 보도자료를 낸다.
 
 ## Claude Code 핸드오프
 
@@ -1472,8 +1615,8 @@ docs/PLAN.md와 CLAUDE.md를 먼저 끝까지 읽어 줘.
 | 3. 소개와 존 4개 | `Intro`, `Zone` 4개, `ProgressDots`, 앵커 | 앵커로 이동하고, 존이 보일 때만 영상이 재생되며, 합성·시뮬레이션 존에 `badge`와 `notice`가 있다 |
 | 4. FAQ와 검색 대응 | `Faq`, 메타 태그와 소유확인 메타, JSON-LD, `robots.ts`, `sitemap.ts`, `llms.txt`, `manifest.ts`, `opengraph-image.tsx`, IndexNow 키 파일, 임시 아이콘 | 페이지 소스에 `h1` 하나와 JSON-LD(Organization, WebSite, WebPage, FAQPage, DefinedTermSet, 영상이 오면 VideoObject)가 보이고, JSON으로 파싱된다 |
 | 5. 사전 신청 | `CtaButton`(`ctaMode()` 연결), `WaitlistDialog`, `WaitlistForm`, `CtaSection`, `/api/waitlist` | Supabase에 저장되고, 중복 번호도 같은 성공 화면이 뜨며, 잘못된 번호는 오류 문구가 뜬다. JS를 끄면 마지막 섹션으로 이동한다 |
-| 6. 법적 페이지 | `/privacy`, `/terms` 초안 | 푸터에서 연결되고, 변호사 검토 전 초안이라는 점이 `docs/OPEN_ITEMS.md`에 적혀 있다 |
-| 7. 분석과 점검 | `analytics.ts`의 이벤트 8개, Lighthouse, 접근성, 테스트 매트릭스 | 성능과 접근성 기준 표를 통과한다 |
+| 6. 법적 페이지 | `/privacy`, `/terms` 초안, `not-found.tsx` | 푸터에서 연결되고, 변호사 검토 전 초안이라는 점이 `docs/OPEN_ITEMS.md`에 적혀 있다. 없는 주소는 한국어 안내와 홈 링크를 보인다 |
+| 7. 분석과 점검 | `analytics.ts`의 이벤트 8개, Lighthouse, 접근성, 테스트 매트릭스 | 성능과 접근성 기준 표를 통과한다(SEO는 첫 공개 당일 `sding.kr`에서 잰다) |
 | 8. 자료 반영 | 로고 SVG, 연락처, 영상, SNS 주소, 스토어 주소 | 운영 빌드에서 `assertCompany()`가 통과하고, `docs/OPEN_ITEMS.md`에는 의도한 항목만 남는다 |
 
 ### 완료 기준

@@ -1,0 +1,114 @@
+/* FAQ(PLAN 'FAQ'). 피치 띠는 여기서 시작해 마지막 CTA를 지나 푸터까지 이어진다. 띠 위에는 제목만 놓고, 오렌지는 흰 카드 안에만 쓴다 */
+@layer components {
+  .faq {
+    --faq-gap: var(--sp-2);     /* 카드 사이 */
+    --faq-row: var(--sp-14);    /* 한 줄 질문의 summary 높이 */
+    --faq-inset: var(--sp-4);   /* 질문 왼쪽과 답의 여백 */
+    padding: var(--section-y) var(--gutter);
+    background: var(--peach);
+    scroll-margin-top: calc(var(--sp-6) - var(--section-y));   /* 앵커로 오면 띠 위 여백을 건너뛰어 제목이 헤더 아래 24px에 온다 */
+  }
+  .faq-in {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    row-gap: var(--sp-6);
+    max-width: var(--container);
+    margin-inline: auto;
+  }
+  .faq-title { margin-top: 0; text-align: center; }   /* 글자 모양은 .zone-title이다. 포커스 링이 글자 폭을 따른다 */
+  .faq-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--faq-gap);
+    width: min(100%, calc(36em + 2 * var(--faq-inset) + 2px));   /* 답 폭은 최대 36em(PLAN '서체') */
+  }
+
+  .faq-item {
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--white);
+    transition: box-shadow 200ms var(--ease);
+  }
+  .faq-item[open] { box-shadow: var(--shadow-soft); }
+  @media (hover: hover) { .faq-item:hover { box-shadow: var(--shadow-soft); } }
+
+  .faq-q {
+    display: block;
+    padding: var(--sp-3) calc((var(--faq-row) - var(--sp-8)) / 2) var(--sp-3) var(--faq-inset);   /* 오른쪽 = 원이 줄 높이 가운데에 오는 거리 */
+    border-radius: calc(var(--r-md) - 1px);
+    list-style: none;
+    cursor: pointer;
+  }
+  .faq-q::-webkit-details-marker { display: none; }
+  .faq-q:focus-visible { outline-offset: -3px; }   /* 링을 카드 안에 두어 열린 답과 옆 카드에 겹치지 않는다 */
+  .faq-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-height: calc(var(--faq-row) - 2 * var(--sp-3));
+    font-size: var(--fs-body);
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: -.01em;
+    transition: scale 200ms var(--ease);
+  }
+  /* summary를 줄이면 누르는 동안 가장자리가 summary 밖으로 빠져 클릭이 사라진다. 안쪽만 줄인다 */
+  .faq-q:active .faq-row { scale: .98; transition-duration: 100ms; }
+  .faq-text { flex: 1; min-width: 0; }
+
+  .faq-mark {   /* 소개 알약의 .intro-ico를 32px로 줄였다 */
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: var(--sp-8);
+    height: var(--sp-8);
+    border-radius: 50%;
+    background: var(--peach);
+    color: var(--brand-deep);   /* 피치 위 --brand는 2.91:1이다 */
+    transition: background-color 200ms var(--ease), color 200ms var(--ease);
+  }
+  .faq-mark svg { width: var(--sp-6); height: var(--sp-6); transition: rotate 300ms var(--ease); }
+  .faq-item[open] .faq-mark { background: var(--brand); color: var(--white); }
+  .faq-item[open] .faq-mark svg { rotate: 180deg; }
+
+  .faq-a { padding: 0 var(--faq-inset) var(--faq-inset); color: var(--ink-600); text-wrap: pretty; }
+  .faq-a strong { color: var(--ink-900); font-weight: 500; }
+  .faq-item[open] > .faq-a { animation: fade 240ms var(--ease); }
+
+  @media (min-width: 768px) {
+    .faq { --faq-gap: var(--sp-3); --faq-row: var(--sp-16); --faq-inset: var(--sp-6); }
+    .faq-in { row-gap: var(--sp-8); }
+  }
+  @media (min-width: 1024px) {
+    .faq-in {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: clamp(var(--sp-6), 4vw, var(--sp-12));   /* 존과 같은 격자. --zone-gap은 .zone-run 안에만 있다 */
+      align-items: start;
+      justify-items: start;
+    }
+    .faq-title {
+      grid-column: 1 / span 5;
+      position: sticky;
+      top: calc(var(--header-h) + var(--sp-6));
+      text-align: left;
+    }
+    .faq-list { grid-column: 6 / span 7; width: 100%; }
+  }
+
+  @media (forced-colors: active) {
+    .faq-mark { border: 1px solid CanvasText; }
+    .faq-item[open] .faq-mark { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .faq-q:active .faq-row { scale: none; }
+  }
+  @media print {
+    .faq { padding-block: var(--sp-6); background: none; }
+    .faq-title { position: static; }
+    .faq-item { break-inside: avoid; }
+    .faq-item[open], .faq-item:hover { box-shadow: none; }
+    .faq-mark { display: none; }
+    .faq-item::details-content { content-visibility: visible; block-size: auto; }   /* 닫힌 답도 인쇄한다 */
+  }
+}

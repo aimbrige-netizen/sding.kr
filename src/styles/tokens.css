@@ -46,6 +46,13 @@
   --btn-fs: 1.25rem;                   /* 주 버튼 글자 20px. 오렌지 위 흰 글자 기준 */
   --buddy: 56px;                       /* 사운드 버디 */
   --ctrl: 44px;                        /* 영상 재생·일시정지 버튼 */
+  --ts-w: 300px;                       /* Turnstile flexible 위젯의 최소 폭 */
+  --qr: 165px;                         /* QR 한 변. 33칸 x 5px이라 칸이 화소에 맞는다 */
+  --scrim-flat: color-mix(in srgb, var(--ink-900) 56%, var(--cream));   /* --scrim을 크림 위에 겹친 색 */
+}
+/* 신청 창 뒤를 어둡게 하는 값과 그 페이드가 읽는 값. Safari 17.4 미만의 ::backdrop은 :root를 상속하지 않아 함께 선언한다 */
+:root, ::backdrop {
+  --scrim: rgb(42 26 20 / .56);
   --ease: cubic-bezier(.22, 1, .36, 1);
 }
 @supports (height: 100svh) { :root { --peek: clamp(170px, 25svh, 250px); } }
@@ -61,12 +68,13 @@
   :root { --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), calc((100vw - 2 * var(--gutter)) / 6.9), 20.6svh, calc(var(--container) / 6.1)); }
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
+html { scroll-padding-top: var(--header-h); }
+html.js { scroll-behavior: smooth; }   /* JS가 꺼지면 해시 주소에서 부드러운 스크롤을 끄는 스크립트도 없으므로 처음부터 쓰지 않는다 */
 body { background: var(--cream); color: var(--ink-900); word-break: keep-all; overflow-wrap: break-word; }
 /* 이동과 확대를 끈다. 반복 횟수를 1로 두어 무한 반복이 아주 짧은 주기로 깜빡이지 않게 한다 */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
+  html.js { scroll-behavior: auto; }
+  *, *::before, *::after, *::backdrop {
     animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important;
   }
 }
