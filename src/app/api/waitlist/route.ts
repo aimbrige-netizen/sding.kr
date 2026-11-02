@@ -8,7 +8,7 @@ import { TURNSTILE_ACTION } from '@/lib/turnstile';
 // 로그에는 오류 코드와 HTTP 상태만 쓴다. Supabase의 error.details에는 행의 값이 들어갈 수 있다
 export const maxDuration = 15;   // 확인 6초와 저장 5초를 넘기면 끊는다. 기본 300초로 두면 폼이 그만큼 기다린다
 
-const CONSENT_VERSION = '2026-10-v1';   // 동의 문구나 처리방침이 바뀌면 올린다
+const CONSENT_VERSION = '2026-11-v1';   // 동의 문구나 처리방침이 바뀌면 올린다
 const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const VERIFY_TIMEOUT = 3000;
 const HOSTNAME = new URL(SITE.url).hostname;
