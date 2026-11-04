@@ -1,5 +1,5 @@
 // FAQ 화면과 FAQPage JSON-LD가 같은 배열을 읽는다
-import { SITE } from './site';
+import { COPY, SITE } from './site';
 import { ZONES } from './zones';
 import { launchFull, type CtaMode } from '@/lib/launch';
 
@@ -22,7 +22,7 @@ export const FAQ: FaqItem[] = [
   { id: 'where', q: '어디서 쓸 수 있나요?', when: 'live', a: STORE_LINE },
   { id: 'fee', q: '이용 요금은 얼마인가요?', hidden: true, a: '' },   // TODO(fee): 요금 정책이 정해지면 답을 채우고 hidden을 지운다
   { id: 'phone', q: '출시 알림에 남긴 번호는 어떻게 쓰이나요?', when: 'waitlist',
-    a: '출시 알림에 남긴 번호는 오픈 안내 문자를 보내는 데만 쓰고, 목적이 끝나면 파기해요.' },   // TODO(retention): 보관 기간 확정
+    a: `출시 알림에 남긴 번호는 정식 오픈 안내 문자를 1회 보내는 데만 써요. ${COPY.waitlist.notice[2].value}해요.` },   // 동의 고지·처리방침과 같은 보유 기간 값을 읽는다
 ];
 
 // 화면과 JSON-LD는 이 함수의 결과만 쓴다

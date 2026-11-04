@@ -89,7 +89,7 @@
   .wl-status, .wl-slot { scroll-margin-bottom: calc(var(--buddy) + var(--sp-6)); }   /* 사운드 버디에 가리지 않게 올린다 */
 
   /* 고지. 상자도 선도 없이 한 크기에서 잉크와 굵기로만 나눈다. 라벨 칸이 세로 통로를 만들어 값만 훑을 수 있다.
-     크게 보이는 줄은 보유 기간 하나다(시행령 제17조③, 고시 제4조) */
+     굵기와 형광 띠로 강조하는 줄은 이용 목적과 보유 기간이다(시행령 제17조③, 고시 제4조) */
   .wl-notice, .wl-terms { color: var(--ink-600); font-size: var(--fs-cap); line-height: 1.5; }
   .wl-notice { display: grid; row-gap: var(--sp-1); margin-top: var(--sp-6); }   /* 번호와 멀고 체크와 가까워 고지가 동의에 붙어 읽힌다 */
   .wl-notice > div { display: grid; grid-template-columns: 5em minmax(0, 1fr); }
