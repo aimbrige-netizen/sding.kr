@@ -5,7 +5,6 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { Close } from './Icons';
 import { Spans } from './Spans';
 import { COPY } from '@/content/site';
-import { hasTurnstileKey, loadTurnstile } from '@/lib/turnstile';
 
 // CtaButton이 부른다. 하이드레이션 전에는 비어 있어 링크대로 이동한다
 let open: ((from: HTMLElement | null) => boolean) | null = null;
@@ -74,7 +73,6 @@ export function WaitlistDialog({ title, description, children }: { title: string
       // 터치 기기에서 입력칸을 바로 잡으면 키보드가 동의 고지와 버튼을 가리므로 제목에서 시작한다
       const field = dialog.querySelector<HTMLElement>('input[type="tel"]');
       (coarse() || !field ? titleRef.current : field)?.focus({ preventScroll: true });
-      if (field && hasTurnstileKey) loadTurnstile().catch(() => {});
       return true;
     };
     return () => {

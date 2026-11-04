@@ -19,9 +19,18 @@
 | `brand-en` | 영문 표기 Sding 또는 SDING(상표 출원안과 맞춤) | `src/content/company.ts`, `src/content/site.ts`의 `SITE.title` | 11월 4일 | `Sding` |
 | — | 도메인 등록처와 DNS 위치 | Vercel 연결 | 11월 4일 | 가비아로 가정 |
 | — | 사전 신청 수집 항목(휴대폰 번호 또는 이메일) | 폼, API, 처리방침 | 11월 4일 | 휴대폰 번호로 진행 |
-| `contact` | 전화번호, 대표 이메일, 개인정보보호책임자 | `src/content/company.ts` | 11월 12일 | 비어 있음. 푸터에서 빠져 있고, 이메일이 없어 '제휴 문의' 링크도 숨겨져 있다. `NEXT_PUBLIC_SITE_ENV=production` 빌드는 `assertCompany()`가 멈춘다 |
+| `contact` | 전화번호, 대표 이메일, 개인정보보호책임자 | `src/content/company.ts`, `src/content/legal.ts` | 11월 12일 | 비어 있음. 책임자는 대표이사나 임원을 지정한다(임원이 아예 없을 때만 부서장). 푸터와 처리방침에서 빠져 있고, 이메일이 없어 '제휴 문의' 링크도 숨겨져 있다. `NEXT_PUBLIC_SITE_ENV=production` 빌드는 `assertCompany()`가 멈춘다 |
 | `price-rule` | 웨딩 가격 정찰제의 실제 규칙(적용 범위, 표시 기준, 추가 비용) | `src/content/zones.ts` | 11월 12일 | 숫자 없는 일반 설명 |
-| — | 변호사 검토(처리방침, 이용약관, 동의 문구, 'AI 합성' 표기) | 6단계 | 11월 12일 | 검토 전에는 첫 공개를 미룬다 |
+| `legal-review` | 변호사 검토(처리방침, 이용약관, 동의 문구, 'AI 합성' 표기) | `src/content/legal.ts` | 11월 12일 | `/privacy`와 `/terms`는 변호사 검토 전 초안이다. 검토 전에는 첫 공개를 미룬다. 검토가 끝나면 문구를 확정하고 `LEGAL_DATE`에 시행일을 넣는다. 비어 있으면 운영 빌드가 멈춘다. 근거와 질문 36개는 `docs/private/legal-facts.md`에 있고, 공개 저장소에는 올리지 않는다. 신청 폼 곁의 `/terms` 링크는 약관의 효력(Q32)을 보고 정한다 |
+| `transfer-basis` | 국외 이전의 법적 근거 | `src/content/legal.ts`의 `TRANSFER_BASIS` | 11월 12일 변호사 검토 | 비어 있다. 비어 있으면 운영 빌드가 멈춘다. 무료 출시 알림이 제28조의8제1항제3호의 계약이 아니면 별도 동의가 필요해 신청 폼이 바뀐다 |
+| `processing-basis` | 신청 기록과 자동으로 처리되는 정보의 처리 근거 | `src/content/legal.ts`의 `RECORD_BASIS`, `AUTO_BASIS` | 11월 12일 변호사 검토 | 비어 있다. 비어 있으면 운영 빌드가 멈춘다. 쿠키에 동의가 필요한지도 함께 정한다. 답에 따라 신청 폼이나 쿠키 안내가 늘 수 있다 |
+| `transfer-table` | 업체별 지위와 표기(수탁자, 제3자, 이전 유형, 나라, 보유 기간) | `src/content/legal.ts`의 `VENDORS`, `TRANSFER_TYPE` | 11월 12일 변호사 검토 | 2026-11-01의 업체 공개 문서로 채웠다. 수탁자라고 단정하지 않고 업체가 맡은 일과 스스로 쓰는 일을 나누어 적었다. 이전 유형은 비어 있고, 비어 있으면 운영 빌드가 멈춘다. Cloudflare와 Google은 목적에 따라 지위가 나뉘고, 나라를 다 특정할 수 없는 곳이 있다 |
+| `sms-vendor` | 문자 발송 업체(이름, 맡기는 일, 보유 기간) | `src/content/legal.ts` | 번호를 넘기기 전 | 미정이라 처리방침에 '정하면 알린다'고 적었다. 정하면 `VENDORS`에 더하고 변경 이력을 남긴다. 광고성 문자로 판단되면 전송자격인증 업체여야 한다 |
+| `security-measures` | 처리방침의 안전조치를 실제 조치와 맞추기 | `src/content/legal.ts` | 공개 전 | 지금은 코드와 SQL로 확인되는 조치만 적었다. 서버 코드가 번호를 로그에 남기지 않는 것은 확인했지만 Supabase 쪽 로그는 프로젝트를 만든 뒤 설정을 보고 확인한다. 관리 계정의 다중 인증, 접속기록 보관, 저장 암호화, 내부 관리계획은 실제로 해 둔 뒤에만 적는다 |
+| `export-file` | 문자 발송용으로 내려받는 파일의 암호화와 삭제 절차 | 운영 절차, `src/content/legal.ts` | 번호를 내려받기 전 | 안전성 확보조치 기준 제7조제5항의 대상일 수 있다. 절차가 없어 처리방침에 적지 않았다. 정하면 파기 방법에 더한다 |
+| `policy-notice` | 처리방침을 바꿀 때 공지할 자리 | 사이트 | 첫 변경 전 | 공지 게시판이 없는 원페이지다. 문자 업체를 정할 때 처음 필요하다. 이전 판도 볼 수 있게 남긴다 |
+| `small-biz` | 업종과 상시 근로자 수(소상공인 여부) | `docs/private/legal-facts.md` Q26 | 11월 12일 변호사 검토 | 내부 관리계획 생략과 보호책임자 지정 방식이 달라진다 |
+| `ga-settings` | GA 데이터 공유, Google 신호, 광고 개인화, 세분화된 위치·기기 데이터, 보관 기간 | GA 관리 화면, `src/content/legal.ts` | 7단계 | 처리방침의 GA 항목은 `NEXT_PUBLIC_GA_ID`가 있을 때만 나온다. 보관 2개월을 관리 화면과 맞춘다. '맞춤형 광고에 쓰지 않는다'는 설정을 마친 뒤에만 적는다 |
 | `founding-date` | 법인 설립등기일 | `src/content/company.ts` | 11월 12일 | 개업일 2026-09-18을 임시로 쓴다 |
 | `hero-film`, `zone-media`, `transcript` | 영상·이미지 파일(소개 영상 데스크톱·모바일, 존 영상, 비교 이미지), 포스터, 자막, 대본, 소개 영상의 설명·업로드일·길이·유튜브 주소 | `src/content/media.ts`, `src/components/Film.tsx` | 늦어도 12월 4일 | 비어 있음. 브랜드 포스터 카드와 '라이드'가 대신 보이고, '영상 내용 글로 보기'에는 존 순서를 보인다. 켤 소리가 없어 사운드 버디도 숨겨져 있다. 업로드일과 포스터가 있어야 `VideoObject`가 나간다. 납품 조건은 진행 메모의 '존 미디어 납품'에 있다 |
 | — | 영상 제작 도구의 상업 이용 조건 | 영상 사용 권리 | 영상 납품 전 | 확인 전에는 공개 페이지에 영상을 올리지 않는다 |
@@ -29,11 +38,13 @@
 | `zone4-hall` | ZONE 04 대상 웨딩홀이 실존하는지, 촬영·사용 허락, 재현 방식 | `src/content/media.ts` | 영상 납품 전 | 파일이 비어 있다. 확인 전에는 공개 페이지에 올리지 않는다 |
 | `zone2-input` | ZONE 02 날짜와 예산 외의 입력 항목, 결과가 나오는 형태 | `src/content/zones.ts` | 영상 납품 전 | 날짜와 예산만 말하는 설명이다 |
 | `zone3-photo-policy` | 사용자 사진의 처리·보관·삭제 정책 | `src/content/faq.ts` | 오픈 전 | FAQ 답에 넣지 않았다 |
+| `launch-terms` | 오픈에 맞춘 약관과 처리방침, 앱 약관 | `src/content/legal.ts` | 12월 11일 | `/terms`는 `ctaMode()`를 따르지 않아 오픈 뒤에도 '출시할 예정'이라고 말한다. 앱의 AI 고지는 앱 약관과 앱 화면에 다시 둔다 |
+| `demo-label` | 데모 표시와 제한 문구 | `src/content/zones.ts`, `src/content/media.ts` | 영상 납품 전 | 지금은 약관에만 '데모'라고 적혀 있다. ZONE 01·02와 소개 영상의 파일이 오면 표시와 제한 문구를 미디어 가까이에 둔다. 제한 문구를 약관에만 두면 충분하지 않다 |
 | `store` | App Store·Google Play 주소, 지원 기기, 12월 25일 오픈의 의미 | `src/content/site.ts`, `src/content/faq.ts` | 12월 11일 | 비어 있음. 비어 있으면 CTA는 '출시 알림 받기'로 남는다. 주소가 12월 25일에 맞지 못하면 그 전에 `SITE.launchDate`를 옮긴다. 그대로 두면 FAQ와 JSON-LD가 지난 날짜를 '정식 오픈 예정'이라고 말한다 |
 | `sns` | SNS 계정 주소 | `src/content/site.ts`, `src/components/Footer.tsx`, `src/components/Icons.tsx` | 정해지면 | 비어 있음. 푸터의 SNS 아이콘은 아직 없다. 주소를 넣을 때 아이콘도 더해야 `sameAs`가 화면과 맞는다 |
 | `fee` | 서비스 지역과 요금 정책 | `src/content/faq.ts` | 정해지면 | FAQ 요금 항목을 숨겼다 |
-| `retention` | 출시 알림 번호 보관 기간(제안: 발송 후 30일). 왜 30일인지(재발송, 수신 거부 처리 등)도 설명할 수 있어야 한다 | `src/content/faq.ts`, `src/content/site.ts` | 11월 12일 변호사 검토 | FAQ는 기간 없이 '목적이 끝나면 파기', 동의 고지는 '안내 문자를 보낸 뒤 30일 안에 파기'다. 확정되면 FAQ, 고지, 처리방침을 같은 말로 맞춘다 |
-| `consent-copy` | 신청 폼의 동의 고지 문구 | `src/content/site.ts`, `src/app/api/waitlist/route.ts`의 `CONSENT_VERSION` | 11월 12일 변호사 검토 | 임시안이다. 문구가 바뀌면 `CONSENT_VERSION`을 올린다 |
+| `retention` | 출시 알림 번호 보관 기간(제안: 발송 후 30일). 왜 30일인지(재발송, 수신 거부 처리 등)도 설명할 수 있어야 한다 | `src/content/faq.ts`, `src/content/site.ts`, `src/content/legal.ts` | 11월 12일 변호사 검토 | FAQ는 기간 없이 '목적이 끝나면 파기', 동의 고지와 처리방침은 '안내 문자를 보낸 뒤 30일 안에 파기'다. 표준지침 제10조는 불필요하게 된 때부터 5일 이내 파기를 정하므로 30일과 충돌할 수 있다. 확정되면 FAQ, 고지, 처리방침을 같은 말로 맞춘다 |
+| `consent-copy` | 신청 폼의 동의 고지 문구 | `src/content/site.ts`, `src/app/api/waitlist/route.ts`의 `CONSENT_VERSION` | 11월 12일 변호사 검토 | 임시안이다. 문구나 처리방침이 바뀌면 `CONSENT_VERSION`을 올린다 |
 | `age-14` | '만 14세 미만은 신청할 수 없어요.' 한 줄로 충분한지 | `src/content/site.ts` | 11월 12일 변호사 검토 | 입력칸 없이 한 줄만 두었다. 자가 체크가 필요하다는 답이 오면 체크 항목을 더한다 |
 | — | 통신판매업 신고번호 | `src/content/company.ts` | 신고 완료 때 | 의도적으로 빈 값. 라벨만 보인다 |
 | — | 구글·네이버 소유확인 값, GA4 ID | Vercel 환경 변수 | 4·7단계 전 | `.env.example`에 이름만 있다 |
@@ -63,7 +74,11 @@
 
 ## 진행 메모
 
-- `/privacy`, `/terms` 링크는 6단계 전까지 404다. 없는 주소도 6단계 전까지 Next 기본 404(영어)가 보인다. 이 화면의 canonical과 `og:url`은 `/_not-found`로 나오지만 `noindex`라 색인에 영향이 없다. 6단계의 `not-found.tsx`에서 지운다.
+- `/privacy`와 `/terms`의 업체 사실, 쿠키 이름, 구제 기관 연락처는 2026-11-01에 공식 문서로 확인한 값이다. 공개 직전에 다시 확인한다. 작성지침과 표준지침은 2026년 9월 11일 개정법 전의 판이다.
+- 처리방침의 쿠키 차단 메뉴 이름은 작성지침의 예시를 따랐다. 공개 전에 실제 화면과 맞춘다.
+- 미디어를 R2로 옮기면 처리방침에 Cloudflare 미디어 항목이 나타난다. 처리방침 변경이므로 공지, 변경 전후 비교, 시행일, `CONSENT_VERSION`을 함께 챙긴다.
+- 동의 고지의 목적에 '1회'를 더하며 `CONSENT_VERSION`을 `2026-11-v1`로 올렸다. 아직 저장된 신청은 없다.
+- 약관의 생성형 AI 문장은 앱 출시 때의 고지를 대신하지 않는다. 앱 약관과 앱 화면에 다시 둔다. 푸터 한 줄도 고지 수단으로 인정되는지 근거를 찾지 못했다.
 - 2026-10-29에 지원 하한(iOS·Safari 16.4)과 폰트(저자 배포 다이내믹 서브셋)를 정해 기획서 v1.2에 반영했다.
 - 동작 줄이기는 토큰 블록의 전역 규칙을 그대로 쓰고 반복 횟수를 1로 막는 줄만 더했다. 이동과 확대가 꺼지고 투명도도 전환 없이 바로 바뀐다.
 - 2단계 반영 결과는 `docs/design/README.md`에 있다.

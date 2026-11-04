@@ -6,6 +6,7 @@ import { WaitlistDialog } from '@/components/WaitlistDialog';
 import { WaitlistForm } from '@/components/WaitlistForm';
 import { assertCompany, COMPANY } from '@/content/company';
 import { STORE_LINE } from '@/content/faq';
+import { assertLegal } from '@/content/legal';
 import { COPY, SITE } from '@/content/site';
 import { FONT_SUBSET, preloadFontSubset } from '@/lib/fonts';
 import { ctaMode } from '@/lib/launch';
@@ -17,8 +18,11 @@ export const revalidate = 3600;
 
 const production = process.env.NEXT_PUBLIC_SITE_ENV === 'production';
 
-// 운영 빌드에서만 연락처 빈 값을 막는다(PLAN '푸터 회사 정보')
-if (production) assertCompany();
+// 운영 빌드에서만 빈 값을 막는다. 연락처(PLAN '푸터 회사 정보')와 변호사 검토 뒤에 넣는 법적 페이지의 값(PLAN '법적 페이지')이다
+if (production) {
+  assertCompany();
+  assertLegal();
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),

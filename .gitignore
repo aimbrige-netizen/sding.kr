@@ -48,3 +48,6 @@ next-env.d.ts
 
 # generated before each build
 /public/llms.txt
+
+# legal research notes, kept out of the public repository
+/docs/private/

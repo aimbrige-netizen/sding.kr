@@ -53,7 +53,7 @@ export const COPY = {
     // TODO(consent-copy): 변호사 검토 뒤 확정한다. TODO(retention): 보관 기간 확정
     notice: [
       { label: '수집 항목', value: '휴대폰 번호' },
-      { label: '이용 목적', value: '정식 오픈 안내 문자 발송' },
+      { label: '이용 목적', value: '정식 오픈 안내 문자 1회 발송' },
       { label: '보유 기간', value: '안내 문자를 보낸 뒤 30일 안에 파기', strong: true },   // 법이 눈에 띄게 표시하라고 정한 항목이다
     ],
     refuse: ['동의를 거부할 수 있어요.', '거부하면 출시 알림을 받을 수 없어요.'],
@@ -79,6 +79,12 @@ export const COPY = {
     qr: '휴대폰 카메라로 찍으면 스딩을 받는 화면이 열려요',
     qrLabel: 'QR 코드',
   },
+  notFound: {
+    metaTitle: '페이지를 찾을 수 없어요 | 스딩',
+    title: '지도에 없는 곳이에요',
+    lead: '주소가 바뀌었거나 잘못 입력된 것 같아요.',
+    home: '스딩 홈으로 가기',
+  },
   terms: '스딩 기능 용어',   // 구조화 데이터의 DefinedTermSet 이름
   llms: { launch: '정식 오픈일', features: '기능', company: '회사 정보', legalName: '법인명', address: '주소', links: '링크', home: '홈' },
   sound: {
@@ -94,7 +100,7 @@ export const COPY = {
       ceo: '대표', bizRegNo: '사업자등록번호', mailOrderNo: '통신판매업신고번호',
       phone: '전화', email: '이메일', privacyOfficer: '개인정보보호책임자',
     },
-    privacy: '개인정보처리방침',
+    privacy: '개인정보 처리방침',   // 표준지침 제20조의 명칭이다. 다른 링크와 굵기, 색으로 구분해 보인다
     terms: '이용약관',
     partner: '제휴 문의',
     aiNotice: 'AI 기능은 생성형 AI를 활용하며 결과는 실제와 다를 수 있어요.',

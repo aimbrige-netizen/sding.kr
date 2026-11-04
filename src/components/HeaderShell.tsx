@@ -18,7 +18,7 @@ export function HeaderShell({ children }: { children: ReactNode }) {
   return (
     <header
       ref={ref}
-      className="fixed inset-x-0 top-0 z-30 h-(--header-h) border-b px-(--gutter) border-transparent transition-[border-color,backdrop-filter] duration-200 ease-brand before:absolute before:inset-0 before:-z-10 before:bg-cream before:opacity-0 before:transition-opacity before:duration-200 data-scrolled:border-line data-scrolled:backdrop-blur-header data-scrolled:before:opacity-85"
+      className="fixed inset-x-0 top-0 z-30 h-(--header-h) border-b px-(--gutter) border-transparent transition-[border-color,backdrop-filter] duration-200 ease-brand before:absolute before:inset-0 before:-z-10 before:bg-cream before:opacity-0 before:transition-opacity before:duration-200 data-scrolled:border-line data-scrolled:backdrop-blur-header data-scrolled:before:opacity-85 print:static"
     >
       {children}
     </header>

@@ -58,22 +58,12 @@ export function WaitlistForm() {
     if (typed) setPhone(formatPhone(typed));
     if (consentRef.current?.checked) setAgreed(true);
 
-    const root = rootRef.current;
-    const dialog = root?.closest('dialog');
-    if (dialog) {
-      // 확인 중에 창을 닫으면 위젯을 없애고 입력 상태로 돌아간다. 닫힌 창 안에서는 사람이 풀 수 없다
-      const stop = () => attempt.current?.abort();
-      dialog.addEventListener('close', stop);
-      return () => dialog.removeEventListener('close', stop);
-    }
-    if (!root || !hasTurnstileKey) return;
-    const io = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
-      io.disconnect();
-      loadTurnstile().catch(() => {});   // 제출할 때 다시 시도한다
-    }, { rootMargin: '600px' });
-    io.observe(root);
-    return () => io.disconnect();
+    // 확인 중에 창을 닫으면 위젯을 없애고 입력 상태로 돌아간다. 닫힌 창 안에서는 사람이 풀 수 없다
+    const dialog = rootRef.current?.closest('dialog');
+    if (!dialog) return;
+    const stop = () => attempt.current?.abort();
+    dialog.addEventListener('close', stop);
+    return () => dialog.removeEventListener('close', stop);
   }, []);
 
   // 끝에서 입력할 때만 바로 다듬는다. 중간을 고칠 때 다듬으면 커서가 끝으로 튄다. 칸을 떠날 때 다듬는다
@@ -89,6 +79,11 @@ export function WaitlistForm() {
   function showField(field: 'phone' | 'consent') {
     flushSync(() => setError(field));
     (field === 'phone' ? phoneRef : consentRef).current?.focus();
+  }
+
+  // 스크립트는 입력을 시작한 사람만 미리 받는다. 지나가는 방문자의 IP가 Cloudflare로 가지 않게 한다. 실패하면 제출할 때 다시 시도한다
+  function preloadTurnstile() {
+    if (hasTurnstileKey) loadTurnstile().catch(() => {});
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -151,7 +146,7 @@ export function WaitlistForm() {
           <strong>{copy.done[0]}</strong> <span>{copy.done[1]}</span>
         </p>
       ) : (
-        <form method="post" action="/api/waitlist" noValidate onSubmit={onSubmit} className="wl-form">
+        <form method="post" action="/api/waitlist" noValidate onSubmit={onSubmit} onInput={preloadTurnstile} className="wl-form">
           <label htmlFor={`${id}-phone`} className="wl-label">{copy.phone}</label>
           <input
             ref={phoneRef}
