@@ -1,6 +1,7 @@
 import { ADDRESS, COMPANY } from './company';
 import { COPY, SITE } from './site';
 import { ZONES } from './zones';
+import { GA_ID } from '@/lib/analytics';
 import { launchFull } from '@/lib/launch';
 
 // /privacy와 /terms의 문구. 변호사 검토 전 초안이다. TODO(legal-review): 검토가 끝나면 문구를 확정하고 LEGAL_DATE를 넣는다.
@@ -22,7 +23,7 @@ const RECORD_BASIS = '';     // TODO(processing-basis): 신청을 처리하며 �
 const AUTO_BASIS = '';       // TODO(processing-basis): 자동으로 처리되는 정보의 처리 근거. 쿠키에 동의가 필요한지도 함께 정한다
 const TRANSFER_TYPE = { vercel: '', supabase: '', cloudflare: '', google: '' };   // TODO(transfer-table): 제공, 조회, 처리위탁, 보관 가운데 무엇인지
 
-const GA_ON = Boolean(process.env.NEXT_PUBLIC_GA_ID);
+const GA_ON = Boolean(GA_ID);
 // 사이트와 같은 도메인의 미디어는 Vercel이 전송한다. R2의 다른 도메인으로 옮겨야 Cloudflare 항목이 나온다
 const MEDIA_ON = new URL(process.env.NEXT_PUBLIC_MEDIA_BASE || '/', SITE.url).hostname !== new URL(SITE.url).hostname;
 
@@ -45,7 +46,7 @@ const [, planner, dress, hall] = ZONES;
 const aiFeatures = [planner, dress, hall].map((zone) => zone.feature).join(', ');
 
 const TLS = 'TLS 지문(브라우저의 연결 방식 정보)';
-const USAGE = '쿠키 식별자, IP 주소, 대략적인 위치, 기기와 브라우저 정보, 페이지 방문과 버튼 누름 같은 이용 기록';
+const USAGE = '쿠키 식별자, IP 주소, 대략적인 위치, 기기와 브라우저 정보, 유입 경로, 페이지 방문과 버튼 누름 같은 이용 기록, 신청 결과(성공·실패)';
 
 // TODO(transfer-table): 업체별 지위(수탁자, 제3자)와 나라, 보유 기간의 표기는 변호사가 정한다.
 // 값은 각 업체의 공개 문서를 따랐다. 업체가 약관이나 처리 위치를 바꾸면 다시 맞춘다
@@ -83,11 +84,12 @@ const VENDORS = [
   ),
   ...(GA_ON ? [group('Google LLC',
     { label: '이용 목적', value: '사이트 방문 통계' },
+    { label: 'Google이 직접 쓰는 목적', value: 'Google은 데이터 공유 설정을 모두 끄면 서비스를 제공하고 유지하는 데만 쓴다고 밝혀요.' },   // TODO(ga-settings): 공유 설정을 끈 뒤에 맞다
     { label: '이전 유형', value: TRANSFER_TYPE.google },
     { label: '이전되는 항목', value: USAGE },
     { label: '이전되는 나라', value: 'Google은 자신이나 다시 맡긴 업체가 시설을 둔 나라에서 처리할 수 있다고 밝히고, 나라를 특정하지 않아요.' },
     { label: '이전되는 때와 방법', value: '페이지를 볼 때 브라우저가 Google로 직접 전송해요.' },
-    { label: '보유 기간', value: '이용 기록은 2개월 보관해요.' },   // TODO(ga-settings): 7단계에서 GA 관리 화면의 값과 맞춘다
+    { label: '보유 기간', value: '이용 기록은 2개월 보관해요.' },   // TODO(ga-settings): 첫 공개 전에 GA 관리 화면의 값과 맞춘다
     mail('googlekrsupport@google.com'),
     subprocessors('https://business.safety.google/adssubprocessors/'),
   )] : []),
@@ -150,7 +152,7 @@ const privacy: LegalDoc = {
       ] },
     ] },
     { id: 'cookies', title: '자동으로 수집하는 정보와 쿠키', blocks: [
-      { p: '쿠키는 웹사이트가 브라우저에 저장하는 작은 파일로, 다시 접속할 때 서버로 전송돼요. 스딩이 직접 만드는 쿠키는 없어요. 소리 안내 말풍선을 다시 보이지 않으려고 브라우저에 임시 표시를 하나 남길 수 있는데, 이 표시는 서버로 보내지 않고 탭을 닫으면 지워져요.' },
+      { p: `쿠키는 웹사이트가 브라우저에 저장하는 작은 파일로, 다시 접속할 때 서버로 전송돼요. ${GA_ON ? '스딩이 설치한 Google 애널리틱스 태그가 sding.kr에 쿠키를 만들어요.' : '스딩이 직접 만드는 쿠키는 없어요.'} 소리 안내 말풍선을 다시 보이지 않으려고 브라우저에 임시 표시를 하나 남길 수 있는데, 이 표시는 서버로 보내지 않고 탭을 닫으면 지워져요.` },
       { rows: rows({ label: '처리 근거', value: AUTO_BASIS }) },
       { groups: [
         group('사이트 접속 기록',
@@ -174,9 +176,12 @@ const privacy: LegalDoc = {
           { label: '처리하는 곳', value: 'Cloudflare, Inc.' },
         )] : []),
         ...(GA_ON ? [group('Google 애널리틱스(방문 통계)',
+          { label: '언제', value: '페이지를 볼 때마다' },
+          { label: '종류', value: '자바스크립트 태그(Google 태그)' },
           { label: '목적', value: '어떤 화면과 버튼이 쓰이는지 통계를 내어 사이트를 고쳐요.' },
           { label: '쿠키', value: '_ga(사용자 구분), _ga_로 시작하는 쿠키(세션 유지). 기간은 기본 2년이고, 브라우저에 따라 더 짧을 수 있어요.' },
           { label: '처리 항목', value: `${USAGE}. 번호는 보내지 않아요.` },
+          { label: '처리하는 곳', value: 'Google LLC' },
           { label: '자세히 보기', value: 'Google의 정보 처리 안내', href: 'https://policies.google.com/technologies/partner-sites?hl=ko' },
         )] : []),
         group('쿠키를 거부하는 방법',

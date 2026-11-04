@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { PlayButtons } from './PlayButtons';
 import { usePlayers } from './VideoProvider';
+import type { MEDIA } from '@/content/media';
 
 type Props = {
+  mediaId: keyof typeof MEDIA;
   src: string;
   srcMobile?: string;
   poster?: string;
@@ -19,7 +21,7 @@ type Props = {
 };
 
 export function VideoPlayer({
-  src, srcMobile, poster, alt, hasAudio = false, captions, captionsLabel, labels, preload, priority = false, children,
+  mediaId, src, srcMobile, poster, alt, hasAudio = false, captions, captionsLabel, labels, preload, priority = false, children,
 }: Props) {
   const players = usePlayers();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -51,7 +53,7 @@ export function VideoPlayer({
       if (unregister) return;
       video.muted = true;
       video.src = url;
-      unregister = players.register({ video, hasAudio });
+      unregister = players.register({ video, hasAudio, mediaId });
     };
     attachRef.current = attach;
     const onWidth = () => {
@@ -91,7 +93,7 @@ export function VideoPlayer({
       video.removeAttribute('src');
       video.load();
     };
-  }, [src, srcMobile, hasAudio, players]);
+  }, [src, srcMobile, hasAudio, mediaId, players]);
 
   const play = () => {
     const video = videoRef.current;

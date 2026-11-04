@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import { useSound } from './VideoProvider';
+import { track } from '@/lib/analytics';
 
 type Copy = { label: string; turnOn: string; turnOff: string; waiting: string; stopped: string; bubble: string };
 
@@ -71,6 +72,7 @@ export function SoundBuddy({ copy }: { copy: Copy }) {
   useEffect(() => () => window.clearTimeout(flashTimer.current), []);
 
   const onClick = () => {
+    track('sound_toggle', { state: soundOn ? 'off' : 'on' });
     toggle();
     setBubble(false);
     // 터치 기기에는 hover가 없으므로 누른 뒤 툴팁을 잠깐 보여 지금 상태를 알린다

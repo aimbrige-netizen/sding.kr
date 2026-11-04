@@ -1,6 +1,8 @@
 'use client';
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import type { MEDIA } from '@/content/media';
+import { trackOnce, trackVideo } from '@/lib/analytics';
 
 // 영상 재생과 소리 규칙을 한곳에서 정한다(PLAN '자동 재생 규칙', '소리와 사운드 버디').
 // 영상은 화면에 35% 이상 보이면 무음으로 재생하고 15% 미만이면 멈춘다. 소리는 사운드 버디로만 켠다.
@@ -8,7 +10,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 export type FallbackReason = 'reduced_motion' | 'save_data' | 'low_power' | 'rejected';
 export type SoundState = 'off' | 'playing' | 'waiting';
 
-export type PlayerHandle = { video: HTMLVideoElement; hasAudio: boolean };
+export type PlayerHandle = { video: HTMLVideoElement; hasAudio: boolean; mediaId: keyof typeof MEDIA };
 
 type Entry = PlayerHandle & {
   ratio: number;         // 화면에 보이는 비율
@@ -94,8 +96,8 @@ function createController(setSoundOn: (on: boolean) => void, setMedia: (media: M
     setSoundOn(on);
   };
 
-  // 7단계에서 이곳에 video_fallback 이벤트(reason)를 붙인다
   const block = (e: Entry, reason: FallbackReason) => {
+    trackOnce('video_fallback', { reason });
     e.blocked = reason;
     applyMute();
   };
@@ -203,10 +205,12 @@ function createController(setSoundOn: (on: boolean) => void, setMedia: (media: M
     };
     handle.video.addEventListener('pause', onPause);
     handle.video.addEventListener('play', onPlay);
+    const stopTracking = trackVideo(handle.video, handle.mediaId);
     announced.delete(handle.video);
     entries.set(handle.video, e);
     io?.observe(handle.video);
     return () => {
+      stopTracking();
       io?.unobserve(handle.video);
       handle.video.removeEventListener('pause', onPause);
       handle.video.removeEventListener('play', onPlay);

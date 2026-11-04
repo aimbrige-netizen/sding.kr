@@ -1,4 +1,4 @@
-# 스딩 랜딩페이지 기획서 v1.7
+# 스딩 랜딩페이지 기획서 v1.8
 
 Oct 28, 2026 · @tae hyeung kwon
 
@@ -15,6 +15,8 @@ Oct 28, 2026 · @tae hyeung kwon
 **v1.6 변경(2026-11-01)**: 5단계(사전 신청)를 만들기 전에 공식 문서와 소스로 사양을 확인하고, 기획서의 코드대로면 실패하는 곳을 고쳤다. 번호 처리는 `+82` 자동 완성에서 끝자리가 잘려 저장되던 문제와 형식(010 + 2~9로 시작하는 8자리)을 바로잡았다. Supabase는 표 권한을 직접 주고, 중복 번호는 `upsert`로 넘겨 번호가 Postgres 로그에 남지 않게 했으며, 키 이름을 `SUPABASE_SECRET_KEY`로 바꿨다. Turnstile은 서버 검증에 시간 제한과 hostname·action 확인을 넣고 장애를 봇 실패와 나누었으며, 위젯은 제출한 폼에서만 그때 만든다. 서울 리전은 `vercel.json`으로 고정했다. 동의 고지는 체크박스 옆에 접지 않고 보이게 했고, 허니팟 칸, JS 끔, 'App Store'·'Google Play' 표기, QR(`uqr`, 하나만)을 정했다. 구현 뒤 교차 검토에서 전송 중 입력 잠금, 전송 시간 제한, 하이드레이션 전 입력 보존, 두 번 누른 CTA, iOS의 뒤 페이지 잠금, 로그의 HTTP 상태를 더했고, 코드 블록을 실제 파일에 다시 맞췄다.
 
 **v1.7 변경(2026-11-01)**: 6단계(법적 페이지)를 만들기 전에 현행 법령과 업체 공식 문서를 조사해 초안의 사실을 맞췄다. 문서 이름은 표준지침 제20조의 '개인정보 처리방침'으로 고치고 푸터에서 다른 고지와 구분한다. 구제 기관에서 2026년 10월 2일 폐지된 대검찰청을 뺐다. Turnstile 스크립트는 폼에 입력을 시작해야 받도록 바꿔, 신청하지 않고 지나가는 방문자의 IP가 봇 확인 때문에 Cloudflare로 가지 않게 했다. 동의 고지의 목적에 '1회'를 더했다. 시행일과 처리 근거가 비어 있으면 운영 빌드가 멈춘다(`assertLegal()`). 약관은 의무를 지우는 조항 없이 안내로 쓴다. `src/content/legal.ts`, `LegalPage`, `src/styles/legal.css`를 더했고, 404 문구는 파크 지도 콘셉트로 정했다.
+
+**v1.8 변경(2026-11-02)**: 7단계(분석과 점검)를 만들며 이벤트를 고쳤다. `form_submit`과 `video_progress`는 GA의 예약 이름이라 `waitlist_submit`, `video_milestone`으로 바꿨다. `video_milestone`에 3초 지점을 더해 시청률 지표를 낼 수 있게 했다. `waitlist_submit`은 요청 전에 막힌 잘못된 번호와 빠진 동의도 보낸다. `zone_view`는 세로로 긴 존을 위해 화면 높이의 50%도 기준으로 삼는다. Google 신호와 광고 개인화는 코드에서 끄고, 쿠키는 `sding.kr`에만 둔다. GA는 `@next/third-parties` 대신 인라인 초기화와 `next/script`로 붙였다. `AnalyticsEvents`를 더했다.
 
 ## 요약
 
@@ -85,14 +87,14 @@ Oct 28, 2026 · @tae hyeung kwon
 
 | 지표 | 정의 | 도구 |
 | --- | --- | --- |
-| 사전 신청 전환율 | 신청 완료 ÷ 방문자 | GA4 |
-| 소개 영상 시청률 | 소개 영상 3초 이상 재생 ÷ 방문자 | GA4 이벤트 |
+| 사전 신청 전환율 | 신청 완료 ÷ 방문자 | GA4 이벤트(`waitlist_submit`의 `result`=success) |
+| 소개 영상 시청률 | 소개 영상 3초 이상 재생 ÷ 방문자 | GA4 이벤트(`video_milestone`의 `media_id`=hero, `mark`=3s) |
 | 소리 켜기 비율 | 소리 켜기 클릭 ÷ 방문자 | GA4 이벤트 |
 | 기능 존 도달률 | 4개 기능 존을 모두 본 세션 비율 | GA4 노출 이벤트 |
 | 검색 노출 | 브랜드 검색 시 공식 사이트 순위 | 서치콘솔, 네이버 서치어드바이저 |
 | AI 인용 | 고정 프롬프트 20개 중 스딩이 언급된 횟수, 월 1회 점검 | 수동 테스트 |
 
-전환율·시청률의 목표치는 공개 후 2주간 기준선을 측정해 정한다.
+전환율의 목표치는 공개 후 2주간, 시청률의 목표치는 소개 영상이 올라간 뒤 2주간 기준선을 측정해 정한다.
 
 ## 레퍼런스 분석: 위디
 
@@ -356,7 +358,7 @@ Oct 28, 2026 · @tae hyeung kwon
 | 재생 | 화면에 35% 이상 보이면 재생하고 15% 아래로 내려가면 멈춘다 |
 | CTA | 존 안에는 두지 않는다. 헤더 CTA가 항상 보인다 |
 | 앵커 | `#zone-1`부터 `#zone-4`. 진행 점과 소개의 존 알약이 이 앵커로 이동한다 |
-| 측정 | 50% 이상 노출되면 `zone_view`, 재생이 시작되면 `video_play` |
+| 측정 | 기준은 '분석 이벤트' 표를 따른다 |
 | 간격 | 섹션 상하 간격 토큰 `clamp(72px, 10vw, 140px)`을 쓴다 |
 
 ### ZONE 01 매표소: 가격 정찰제
@@ -903,7 +905,7 @@ AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형
 | 미디어 | 1단계 `public/media/`(같은 도메인), 2단계 Cloudflare R2 | 처음에는 DNS 변경과 CORS 설정 없이 시작하고, 영상이 늘면 옮긴다 |
 | 저장소 | Supabase(Postgres), `@supabase/supabase-js` 2.118.0 | 사전 신청 번호 저장. 스딩 업체 관리 도구의 DB와 섞이지 않게 별도 프로젝트로 만든다. 리전은 'Northeast Asia (Seoul)' `ap-northeast-2`를 특정해 고른다. 만든 뒤에는 옮길 수 없다. 요금제는 Pro를 권한다. Free는 활동이 적으면 멈추고, 멈추면 신청이 모두 실패하며, 자동 백업이 없다 \[확인 필요\] |
 | 스팸 방지 | 허니팟 + Cloudflare Turnstile | 로그인 없이 봇을 거른다 |
-| 분석 | GA4(`@next/third-parties`) | 이벤트는 아래 표를 따른다 |
+| 분석 | GA4(인라인 초기화와 `next/script`의 `lazyOnload`) | 이벤트는 아래 표를 따른다 |
 | QR | `uqr` 0.1.3 | 오픈 후 QR을 서버 컴포넌트에서 SVG로 그린다. 의존성이 없고 브라우저 번들에 들어가지 않는다 |
 
 ### 저장소 구조
@@ -937,7 +939,7 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
       Header  HeaderShell  Hero  Film  Intro  Zone  ProgressDots  Faq  CtaSection  Footer
       MediaSlot  VideoProvider  VideoPlayer  PlayButtons  RidePreview  ParkMap  ZonePoster  CompareSlider
       HookMotion  InlineScript  SoundBuddy  RevealArmer  AnchorFocus  Logo
-      WaitlistDialog  WaitlistForm  CtaButton  StoreChoice  QrCode  Spans  Icons  LegalPage
+      WaitlistDialog  WaitlistForm  CtaButton  StoreChoice  QrCode  Spans  Icons  LegalPage  AnalyticsEvents
     content/
       site.ts  zones.ts  faq.ts  media.ts  company.ts  legal.ts
     lib/
@@ -1144,7 +1146,7 @@ export const HAS_SOUND = Boolean(MEDIA.hero.src && MEDIA.hero.hasAudio);
 | --- | --- | --- | --- |
 | `NEXT_PUBLIC_SITE_ENV` | 공개 | `production` 또는 `preview` | `production`일 때만 색인을 허용하고 `assertCompany()`와 `assertLegal()`을 실행한다 |
 | `NEXT_PUBLIC_MEDIA_BASE` | 공개 | 영상·이미지 주소의 앞부분 | 운영은 `https://sding.kr/media`처럼 절대 주소. 로컬은 비워 두면 `/media` |
-| `NEXT_PUBLIC_GA_ID` | 공개 | GA4 측정 ID | 비어 있으면 분석 코드를 넣지 않는다 |
+| `NEXT_PUBLIC_GA_ID` | 공개 | GA4 측정 ID | 비어 있으면 GA 스크립트를 넣지 않고 아무것도 보내지 않는다. 빌드 때 읽으므로 바꾸면 다시 배포한다 |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | 공개 | Turnstile 위젯 키 | 비어 있으면 폼이 전송 단계에서 '잠시 후 다시 시도해 주세요.'를 보인다 |
 | `NEXT_PUBLIC_GOOGLE_VERIFICATION` | 공개 | 구글 서치 콘솔 소유확인 메타 값 | 비어 있으면 태그를 넣지 않는다. 구글은 DNS TXT 인증이 기본이다 |
 | `NEXT_PUBLIC_NAVER_VERIFICATION` | 공개 | 네이버 서치어드바이저 소유확인 메타 값 | 비어 있으면 태그를 넣지 않는다 |
@@ -1377,17 +1379,24 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 
 | 이벤트 | 보내는 때 | 매개변수 |
 | --- | --- | --- |
-| `cta_click` | 헤더·히어로·마지막 섹션·신청 창의 버튼을 누를 때 | `location`: header, hero, final, dialog. `mode`: waitlist, live |
+| `cta_click` | 헤더·히어로의 CTA, 마지막 섹션·신청 창의 신청 버튼과 스토어 링크를 누를 때 | `location`: header, hero, final, dialog. `mode`: waitlist, live |
 | `sound_toggle` | 사운드 버디를 누를 때 | `state`: on, off |
 | `video_play` | 영상이 처음 재생될 때(페이지당 한 번) | `media_id`: hero, zone1 \~ zone4 |
-| `video_progress` | 재생이 25·50·75·100%를 지날 때 | `media_id`, `percent` |
+| `video_milestone` | 재생이 3초와 25·50·75·100%를 지날 때(영상마다 한 번씩). 반복 재생은 끝에서 처음으로 돌아가는 순간이 100%다 | `media_id`, `mark`: 3s, 25%, 50%, 75%, 100% |
 | `video_fallback` | 자동 재생 대신 포스터와 재생 버튼을 보일 때 | `reason`: reduced\_motion, save\_data, low\_power, rejected |
-| `zone_view` | 존이 화면의 50% 이상 보일 때(존당 한 번) | `zone_id`: zone-1 \~ zone-4 |
+| `zone_view` | 존의 50% 이상이 보이거나 존이 화면 높이의 50% 이상을 차지할 때(존당 한 번) | `zone_id`: zone-1 \~ zone-4 |
 | `faq_open` | FAQ 항목을 열 때 | `faq_id`: what, price-rule, planner, dress, hall, when, where, fee, phone |
-| `form_submit` | 신청 요청의 결과가 나올 때. 요청 전에 Turnstile이 실패하면 `challenge`다 | `result`: success, phone, consent, challenge, invalid, server |
+| `waitlist_submit` | 신청 결과가 나올 때. 요청 전에 막힌 잘못된 번호와 빠진 동의는 `phone`, `consent`, Turnstile 실패는 `challenge`다. 확인 중에 창을 닫으면 보내지 않는다 | `result`: success, phone, consent, challenge, invalid, server |
 
 - 번호와 입력값은 어떤 매개변수에도 넣지 않는다.
 - 이벤트 이름은 영문 소문자와 밑줄만 쓴다.
+- 코드는 `src/lib/analytics.ts`에 있고, 여러 컴포넌트에 걸친 CTA, FAQ, 존 이벤트는 `AnalyticsEvents`가 문서에서 듣는다. GA ID가 없으면 스크립트와 이 컴포넌트를 그리지 않고 아무것도 보내지 않는다. 코드는 번들에 남는다.
+- '한 번'은 페이지를 다시 불러올 때까지다. 다른 페이지에 갔다가 홈으로 돌아와도 같은 영상과 존의 이벤트를 다시 보내지 않는다.
+- `gtag` 초기화는 `<head>`의 인라인 스크립트가 맡고, `gtag.js`는 `next/script`의 `lazyOnload`로 로드가 끝난 뒤에 받는다. 그 사이의 이벤트는 `dataLayer`에 쌓였다가 함께 나간다. 스크립트를 받기 전에 페이지를 떠나면 쌓인 이벤트는 사라진다.
+- `allow_google_signals`와 `allow_ad_personalization_signals`는 코드에서 `false`로 둔다. `allow_google_signals`는 관리 화면보다 우선하지만 광고 개인화는 관리 화면의 설정도 끈다. `cookie_domain`을 `'none'`으로 두어 `_ga` 쿠키가 미디어 서브도메인으로 가지 않게 한다.
+- `form_submit`, `form_start`, `video_progress`, `click`, `scroll`, `page_view`는 GA의 웹 예약 이름이라 쓰지 않는다.
+- 이벤트 매개변수는 맞춤 측정기준으로 등록해야 보고서에 나온다. 등록 전 데이터는 보고서에 나오지 않으므로 첫 공개 48시간 전까지 등록한다.
+- 자동 `page_view`는 주소가 바뀔 때마다 생기므로 앵커 이동도 잡힐 수 있다. 실제 데이터를 보고 관리 화면의 설정을 정한다.
 - 처리방침의 자동 수집 장치(쿠키) 항목에 GA4를, 위탁·국외 이전 항목에 Google, Cloudflare, Supabase, 호스팅 업체를 올린다 \[확인 필요\].
 
 ### 성능과 접근성 기준
@@ -1399,7 +1408,7 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 | LCP | 2.5초 이하 | 포스터 이미지가 오기 전에는 첫 화면에서 가장 큰 글자인 후킹('Coming Soon')이 LCP 후보이고, 낮은 화면에서는 히어로 H1도 후보가 된다. 둘 다 등장은 투명도 0에서 시작하지 않고(이동만), 웹폰트 대기는 HTML 안의 스크립트가 최대 700ms로 맡는다. 후킹 글자가 든 글꼴 묶음(91번, 'Coming Soon'일 때 74번)은 preload한다. 포스터가 오면 첫 화면에 보이는 윗부분도 LCP 후보가 되므로 `preload`와 `fetchpriority='high'`를 걸고, 영상 파일은 포스터가 그려진 뒤에 붙인다 |
 | INP | 200ms 이하 | 공개 후 PageSpeed Insights의 실사용 데이터 |
 | CLS | 0.1 이하 | 모든 영상·이미지에 `aspect-ratio`를 지정한다 |
-| Lighthouse 모바일 | 성능 90 이상, 접근성 95 이상, SEO 100 | 성능과 접근성은 배포 미리보기마다 실행한다. SEO는 첫 공개 당일 `sding.kr`에서 잰다. 미리보기는 `noindex`이고 canonical이 다른 도메인이라 `is-crawlable`과 `canonical`이 실패하므로, 미리보기에서는 이 두 항목을 빼고 본다 |
+| Lighthouse 모바일 | 성능 90 이상, 접근성 95 이상, SEO 100 | 성능과 접근성은 배포 미리보기마다 실행한다. SEO는 첫 공개 당일 `sding.kr`에서 잰다. 미리보기는 `noindex`라 `is-crawlable`이 실패하므로, 미리보기에서는 이 항목을 빼고 본다 |
 | 자체 JS | 170KB 이하(gzip) | Next 16의 `next build`는 크기를 출력하지 않는다. 빌드 뒤 `.next/diagnostics/route-bundle-stats.json`에서 `/`의 `firstLoadChunkPaths` 파일을 gzip으로 합산하거나, Lighthouse·DevTools의 스크립트 전송 크기로 확인한다. GA4와 Turnstile은 늦게 불러오므로 제외한다 |
 | JS 없이 보기 | 모든 문구가 HTML에 있다 | 등장 효과의 숨김 상태는 JS가 켜진 뒤에만 건다 |
 
@@ -1412,7 +1421,7 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 | 터치 영역 | 모든 버튼, 링크, 체크박스 줄이 44×44px 이상 |
 | 영상 | 일시정지 버튼 상시 노출, 자막, 대본 |
 | 모션 | `prefers-reduced-motion`을 따른다 |
-| 확대 | `maximum-scale`을 두지 않고, 200% 확대에서도 가로 스크롤이 없다. 신청 창은 높이를 고정하지 않고 카드 안에서 세로로 스크롤한다 |
+| 확대 | `maximum-scale`을 두지 않고, 200% 확대에서도 가로 스크롤이 없다. 360px 화면의 200%에 해당하는 180px 폭의 히어로는 예외로 두었다(`docs/OPEN_ITEMS.md`). WCAG 재배치 기준인 320px에서는 없다. 신청 창은 높이를 고정하지 않고 카드 안에서 세로로 스크롤한다 |
 | 폼 | 보이는 라벨, 오류 문구와 전송 중 상태는 처음부터 있는 `aria-live='polite'` 영역에 넣고, 칸에 `aria-invalid`와 `aria-describedby`를 달고 포커스를 옮긴다. 색만으로 오류를 알리지 않는다 |
 | 구조 | `lang='ko'`, `h1` 하나, 제목 순서 유지, `header`·`main`·`footer`, 본문 바로가기 링크 |
 
@@ -1634,7 +1643,7 @@ docs/PLAN.md와 CLAUDE.md를 먼저 끝까지 읽어 줘.
 | 4. FAQ와 검색 대응 | `Faq`, 메타 태그와 소유확인 메타, JSON-LD, `robots.ts`, `sitemap.ts`, `llms.txt`, `manifest.ts`, `opengraph-image.tsx`, IndexNow 키 파일, 임시 아이콘 | 페이지 소스에 `h1` 하나와 JSON-LD(Organization, WebSite, WebPage, FAQPage, DefinedTermSet, 영상이 오면 VideoObject)가 보이고, JSON으로 파싱된다 |
 | 5. 사전 신청 | `CtaButton`(`ctaMode()` 연결), `WaitlistDialog`, `WaitlistForm`, `CtaSection`, `/api/waitlist` | Supabase에 저장되고, 중복 번호도 같은 성공 화면이 뜨며, 잘못된 번호는 오류 문구가 뜬다. JS를 끄면 마지막 섹션으로 이동한다 |
 | 6. 법적 페이지 | `/privacy`, `/terms` 초안, `not-found.tsx` | 푸터에서 연결되고, 변호사 검토 전 초안이라는 점이 `docs/OPEN_ITEMS.md`에 적혀 있다. 없는 주소는 한국어 안내와 홈 링크를 보인다 |
-| 7. 분석과 점검 | `analytics.ts`의 이벤트 8개, Lighthouse, 접근성, 테스트 매트릭스 | 성능과 접근성 기준 표를 통과한다(SEO는 첫 공개 당일 `sding.kr`에서 잰다) |
+| 7. 분석과 점검 | `analytics.ts`의 이벤트 8개, Lighthouse, 접근성, 테스트 매트릭스 | 이벤트 8개가 나가고, 자동 접근성 검사가 기준을 넘는다. Lighthouse는 로컬에서 재서 `docs/OPEN_ITEMS.md`에 기록하고, 기준은 배포 미리보기에서 확인한다. INP, 실기기, 영상이 필요한 항목도 그 파일의 날짜에 확인한다(SEO는 첫 공개 당일 `sding.kr`에서 잰다) |
 | 8. 자료 반영 | 로고 SVG, 연락처, 영상, SNS 주소, 스토어 주소 | 운영 빌드에서 `assertCompany()`와 `assertLegal()`이 통과하고, `docs/OPEN_ITEMS.md`에는 의도한 항목만 남는다 |
 
 ### 완료 기준

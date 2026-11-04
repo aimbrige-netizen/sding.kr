@@ -5,6 +5,7 @@ import { flushSync } from 'react-dom';
 import { Sparkle } from './Icons';
 import { Spans } from './Spans';
 import { COPY } from '@/content/site';
+import { track, type FormResult } from '@/lib/analytics';
 import { formatPhone, normalizePhone } from '@/lib/phone';
 import { getToken, hasTurnstileKey, loadTurnstile } from '@/lib/turnstile';
 
@@ -13,6 +14,7 @@ const noop = () => () => {};
 const SEND_WAIT = 20_000;   // 서버 한도 15초보다 길다. 연결이 끊겨도 '보내는 중'에 갇히지 않게 한다. 다시 눌러도 번호는 한 번만 저장된다
 
 type Failure = keyof typeof copy.errors;
+const report = (result: FormResult) => track('waitlist_submit', { result });
 
 // 응답 표(PLAN '사전 신청 API')를 화면 상태로 옮긴다. 413, 504처럼 JSON이 아닌 응답과 망 오류, 시간 초과는 server다
 async function send(phone: string, token: string, hp: string): Promise<Failure | null> {
@@ -24,10 +26,16 @@ async function send(phone: string, token: string, hp: string): Promise<Failure |
       signal: AbortSignal.timeout(SEND_WAIT),
     });
     const { ok, code } = (await res.json()) as { ok?: boolean; code?: string };
-    if (ok) return null;
-    if (code === 'phone' || code === 'invalid') return 'phone';
-    if (code === 'consent' || code === 'challenge') return code;
+    if (ok) {
+      report('success');
+      return null;
+    }
+    if (code === 'phone' || code === 'invalid' || code === 'consent' || code === 'challenge') {
+      report(code);
+      return code === 'invalid' ? 'phone' : code;
+    }
   } catch {}
+  report('server');
   return 'server';
 }
 
@@ -89,8 +97,12 @@ export function WaitlistForm() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (attempt.current) return;
-    if (!normalizePhone(phone)) return showField('phone');
-    if (!agreed) return showField('consent');
+    // 잘못된 번호와 빠진 동의는 요청 전에 막힌다. 여기서 보내지 않으면 이 두 결과는 집계되지 않는다
+    const invalid = !normalizePhone(phone) ? 'phone' : !agreed ? 'consent' : null;
+    if (invalid) {
+      report(invalid);
+      return showField(invalid);
+    }
 
     const abort = new AbortController();
     attempt.current = abort;
@@ -99,8 +111,10 @@ export function WaitlistForm() {
 
     let failure: Failure | null = null;
     let closed = false;
-    if (!hasTurnstileKey) failure = 'server';
-    else {
+    if (!hasTurnstileKey) {
+      failure = 'server';
+      report('server');
+    } else {
       try {
         const slot = slotRef.current!;
         const token = await getToken(slot, abort.signal, () => {
@@ -112,6 +126,7 @@ export function WaitlistForm() {
       } catch {
         closed = abort.signal.aborted;   // send()는 던지지 않으므로 여기는 getToken뿐이다
         failure = 'challenge';
+        if (!closed) report('challenge');
       }
     }
 
