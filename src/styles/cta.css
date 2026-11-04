@@ -97,12 +97,10 @@
   .wl-notice-strong dd { font-weight: 700; }
   .wl-terms { display: grid; margin-top: var(--sp-2); }
 
-  /* 동의. 줄 전체가 체크다. 링크는 라벨 밖에 둔다 */
+  /* 동의. 줄 전체가 체크다. 링크는 라벨 밖, 동의 줄 아래 .wl-docs에 둔다 */
   .wl-consent {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    column-gap: var(--sp-3);
     margin-top: var(--sp-2);
   }
   .wl-check {
@@ -154,6 +152,8 @@
     text-underline-offset: var(--sp-1);
   }
   .wl-more { flex: none; font-size: var(--fs-cap); }
+  /* 처리방침과 약관 링크. 폭이 모자라면 약관 링크가 다음 줄로 넘어간다 */
+  .wl-docs { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--sp-2); color: var(--ink-600); font-size: var(--fs-cap); }
 
   /* 주 버튼은 .btn-primary 그대로다. 폭과 배치만 바꾼다. 글자는 입력칸의 번호와 같은 선에서 시작한다 */
   .wl-submit, .store-link {
@@ -311,8 +311,7 @@
   /* 휴대폰의 200% 확대. 폭이 195px까지 줄어도 가로 스크롤 없이 쌓인다 */
   @media (max-width: 17rem) {
     .wl-notice > div { grid-template-columns: minmax(0, 1fr); }
-    .wl-consent { flex-wrap: wrap; }
-    .wl-check { flex-basis: 100%; }
+    .wl-docs > [aria-hidden="true"] { display: none; }   /* 두 링크가 줄을 나눠 쓰면 가운뎃점이 줄 끝에 홀로 남는다 */
     .wl-submit, .store-link { justify-content: center; padding-inline: var(--sp-4); text-align: center; }
     .wl-submit .btn-orb, .store-link .btn-orb { display: none; }
   }

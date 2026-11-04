@@ -216,13 +216,20 @@ export function WaitlistForm() {
               />
               <span><Spans parts={copy.consent} className="nb" /></span>
             </label>
-            {/* 입력한 번호를 지키려고 새 탭으로 연다. 라벨 안에 링크를 두면 누를 때 체크가 바뀐다 */}
-            <a href="/privacy" target="_blank" rel="noopener" className="wl-more">
-              {copy.more}<span className="sr-only">{copy.moreSr}</span>
-            </a>
           </div>
           <p id={`${id}-consent-error`} aria-live="polite" aria-atomic="true" className="wl-error">
             {error === 'consent' ? copy.errors.consent : ''}
+          </p>
+          {/* 입력한 번호를 지키려고 새 탭으로 연다. 라벨 안에 두면 누를 때 체크가 바뀌고,
+              체크박스 설명(aria-describedby)에 넣으면 낭독기가 동의 설명과 함께 읽으므로 동의 줄 아래 따로 둔다 */}
+          <p className="wl-docs">
+            <a href="/privacy" target="_blank" rel="noopener" className="wl-more">
+              {copy.more}<span className="sr-only">{copy.moreSr}</span>
+            </a>
+            {' '}<span aria-hidden="true">·</span>{' '}
+            <a href="/terms" target="_blank" rel="noopener" className="wl-more">
+              {copy.termsLink}<span className="sr-only">{copy.moreSr}</span>
+            </a>
           </p>
 
           {/* 사람은 비워 둔다. 숨겨 자동 완성이 채우지 못하게 하고, 이름은 휴대폰으로 읽히지 않게 정했다 */}

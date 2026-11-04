@@ -72,7 +72,7 @@ export function MediaSlot({ id, children }: { id: keyof typeof MEDIA; children?:
         </div>
       );
     case 'compare':
-      // 비교할 파일이 없으면 조작할 것도 없으므로 포스터만 그린다. 라벨은 이때도 남는다
+      // 비교할 파일이 없으면 조작할 것도 없으므로 포스터만 그린다. 라벨은 Zone이 파일이 있을 때만 넘긴다
       if (!spec.before || !spec.after) return <>{art}{children}</>;
       return <><CompareSlider before={spec.before} after={spec.after} alt={spec.alt} labels={COPY.compare} />{children}</>;
   }

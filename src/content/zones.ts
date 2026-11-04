@@ -11,8 +11,9 @@ export type Zone = {
   body: string;               // body와 notice의 \u00A0은 줄바꿈으로 가르지 않는 띄어쓰기다(text-wrap: balance가 구절 가운데서 끊지 않게)
   media: 'zone1' | 'zone2' | 'zone3' | 'zone4';
   icon: 'ticket' | 'map' | 'dress' | 'arch';   // components/Icons.tsx의 존 아이콘
-  badge?: string;
-  notice?: string;
+  badge?: string;             // 화면 위 'AI' 라벨. 파일이 있을 때만 붙는다
+  notice?: string;            // 미디어 아래 고지. 파일이 있을 때만 나온다
+  posterNotice?: string;      // 파일이 오기 전 포스터 아래 고지. 포스터는 AI가 만든 그림이 아니어서 기능의 한계만 말한다
 };
 
 export const zoneLabel = (zone: Zone) => `ZONE ${zone.no} · ${zone.name}`;
@@ -31,10 +32,12 @@ export const ZONES: Zone[] = [
     definition: '드레스 AI 합성은 내 사진에 드레스를 합성해 어울리는 스타일을 미리 보는 가상 피팅 기능이에요.',   // TODO(term-synonym): 임시. '가상 피팅'을 정의 문장에 두었고 사용자가 나중에 다시 정한다
     headline: '입기 전에, 먼저 입어 봐요', hl: '먼저 입어 봐요',
     body: '내 사진에 드레스를 입혀 어울리는 스타일을 미리 확인해요. 피팅 전에 후보를 좁힐 수 있어요.', media: 'zone3', icon: 'dress',
-    badge: 'AI 합성', notice: 'AI로 합성한 이미지예요. 실제\u00A0착용 모습과 다를 수 있어요.' },
+    badge: 'AI 합성', notice: 'AI로 합성한 이미지예요. 실제\u00A0착용 모습과 다를 수 있어요.',
+    posterNotice: '드레스 AI 합성의 결과는 AI로 합성한 이미지라 실제\u00A0착용 모습과 다를 수 있어요.' },
   { id: 'zone-4', no: '04', name: '시뮬레이터', feature: 'AI 웨딩홀 시뮬레이션',
     definition: 'AI 웨딩홀 시뮬레이션은 입장부터 버진로드까지, 방문 전에 분위기와 동선을 먼저 걸어 보는 기능이에요.',   // TODO(term-def): 임시 문장이다. 사용자가 나중에 직접 고친다
     headline: '웨딩홀을 걸어 본 것처럼', hl: '걸어 본 것처럼',
     body: '입장부터 버진로드까지, 방문 전에 분위기와 동선을 먼저 걸어 봐요.', media: 'zone4', icon: 'arch',
-    badge: 'AI 시뮬레이션', notice: 'AI가 만든 시뮬레이션이에요. 실제 웨딩홀과 다를 수 있어요.' },
+    badge: 'AI 시뮬레이션', notice: 'AI가 만든 시뮬레이션이에요. 실제 웨딩홀과 다를 수 있어요.',
+    posterNotice: 'AI 웨딩홀 시뮬레이션은 AI가 만든 장면이라 실제 웨딩홀과 다를 수 있어요.' },
 ];

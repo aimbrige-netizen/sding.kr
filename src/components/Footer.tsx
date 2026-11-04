@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Logo } from './Logo';
 import { ADDRESS, COMPANY } from '@/content/company';
 import { COPY } from '@/content/site';
+import { ctaMode } from '@/lib/launch';
 
 // 보이는 '|'는 장식이다. 읽기 도구가 단어를 붙여 읽지 않도록 앞뒤에 실제 공백을 둔다
 const Sep = () => <>{' '}<span aria-hidden="true" className="px-1 text-line">|</span>{' '}</>;
@@ -50,7 +51,7 @@ export function Footer() {
             ))}
           </ul>
         </nav>
-        <p className="mt-2">{COPY.footer.aiNotice}</p>
+        <p className="mt-2">{ctaMode() === 'live' ? COPY.footer.aiNotice : COPY.footer.aiNoticeSoon}</p>
         <p className="mt-1">{COPY.footer.copyright}</p>
       </div>
     </footer>

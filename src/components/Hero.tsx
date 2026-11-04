@@ -94,7 +94,7 @@ export function Hero() {
         <p className="kicker rise" style={order(0)}>
           <Sparkle className="kicker-icon" />
           <span>
-            {launchDotted()} {COPY.hero.kicker}
+            {launchDotted()} {mode === 'live' ? COPY.hero.kicker : COPY.hero.kickerSoon}
           </span>
         </p>
 

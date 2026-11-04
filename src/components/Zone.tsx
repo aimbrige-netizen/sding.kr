@@ -1,5 +1,5 @@
 import { MediaSlot } from './MediaSlot';
-import { MEDIA, type MediaSpec } from '@/content/media';
+import { MEDIA, hasFile, type MediaSpec } from '@/content/media';
 import { zoneLabel, type Zone as ZoneData } from '@/content/zones';
 import { order } from '@/lib/motion';
 
@@ -10,10 +10,17 @@ export function Zone({ zone, flip }: { zone: ZoneData; flip: boolean }) {
   const kind = spec.kind === 'phone' || spec.kind === 'compare' ? spec.kind : 'wide';
   // 모바일 4:5 컷이 있을 때만 모바일 프레임을 4:5로 바꾼다. 없으면 16:9를 폭 가득 보인다
   const cut = spec.kind === 'video' && Boolean(spec.src && spec.srcMobile);
-  // TODO(poster-ai-label): 파일이 오기 전에는 AI가 만들지 않은 포스터 위에 라벨이 붙는다. 변호사 검토에서 함께 본다
-  const badge = zone.badge
+  // 파일이 오기 전의 포스터 카드는 AI가 만든 그림이 아니다. 그래서 'AI' 라벨은 파일이 있을 때만 붙이고,
+  // 고지도 파일에 대한 문장(notice) 대신 기능의 한계를 말하는 문장(posterNotice)을 쓴다
+  const ready = hasFile(spec);
+  // 포스터 이미지가 없는 영상은 재생 전까지 포스터 카드를 덮개로 써서 'AI' 라벨이 그 위에 붙는다.
+  // 영상은 포스터와 함께 넣는다(PLAN '미디어 슬롯 사양'의 poster-*)
+  const screen = spec.kind === 'phone' ? spec.screen : spec;
+  if (ready && screen.kind === 'video' && !screen.poster) throw new Error(`${zone.id}: 영상에 poster가 없다`);
+  const badge = zone.badge && ready
     ? <span className="ai-badge" data-strong={kind === 'compare' || undefined}>{zone.badge}</span>
     : null;
+  const notice = ready ? zone.notice : zone.posterNotice;
   // 문구를 고치다 hl이 어긋나면 제목이 소리 없이 깨지므로 빌드를 멈춘다
   if (!zone.headline.endsWith(` ${zone.hl}`)) throw new Error(`${zone.id}: hl이 headline의 끝 구절이 아니다`);
   const lead = zone.headline.slice(0, -zone.hl.length).trimEnd();
@@ -40,7 +47,7 @@ export function Zone({ zone, flip }: { zone: ZoneData; flip: boolean }) {
               </div>
             </div>
           )}
-          {zone.notice ? <figcaption className="zone-notice">{zone.notice}</figcaption> : null}
+          {notice ? <figcaption className="zone-notice">{notice}</figcaption> : null}
         </figure>
       </div>
     </section>

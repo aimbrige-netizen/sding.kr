@@ -1,4 +1,4 @@
-import { launchFull } from './launch';
+import { ctaMode, launchFull } from './launch';
 import { ADDRESS, COMPANY } from '@/content/company';
 import { COPY, SITE } from '@/content/site';
 import { ZONES } from '@/content/zones';
@@ -11,7 +11,8 @@ export function llmsText() {
     '',
     `> ${SITE.definition}`,
     '',
-    `${llms.launch}: ${launchFull()}`,
+    // 빌드할 때의 ctaMode()를 쓴다. 재생성으로는 바뀌지 않으므로 오픈일 0시(KST)가 지난 뒤 다시 배포해야 '정식 오픈일'이 된다(PLAN 'CTA 전환')
+    `${ctaMode() === 'live' ? llms.launch : llms.launchSoon}: ${launchFull()}`,
     '',
     `## ${llms.features}`,
     '',
