@@ -16,13 +16,15 @@ const filmLabels = { play: COPY.film.play, pause: COPY.film.pause };
 // 재생 버튼이 페이지에 여럿이라 스크린리더 목록에서 구별되게 존 이름을 붙인다
 const zoneLabels = (name: string) => ({ play: `${name} ${filmLabels.play}`, pause: `${name} ${filmLabels.pause}` });
 
-function VideoSlot({ spec, hero, art, labels }: { spec: VideoSpec; hero: boolean; art: ReactNode; labels: typeof filmLabels }) {
+function VideoSlot({ id, spec, art, labels }: { id: keyof typeof MEDIA; spec: VideoSpec; art: ReactNode; labels: typeof filmLabels }) {
+  const hero = id === 'hero';
   // 소개 영상은 파일이 오기 전에도 같은 재생 버튼으로 포스터 카드의 라이드를 보여 준다
   if (!spec.src) return hero ? <RidePreview labels={labels}>{art}</RidePreview> : art;
   // 포스터 윗부분이 첫 화면에 보이므로 지연 로드하지 않고 먼저 받는다(PLAN '성능과 접근성 기준'의 LCP)
   if (hero && spec.poster) preload(spec.poster, { as: 'image', fetchPriority: 'high' });
   return (
     <VideoPlayer
+      mediaId={id}
       src={spec.src}
       srcMobile={spec.srcMobile || undefined}
       poster={spec.poster || undefined}
@@ -55,7 +57,7 @@ export function MediaSlot({ id, children }: { id: keyof typeof MEDIA; children?:
 
   switch (spec.kind) {
     case 'video':
-      return <><VideoSlot spec={spec} hero={id === 'hero'} art={art} labels={labels} />{children}</>;
+      return <><VideoSlot id={id} spec={spec} art={art} labels={labels} />{children}</>;
     case 'image':
       return <><ImageSlot spec={spec} art={art} />{children}</>;
     case 'phone':
@@ -63,7 +65,7 @@ export function MediaSlot({ id, children }: { id: keyof typeof MEDIA; children?:
         <div className="phone">
           <div className="phone-screen">
             {spec.screen.kind === 'video'
-              ? <VideoSlot spec={spec.screen} hero={false} art={art} labels={labels} />
+              ? <VideoSlot id={id} spec={spec.screen} art={art} labels={labels} />
               : <ImageSlot spec={spec.screen} art={art} />}
             {children}
           </div>

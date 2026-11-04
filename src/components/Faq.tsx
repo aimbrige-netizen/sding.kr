@@ -18,7 +18,7 @@ export function Faq() {
             const [lead, ...rest] = sentences(item.a);
             return (
               <li key={item.id}>
-                <details className="faq-item">
+                <details data-faq={item.id} className="faq-item">
                   <summary className="faq-q">
                     {/* flex는 제목에 건다. summary가 display를 따르는지에 기대지 않는다 */}
                     <h3 className="faq-row">

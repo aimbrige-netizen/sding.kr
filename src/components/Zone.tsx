@@ -4,7 +4,7 @@ import { zoneLabel, type Zone as ZoneData } from '@/content/zones';
 import { order } from '@/lib/motion';
 
 // 존 섹션 하나(PLAN '존 공통 틀'). 문서 순서는 늘 글 다음 미디어이고, 좌우는 CSS가 바꾼다.
-// 고지 문구는 미디어 바로 아래에 둔다(ZONE 03 표). 측정(zone_view, video_play)은 7단계에서 붙인다
+// 고지 문구는 미디어 바로 아래에 둔다(ZONE 03 표)
 export function Zone({ zone, flip }: { zone: ZoneData; flip: boolean }) {
   const spec: MediaSpec = MEDIA[zone.media];
   const kind = spec.kind === 'phone' || spec.kind === 'compare' ? spec.kind : 'wide';
