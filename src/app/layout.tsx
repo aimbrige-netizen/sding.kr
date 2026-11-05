@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
+import { AnalyticsEvents } from '@/components/AnalyticsEvents';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { StoreChoice } from '@/components/StoreChoice';
@@ -8,6 +10,7 @@ import { assertCompany, COMPANY } from '@/content/company';
 import { STORE_LINE } from '@/content/faq';
 import { assertLegal } from '@/content/legal';
 import { COPY, SITE } from '@/content/site';
+import { GA_ID } from '@/lib/analytics';
 import { FONT_SUBSET, preloadFontSubset } from '@/lib/fonts';
 import { ctaMode } from '@/lib/launch';
 import './globals.css';
@@ -58,6 +61,11 @@ const JS_FLAG = "(function(d){d.classList.add('js');"
   + "if(location.hash){d.style.scrollBehavior='auto';addEventListener('load',function(){d.style.scrollBehavior=''})}"
   + "})(document.documentElement)";
 
+// GA4(PLAN '분석 이벤트'). 스크립트는 로드가 끝난 뒤에 받고, 그 전의 이벤트는 dataLayer에 쌓였다가 함께 나간다.
+// 설정은 처리방침과 맞춘다. 광고 개인화는 관리 화면에서도 끈다. 쿠키는 sding.kr에만 두어 다른 서브도메인으로 가지 않게 한다
+const GA_INIT = "window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());"
+  + `gtag('config',${JSON.stringify(GA_ID)},{allow_google_signals:false,allow_ad_personalization_signals:false,cookie_domain:'none'})`;
+
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   preloadFontSubset(FONT_SUBSET.latin);
   const mode = ctaMode();
@@ -66,6 +74,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang="ko" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: JS_FLAG }} />
+        {GA_ID ? <script dangerouslySetInnerHTML={{ __html: GA_INIT }} /> : null}
       </head>
       <body>
         <a
@@ -80,6 +89,12 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         <WaitlistDialog title={COPY.cta[mode]} description={mode === 'live' ? [STORE_LINE] : COPY.final.lead}>
           {mode === 'live' ? <StoreChoice /> : <WaitlistForm />}
         </WaitlistDialog>
+        {GA_ID ? (
+          <>
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="lazyOnload" />
+            <AnalyticsEvents mode={mode} />
+          </>
+        ) : null}
       </body>
     </html>
   );

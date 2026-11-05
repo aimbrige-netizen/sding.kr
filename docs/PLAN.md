@@ -1,4 +1,4 @@
-# 스딩 랜딩페이지 기획서 v1.7
+# 스딩 랜딩페이지 기획서 v1.12
 
 Oct 28, 2026 · @tae hyeung kwon
 
@@ -15,6 +15,16 @@ Oct 28, 2026 · @tae hyeung kwon
 **v1.6 변경(2026-11-01)**: 5단계(사전 신청)를 만들기 전에 공식 문서와 소스로 사양을 확인하고, 기획서의 코드대로면 실패하는 곳을 고쳤다. 번호 처리는 `+82` 자동 완성에서 끝자리가 잘려 저장되던 문제와 형식(010 + 2~9로 시작하는 8자리)을 바로잡았다. Supabase는 표 권한을 직접 주고, 중복 번호는 `upsert`로 넘겨 번호가 Postgres 로그에 남지 않게 했으며, 키 이름을 `SUPABASE_SECRET_KEY`로 바꿨다. Turnstile은 서버 검증에 시간 제한과 hostname·action 확인을 넣고 장애를 봇 실패와 나누었으며, 위젯은 제출한 폼에서만 그때 만든다. 서울 리전은 `vercel.json`으로 고정했다. 동의 고지는 체크박스 옆에 접지 않고 보이게 했고, 허니팟 칸, JS 끔, 'App Store'·'Google Play' 표기, QR(`uqr`, 하나만)을 정했다. 구현 뒤 교차 검토에서 전송 중 입력 잠금, 전송 시간 제한, 하이드레이션 전 입력 보존, 두 번 누른 CTA, iOS의 뒤 페이지 잠금, 로그의 HTTP 상태를 더했고, 코드 블록을 실제 파일에 다시 맞췄다.
 
 **v1.7 변경(2026-11-01)**: 6단계(법적 페이지)를 만들기 전에 현행 법령과 업체 공식 문서를 조사해 초안의 사실을 맞췄다. 문서 이름은 표준지침 제20조의 '개인정보 처리방침'으로 고치고 푸터에서 다른 고지와 구분한다. 구제 기관에서 2026년 10월 2일 폐지된 대검찰청을 뺐다. Turnstile 스크립트는 폼에 입력을 시작해야 받도록 바꿔, 신청하지 않고 지나가는 방문자의 IP가 봇 확인 때문에 Cloudflare로 가지 않게 했다. 동의 고지의 목적에 '1회'를 더했다. 시행일과 처리 근거가 비어 있으면 운영 빌드가 멈춘다(`assertLegal()`). 약관은 의무를 지우는 조항 없이 안내로 쓴다. `src/content/legal.ts`, `LegalPage`, `src/styles/legal.css`를 더했고, 404 문구는 파크 지도 콘셉트로 정했다.
+
+**v1.8 변경(2026-11-02)**: 7단계(분석과 점검)를 만들며 이벤트를 고쳤다. `form_submit`과 `video_progress`는 GA의 예약 이름이라 `waitlist_submit`, `video_milestone`으로 바꿨다. `video_milestone`에 3초 지점을 더해 시청률 지표를 낼 수 있게 했다. `waitlist_submit`은 요청 전에 막힌 잘못된 번호와 빠진 동의도 보낸다. `zone_view`는 세로로 긴 존을 위해 화면 높이의 50%도 기준으로 삼는다. Google 신호와 광고 개인화는 코드에서 끄고, 쿠키는 `sding.kr`에만 둔다. GA는 `@next/third-parties` 대신 인라인 초기화와 `next/script`로 붙였다. `AnalyticsEvents`를 더했다.
+
+**v1.9 변경(2026-11-04)**: 처리방침, 이용약관, 동의 문구를 Claude가 법령과 공식 지침에 대조해 검토하고, 다른 검토자의 반박 검토를 거친 수정을 반영했다. 변호사의 법률 의견은 아니다(검토서는 `docs/private/legal-review.md`). 동의 고지는 이용 목적 줄도 굵게 보이고, `CONSENT_VERSION`을 `2026-11-v2`로 올렸다. FAQ의 번호 답은 동의 고지의 보유 기간 값을 읽는다. 처리방침은 업체마다 국외 이전 사항과 거부 방법을 채우고, 아동, 보유 기간, 권리, 쿠키, 구제, 변경 절을 법령의 항목에 맞췄다. 국외 이전 근거(제28조의8제1항제3호가목), 처리 근거, 이전 유형을 넣었고 시행일만 남겼다. 출시 문자는 비광고 1회 안내로 보낸다. 법률사무소 소식지, 언론, 업체 블로그 출처는 공식 자료로 바꿨다. 보유 기간의 상한 날짜, 푸터 AI 문구, 검토가 낸 기획 변경은 사용자 결정을 기다린다(`docs/OPEN_ITEMS.md`).
+
+**v1.10 변경(2026-11-04)**: 사용자가 검토의 권장안을 승인해 반영했다. 보유 기간은 '안내 문자를 보낸 뒤 5일 안에, 오픈이 늦어져도 2027년 6월 30일까지 파기'이고 `CONSENT_VERSION`은 `2026-11-v3`이다. 파일이 오기 전의 포스터 카드에는 'AI' 라벨을 붙이지 않고, 합성·시뮬레이션 존은 기능의 한계를 말하는 문장(`posterNotice`)을 둔다. 신청 폼의 동의 줄 아래에 '개인정보 처리방침 보기'와 '이용약관 보기'를 둔다. 오픈 전에는 히어로 날짜 줄, 마지막 CTA 제목, llms.txt, 푸터 AI 문구에 '예정'을 쓴다. 첫 공개는 GA4 없이 하고, 그동안의 지표는 Supabase 신청 건수와 검색 도구로 본다. 정찰제 표현, 같은 폼의 신청 취소, 1자 방문 합계는 아직 정하지 않았다.
+
+**v1.11 변경(2026-11-05)**: 대표 연락처(전화, 이메일)와 개인정보 보호책임자(대표 정원창)를 받아 넣었다. 처리방침의 책임자 절에는 성명, 직위, 연락처를 적는다. 신청 폼 아래 '신청 취소하기'로 같은 자리에서 신청을 취소하게 했다(검토 P4). 서버는 같은 주소에서 `action: 'withdraw'`를 나눠 받고, Supabase 함수 `waitlist_withdraw`가 행을 지우고 날짜별 건수만 번호 없이 남긴다. 처리방침에 신청 취소와 문의·요구를 받을 때 처리하는 정보를 더했다. 문의 정보의 보유 기간은 회사가 정하고, 비어 있으면 운영 빌드가 멈춘다. `CONSENT_VERSION`은 `2026-11-v4`다.
+
+**v1.12 변경(2026-11-05)**: 업체 공식 문서와 대조해 사실 세 가지를 고쳤다. 네이버 서치어드바이저에는 대표 도메인을 고르는 메뉴가 없어 www의 301 이동과 canonical로 맡긴다. IndexNow는 검색엔진에 키를 등록하는 절차가 없고 키 파일만 둔다. Turnstile 시험 비밀 키는 더미 토큰만 받고 실제 토큰은 거절한다. 업체 대시보드 설정 순서는 저장소 밖 `docs/private/setup-guide.md`에 있다.
 
 ## 요약
 
@@ -42,9 +52,9 @@ Oct 28, 2026 · @tae hyeung kwon
 본문의 \[확인 필요\]는 이 목록의 항목이거나 변호사·세무사 확인이 필요한 항목에 달았다. 정해지기 전에도 기본값으로 개발은 시작할 수 있으며, 항목별 쓰임과 기본값은 자료 체크리스트와 일정 절의 표와 `docs/OPEN_ITEMS.md`에 있다.
 
 - **개발 시작 전(11월 4일까지)**: 로고 SVG 원본(받은 값은 `Layer 2` 위치뿐이다), 영문 표기(Sding 또는 SDING), 도메인 등록처와 DNS 위치, 사전 신청 수집 항목(휴대폰 번호 또는 이메일).
-- **첫 공개 전(11월 12일까지)**: 전화번호·대표 이메일·개인정보보호책임자, 업종과 상시 근로자 수(소상공인 여부), 처리방침에 적을 실제 안전조치, 웨딩 가격 정찰제의 실제 규칙과 문구, 변호사 검토(끝나야 첫 공개를 할 수 있다), 법인 설립등기일, 출시 알림 번호 보관 기간, 구글·네이버 소유확인 값, GA4 ID, Turnstile 키, Supabase 프로젝트와 요금제, Vercel 요금제, AI 웨딩홀 시뮬레이션 정의 문장과 '가상 피팅' 표현(임시로 넣었고 사용자가 직접 고친다).
+- **첫 공개 전(11월 12일까지)**: 업종과 상시 근로자 수(소상공인 여부), 처리방침에 적을 실제 안전조치, 웨딩 가격 정찰제의 실제 규칙과 문구, 변호사 검토(끝나야 첫 공개를 할 수 있다), 법인 설립등기일, 구글·네이버 소유확인 값, Turnstile 키, Supabase 프로젝트와 요금제, Vercel 요금제, AI 웨딩홀 시뮬레이션 정의 문장과 '가상 피팅' 표현(임시로 넣었고 사용자가 직접 고친다).
 - **영상과 오픈**: 영상 제작 도구의 상업 이용 조건(납품 전), 영상 파일(12월 4일), ZONE 02 입력 항목, ZONE 03 모델 초상권과 드레스 브랜드 사용 허락, ZONE 04 웨딩홀 사용 허락(납품 전), 12월 25일 오픈의 의미, 스토어 주소와 지원 기기, 오픈 후 후킹 문구(12월 11일), 공식 스토어 배지와 Apple 크레딧 줄(12월 11일), 앱에 맞춘 약관과 처리방침(12월 11일), 사용자 사진 처리 정책(오픈 전), 문자 발송 업체와 내려받는 파일의 삭제 절차(번호를 내려받기 전).
-- **정해지면**: 서비스 지역과 요금 정책, SNS 계정 주소, 통신판매업 신고 시점. 위디 영상 사용 방식의 직접 확인은 선택이다.
+- **정해지면**: 서비스 지역과 요금 정책, SNS 계정 주소, 통신판매업 신고 시점, GA4 ID(방문 통계 동의 창을 만든 뒤). 위디 영상 사용 방식의 직접 확인은 선택이다.
 
 ## 프로젝트 개요
 
@@ -85,14 +95,16 @@ Oct 28, 2026 · @tae hyeung kwon
 
 | 지표 | 정의 | 도구 |
 | --- | --- | --- |
-| 사전 신청 전환율 | 신청 완료 ÷ 방문자 | GA4 |
-| 소개 영상 시청률 | 소개 영상 3초 이상 재생 ÷ 방문자 | GA4 이벤트 |
+| 사전 신청 전환율 | 신청 완료 ÷ 방문자 | GA4 이벤트(`waitlist_submit`의 `result`=success) |
+| 소개 영상 시청률 | 소개 영상 3초 이상 재생 ÷ 방문자 | GA4 이벤트(`video_milestone`의 `media_id`=hero, `mark`=3s) |
 | 소리 켜기 비율 | 소리 켜기 클릭 ÷ 방문자 | GA4 이벤트 |
 | 기능 존 도달률 | 4개 기능 존을 모두 본 세션 비율 | GA4 노출 이벤트 |
 | 검색 노출 | 브랜드 검색 시 공식 사이트 순위 | 서치콘솔, 네이버 서치어드바이저 |
 | AI 인용 | 고정 프롬프트 20개 중 스딩이 언급된 횟수, 월 1회 점검 | 수동 테스트 |
 
-전환율·시청률의 목표치는 공개 후 2주간 기준선을 측정해 정한다.
+첫 공개는 GA4 없이 한다(2026-11-04 검토 Q16). GA 데이터가 Google LLC로 가는 국외 이전에 동의 없이 쓸 근거가 없다는 판단이다. 그동안 사전 신청 수는 Supabase의 날짜별 신청 건수로 세고(번호 없이 합계만 남긴다), 검색 유입은 서치콘솔과 네이버 서치어드바이저로 본다. 방문자가 분모인 지표(전환율, 시청률, 소리 켜기 비율, 존 도달률)는 잴 방법을 정할 때까지 내지 않는다. 방문 통계 동의 창을 만들어 동의한 방문자에게만 GA4를 싣는 안과, 쿠키 없이 날짜별 합계만 쌓는 1자 방문 합계 가운데 고른다(`docs/OPEN_ITEMS.md` 결정 질문 15).
+
+전환율과 시청률의 목표치는 방문자 분모를 잴 수 있게 된 뒤 2주간 기준선을 측정해 정한다. 시청률은 소개 영상이 올라간 뒤부터 잰다.
 
 ## 레퍼런스 분석: 위디
 
@@ -310,7 +322,7 @@ Oct 28, 2026 · @tae hyeung kwon
 | --- | --- |
 | 목적 | 'Coming Soon'으로 눈길을 붙잡고 10초 안에 스딩이 무엇인지 알린다 |
 | 순서 | 킥커(날짜 줄), 후킹, H1, 보조 문장, CTA. 영상은 바로 아래 영상 섹션이다 |
-| 킥커 | 가는 선 두 줄 사이에 반짝임 아이콘과 '2026.12.25 정식 오픈'(`--ink-900`). 청첩장의 날짜 줄 모양이다. 날짜는 `launchDate`에서 만든다 |
+| 킥커 | 가는 선 두 줄 사이에 반짝임 아이콘과 '2026.12.25 정식 오픈 예정'(`--ink-900`, 오픈 뒤에는 '2026.12.25 정식 오픈'). 청첩장의 날짜 줄 모양이다. 날짜는 `launchDate`에서 만든다 |
 | 후킹 | 'Coming'(300, `--ink-900`)과 'Soon'(900, `--brand`)을 `--fs-display`로 쓴다. 'Soon'의 oo는 흰자와 눈동자가 있는 두 눈이고 기본 시선은 아래 영상이다. 'Coming'의 i 점은 반짝임이다. 보이는 글자는 `aria-hidden`이고 스크린리더용 'Coming Soon'(`lang="en"`)을 따로 둔다. 후킹은 H1이 아니다 |
 | D-day | 'n' 오른쪽 위에 붙은 `--brand-deep` 왁스 실링 스티커. '오픈까지'와 'D-58'을 흰 글자로 쓴다(4.70:1). 밝은 `--brand`는 왼쪽 위 가장자리에만 두고, 실링 폭은 `--seal-min`보다 작아지지 않는다. 값은 `launchDate`에서 계산하고, 정적 HTML에는 빌드 시점 값을 넣은 뒤 브라우저에서 다시 계산한다 |
 | H1 | 웨딩 준비, 스딩에서 놀듯이 |
@@ -356,7 +368,7 @@ Oct 28, 2026 · @tae hyeung kwon
 | 재생 | 화면에 35% 이상 보이면 재생하고 15% 아래로 내려가면 멈춘다 |
 | CTA | 존 안에는 두지 않는다. 헤더 CTA가 항상 보인다 |
 | 앵커 | `#zone-1`부터 `#zone-4`. 진행 점과 소개의 존 알약이 이 앵커로 이동한다 |
-| 측정 | 50% 이상 노출되면 `zone_view`, 재생이 시작되면 `video_play` |
+| 측정 | 기준은 '분석 이벤트' 표를 따른다 |
 | 간격 | 섹션 상하 간격 토큰 `clamp(72px, 10vw, 140px)`을 쓴다 |
 
 ### ZONE 01 매표소: 가격 정찰제
@@ -378,7 +390,7 @@ Oct 28, 2026 · @tae hyeung kwon
 | 설명 | 결혼식 날짜와 예산만 알려 주세요. 해야 할 일을 코스처럼 이어서 정리해 드려요. |
 | 미디어 | 폰 프레임 안의 앱 화면 루프. 일정 카드가 차례로 채워지는 6\~8초, 9:19.5, 무음 |
 | 대체 텍스트 | 스딩 앱의 AI 플래너 화면. 결혼 준비 일정이 시간순으로 이어진다 |
-| 고지 | 화면 모서리에 'AI' 배지를 둔다 |
+| 고지 | 화면 모서리에 'AI' 배지를 둔다. 파일이 오기 전의 포스터 카드는 AI가 만든 그림이 아니므로 배지를 붙이지 않는다 |
 | 확정 필요 | 날짜와 예산 외의 입력 항목, 결과가 나오는 형태 |
 
 ### ZONE 03 의상실: 드레스 AI 합성
@@ -389,7 +401,7 @@ Oct 28, 2026 · @tae hyeung kwon
 | 설명 | 내 사진에 드레스를 입혀 어울리는 스타일을 미리 확인해요. 피팅 전에 후보를 좁힐 수 있어요. |
 | 미디어 | 전후 비교 슬라이더(원본 대 AI 합성) 4:5. 드레스가 바뀌는 연속 컷 6\~8초를 함께 쓸 수 있다. 슬라이더는 키보드 방향키로도 움직인다 |
 | 대체 텍스트 | 같은 인물의 원본 사진과 드레스를 합성한 사진을 좌우로 비교하는 화면 |
-| 고지 | 이미지 위에 'AI 합성' 라벨을 항상 보이게 하고, 아래에 'AI로 합성한 이미지예요. 실제 착용 모습과 다를 수 있어요.'를 쓴다 |
+| 고지 | 이미지 위에 'AI 합성' 라벨을 항상 보이게 하고, 아래에 'AI로 합성한 이미지예요. 실제 착용 모습과 다를 수 있어요.'를 쓴다. 파일이 오기 전의 포스터 카드는 AI가 만든 그림이 아니므로 라벨을 붙이지 않고, 아래에 '드레스 AI 합성의 결과는 AI로 합성한 이미지라 실제 착용 모습과 다를 수 있어요.'를 쓴다 |
 | 확정 필요 | 모델 초상권 동의, 드레스 브랜드 사용 허락, 사용자 사진의 처리·보관·삭제 정책 |
 
 ### ZONE 04 시뮬레이터: AI 웨딩홀 시뮬레이션
@@ -400,7 +412,7 @@ Oct 28, 2026 · @tae hyeung kwon
 | 설명 | 입장부터 버진로드까지, 방문 전에 분위기와 동선을 먼저 걸어 봐요. |
 | 미디어 | 1인칭 워크스루 영상 16:9, 10\~15초, 무음 루프. 모바일용 4:5 컷이 있으면 쓰고, 없으면 16:9를 폭 가득 보여 준다 |
 | 대체 텍스트 | 웨딩홀 입구에서 버진로드까지 1인칭으로 걸어가는 AI 시뮬레이션 영상 |
-| 고지 | 'AI 시뮬레이션' 라벨과 'AI가 만든 시뮬레이션이에요. 실제 웨딩홀과 다를 수 있어요.' |
+| 고지 | 'AI 시뮬레이션' 라벨과 'AI가 만든 시뮬레이션이에요. 실제 웨딩홀과 다를 수 있어요.' 파일이 오기 전의 포스터 카드에는 라벨 없이 'AI 웨딩홀 시뮬레이션은 AI가 만든 장면이라 실제 웨딩홀과 다를 수 있어요.'를 쓴다 |
 | 확정 필요 | 대상 웨딩홀이 실존하는지, 촬영·사용 허락, 재현 방식 |
 
 ### FAQ
@@ -416,7 +428,7 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 | AI 웨딩홀 시뮬레이션은 실제 웨딩홀과 같나요? | AI 웨딩홀 시뮬레이션은 실제 웨딩홀과 같지 않아요. AI가 만든 시뮬레이션이라 실제와 다를 수 있어요. 방문 전에 분위기와 동선을 확인하는 용도로 써 주세요. | 재현 방식 |
 | 언제부터 쓸 수 있나요? | 스딩은 2026년 12월 25일 정식 오픈 예정이에요. 출시 알림을 신청하면 오픈하는 날 문자로 알려 드려요. | 지원 기기, 스토어 |
 | 이용 요금은 얼마인가요? | 요금 정책이 정해진 뒤에 쓴다. 정해지기 전에는 이 항목을 노출하지 않는다. | 요금 정책 |
-| 출시 알림에 남긴 번호는 어떻게 쓰이나요? | 출시 알림에 남긴 번호는 오픈 안내 문자를 보내는 데만 쓰고, 목적이 끝나면 파기해요. | 보관 기간 |
+| 출시 알림에 남긴 번호는 어떻게 쓰이나요? | 출시 알림에 남긴 번호는 정식 오픈 안내 문자를 1회 보내는 데만 써요. {보유 기간}해요. | 없음. {보유 기간}은 '마지막 CTA' 동의 고지의 보유 기간 값을 그대로 읽는다 |
 
 오픈 후에는 '언제부터 쓸 수 있나요?'가 '어디서 쓸 수 있나요?'('스딩은 App Store와 Google Play에서 받을 수 있어요.', 스토어 주소가 하나면 그곳만 말한다)로 바뀌고, '출시 알림에 남긴 번호' 질문은 사라진다. 항목의 `when`·`hidden` 필드와 `faqFor()`가 이 전환을 처리한다(개발 사양 절 참고).
 
@@ -427,12 +439,13 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 | 목적 | 방문자가 가장 쉬운 방법으로 출시 알림을 신청하게 한다 |
 | 구성 | 오렌지 패널 하나 안에 헤드라인(흰색 H2), 한 줄 설명(`--ink-900`), 폼 카드. 제휴 문의 링크는 패널 아래에 둔다 |
 | 배치 | 피치는 FAQ부터 푸터까지 이어지고 패널 하나만 뜬다. 흰 카드가 페이지 세로줄에 놓이고 오렌지가 그 밖으로 8px 나온다. `--r-lg`에서 `--r-md`를 빼면 `--sp-2`라 두 곡선의 중심이 같다. 제목, 설명, 라벨, 고지, 체크가 왼쪽 선 하나를 쓰고, 날짜는 혼자 한 줄을 쓴다. 1024px부터 두 칸이고 카드 폭은 480px이다. 눈은 번호, 체크, 버튼 순서로 내려가고, 누른 뒤에 생기는 것(상태 문구, Turnstile)은 모두 버튼 아래에 나온다. 패널은 아래로만 자라 위의 내용이 움직이지 않는다. 신청 창은 카드가 가운데에 있어 자란 만큼 위아래로 나뉜다 |
-| 헤드라인 | 12월 25일, 스딩이 문을 열어요 (오픈 후: 지금 스딩을 시작해 보세요) |
+| 헤드라인 | 12월 25일, 스딩이 문을 열 예정이에요 (오픈 후: 지금 스딩을 시작해 보세요) |
 | 설명 | 전화번호를 남기면 오픈하는 날 문자로 알려 드려요. 로그인은 필요 없어요. |
 | 폼 카드 | 패널 안의 흰 카드. 전화번호 한 칸(`type=tel`, `inputmode=tel`, `autocomplete=tel`), 동의 고지, 필수 동의 체크, 주 버튼. 작은 글자가 모두 흰 바탕 위에 놓인다 |
-| 동의 고지 | 체크박스 바로 옆에 접지 않고 보인다. 대법원 2014두2638은 고지 전부를 명확히 게재하고 동의 표시와 밀접하게 배치하라고 했으므로 링크나 접기 뒤에 두지 않는다. 항목은 휴대폰 번호, 목적은 정식 오픈 안내 문자 1회 발송, 보유 기간은 '안내 문자를 보낸 뒤 30일 안에 파기'(제안, 굵게) \[확인 필요\], 거부 권리와 불이익, '만 14세 미만은 신청할 수 없어요.' \[확인 필요\]. 체크 라벨은 '개인정보 수집·이용에 동의해요 (필수)'이고 기본은 해제다. 자세히 보기는 /privacy를 새 탭으로 연다. 입력한 번호를 지키고, 신청 창이 열린 채 페이지가 바뀌지 않게 하기 위해서다. 광고성 정보 수신 동의는 변호사 검토 뒤에 별도 항목으로 더한다 \[확인 필요\] |
+| 동의 고지 | 체크박스 바로 옆에 접지 않고 보인다. 동의를 받을 때 알릴 사항(「개인정보 보호법」 제15조제2항)과 눈에 띄게 표시할 중요한 내용(제22조제2항, 시행령 제17조제3항, 「개인정보 처리 방법에 관한 고시」 제4조)을 체크하기 전에 분명히 볼 수 있어야 하므로 링크나 접기 뒤에 두지 않는다. 항목은 휴대폰 번호, 목적은 정식 오픈 안내 문자 1회 발송(굵게), 보유 기간은 '안내 문자를 보낸 뒤 5일 안에, 오픈이 늦어져도 2027년 6월 30일까지 파기'(굵게. 공개 뒤 상한 날짜를 늦추려면 다시 동의를 받는다), 거부 권리와 불이익, '만 14세 미만은 신청할 수 없어요.'(나이는 묻지 않는다). 체크 라벨은 '개인정보 수집·이용에 동의해요 (필수)'이고 기본은 해제다. 동의 줄 아래에 '개인정보 처리방침 보기'와 '이용약관 보기'를 한 줄로 두고 둘 다 새 탭으로 연다. 약관 동의 체크는 두지 않는다. 새 탭으로 여는 것은 입력한 번호를 지키고, 신청 창이 열린 채 페이지가 바뀌지 않게 하기 위해서다. 출시 문자는 광고가 아닌 1회 안내로 보내므로 광고성 정보 수신 동의는 두지 않는다. 광고로 바꾸려면 11월 13일 전에 정한다 |
 | 상태 | 입력, 전송 중, 성공, 오류. 성공 문구는 '신청이 완료됐어요. 오픈하는 날 문자로 알려 드릴게요.'다. Turnstile이 사람 확인을 요구하면 위젯이 카드 안에 나타나고 '확인을 마치면 신청이 끝나요.'를 보인다. JS가 꺼져 있으면 제출 버튼이 꺼지고 'JavaScript를 켜야 신청할 수 있어요.'를 보인다. 전송 중에는 번호와 체크를 잠가 보낸 값과 화면이 어긋나지 않게 하고, 버튼의 반짝임이 4.9초까지 돌고, 성공하면 폼 자리에 반짝임이 D-day 실링처럼 찍힌다(신청 창에서는 페이드). 패널은 성공해도 높이를 지켜 아래가 뛰지 않는다 |
 | 중복 번호 | 이미 있는 번호도 같은 성공 문구를 보여 준다. 번호가 등록돼 있는지 드러내지 않는다 |
+| 신청 취소 | 카드 맨 아래 '이미 신청했나요? 신청 취소하기'(글자 버튼)를 누르면 같은 자리에 취소 폼이 나온다. 설명 '입력한 번호로 한 출시 알림 신청을 취소해요.', 휴대폰 번호 한 칸, 주 버튼 '신청 취소', '신청 화면으로 돌아가기'. 번호가 있든 없든 완료 문구는 '신청 취소를 처리했어요. 이 번호로 한 신청이 있었다면 목록에서 지웠어요.'다. 동의 체크는 없고 Turnstile은 신청과 같은 방식이다(action `withdraw`). 열면 포커스는 설명으로, 돌아가면 '신청 취소하기' 버튼으로 간다(입력칸으로 돌리면 터치 기기에서 키보드가 뜬다). 취소가 끝나면 신청 쪽의 완료 문구와 입력도 거둔다. 요청을 보낸 뒤에는 돌아갈 수 없고, 신청 창을 닫으면 신청 화면으로 돌아간다. 취소용으로 넣은 번호는 돌아가면 사라진다. 분석 이벤트는 보내지 않는다. JS가 꺼져 있으면 숨기고 처리방침의 메일과 전화로 받는다. 권리 행사가 신청보다 어렵지 않게 하려는 장치다(2026-11-04 검토 Q22, P4) |
 | 오픈 후 | 폼 대신 App Store·Google Play 링크와 QR 코드를 보여 준다. 설명은 FAQ의 '어디서 쓸 수 있나요?' 답과 같다. 주소가 있는 곳만 보이고 App Store를 앞에 둔다. 공식 배지 파일을 받기 전에는 'App Store에서 받기' 같은 글자 링크를 쓴다. 로고를 그린 자체 버튼은 만들지 않는다. 배지와 QR은 그림을 바꾸면 안 되거나 코드가 만드는 그림이라 `MediaSlot`을 쓰지 않는다 |
 | QR | 스토어가 둘이어도 하나만 둔다. `https://sding.kr/#waitlist`를 담아 폰에서 이 자리의 링크를 누르게 한다. 기기를 판별하는 리다이렉트 라우트나 외부 업체가 필요 없다. 1024px 이상이면서 hover와 정밀 포인터가 있는 화면에서만 보인다. 자기 화면의 코드는 찍을 수 없다 |
 | 제휴 문의 | 패널 아래 작은 글씨로 '웨딩 업체이신가요? 제휴 문의' `mailto:` 링크를 둔다 |
@@ -445,7 +458,7 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 | 구성 | 로고, 회사 정보 블록, 링크 3개(개인정보 처리방침, 이용약관, 제휴 문의), 있는 채널만 SNS 아이콘, 저작권 |
 | 스타일 | `--peach` 배경, `--ink-600` 글자 `--fs-cap`(13~14px). 어두운 푸터는 쓰지 않는다 |
 | 회사 정보 | 항목과 값은 회사정보·법적 표기 절에서 정한다. 통신판매업 신고번호는 값을 비워 둔다 |
-| 제휴 문의 | `mailto:` 링크. 주소는 \[확인 필요\] |
+| 제휴 문의 | `mailto:` 링크. 주소는 `namu@sding.kr`(2026-11-05 전달) |
 
 ### 전역 요소
 
@@ -535,7 +548,7 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 - 초당 3회를 넘게 번쩍이는 장면은 넣지 않는다(WCAG 2.3.1).
 - 음량은 -16 LUFS 안팎, true peak는 -1 dBTP 이하로 맞춘다. iOS는 `volume`을 바꿀 수 없어 파일의 음량이 곧 재생 음량이다.
 - 첫 프레임을 포스터로 쓰므로 첫 1초에 핵심 장면이 보이게 한다.
-- AI 인물이 체험담처럼 추천하는 대사는 쓰지 않는다. 가상 인물이 나오는 장면에는 '가상인물'을 표기한다(공정위 추천·보증 심사지침).
+- AI 인물이 체험담처럼 추천하는 대사는 쓰지 않는다. 가상 인물이 나오는 장면에는 그 인물이 나오는 동안 가까운 자리에 '가상인물'을 표기한다(공정위 추천·보증 심사지침 Ⅴ.5).
 - AI로 제작한 영상이면 엔딩 카드에 'AI로 제작한 영상' 문구를 넣을 자리를 둔다. 유튜브 설명에도 같은 문구를 쓴다.
 - 음원, 폰트, 소스 영상의 상업적 이용 허락 문서를 보관한다.
 
@@ -550,7 +563,7 @@ SEO·GEO·AEO는 따로 하지 않고 같은 기반 위에서 한꺼번에 처�
 3. 모든 카피는 서버가 만든 HTML에 넣는다(SSG). 영상이나 이미지 안에만 있는 정보는 두지 않는다.
 4. FAQ 답변은 첫 문장이 곧 답이다. 질문의 주제어를 그 문장에 다시 써서, 문장만 떼어 가도 뜻이 통하게 한다.
 5. 구조화 데이터의 값은 화면에 보이는 내용과 같아야 한다. 근거 없는 후기·평점·가격은 넣지 않는다.
-6. 오픈일은 `launch.ts`의 도우미로만 만든다. 문장은 '2026년 12월 25일 정식 오픈', 킥커는 '2026.12.25', CTA는 '12월 25일'로 쓰고 히어로, FAQ, JSON-LD, llms.txt가 같은 날짜를 말하게 한다.
+6. 오픈일은 `launch.ts`의 도우미로만 만든다. 문장은 오픈 전 '2026년 12월 25일 정식 오픈 예정', 킥커는 '2026.12.25', CTA는 '12월 25일'로 쓰고 히어로, FAQ, JSON-LD, llms.txt가 같은 날짜를 말하게 한다.
 
 ### 고정 용어
 
@@ -601,7 +614,7 @@ export const viewport: Viewport = {
 - 공유 이미지는 `src/app/opengraph-image.tsx`가 1200×630 PNG로 만든다. 로고 텍스트, 정의 문장, 후킹 문구(`COPY.hero.hook[ctaMode()]`)와 `launchDotted()` 날짜를 담고, 후킹이 'Coming Soon'일 때는 히어로의 눈을 함께 그린다. 로고 SVG가 오면 이 파일 안에서 바꾼다. `next/og`는 woff2와 가변 폰트를 읽지 못해 Pretendard 고정 굵기 woff 3개를 `assets/fonts/`에 둔다. 방문자에게는 내려가지 않는다. 문구를 바꾸면 글자가 이 폰트에 있는지 확인한다. 없으면 `next/og`가 렌더링 때 외부에서 글꼴을 받는다. alt는 `SITE.ogAlt`다. 페이지와 같은 `revalidate = 3600`으로 다시 만들어 오픈일에 오픈 후 문구로 바뀌게 한다. 다시 만들기는 요청이 와야 시작하고 그 요청은 이전 이미지를 받으므로, 오픈일 1시(KST)가 지나 `/opengraph-image`를 열어 새 문구를 확인한 뒤 카카오 공유 캐시를 지운다.
 - 소유확인 메타 태그는 환경 변수 `NEXT_PUBLIC_GOOGLE_VERIFICATION`, `NEXT_PUBLIC_NAVER_VERIFICATION`에서 읽는다. 구글은 DNS TXT 인증을 기본으로 하고 메타 태그는 보조로 둔다. 네이버 서치어드바이저는 메타 태그로 인증한다.
 
-`www.sding.kr`은 `sding.kr`로 301 이동한다. 네이버 서치어드바이저에서도 대표 도메인을 `sding.kr`로 지정한다. 카카오톡 미리보기는 OG 태그를 읽으므로, 이미지나 문구를 바꾸면 카카오 공유 디버거에서 캐시를 지운다.
+`www.sding.kr`은 `sding.kr`로 301 이동한다. 네이버 서치어드바이저에는 대표 도메인을 고르는 메뉴가 없다. 네이버 가이드대로 www와 www 없는 주소를 301로 한쪽에 모으고 canonical을 `sding.kr`로 둔다. 카카오톡 미리보기는 OG 태그를 읽으므로, 이미지나 문구를 바꾸면 카카오 공유 디버거에서 캐시를 지운다.
 
 ### 크롤러와 색인 파일
 
@@ -636,7 +649,7 @@ export default function robots(): MetadataRoute.Robots {
 
 학습용 봇만 막고 싶으면 GPTBot, ClaudeBot, Google-Extended 규칙의 `allow`를 `disallow: '/'`로 바꾼다. 검색과 사용자 요청 봇은 계속 허용한다. 사이트맵에는 `/`, `/privacy`, `/terms` 세 주소만 넣는다.
 
-IndexNow 키 파일을 `public/{키}.txt`로 둔다. 키는 소유자가 정하는 공개 값이라 무작위로 만들어 두었고, 빙 웹마스터 도구에 같은 값을 등록한다. 다른 키를 쓰게 되면 파일과 아래 요청의 `key`를 함께 바꾼다. 배포 뒤에는 IndexNow로 바뀐 주소를 알린다. 첫 공개 날에는 세 주소를, 정식 오픈 날에는 홈 주소를 보낸다. 응답이 200이나 202면 접수된 것이다.
+IndexNow 키 파일을 `public/{키}.txt`로 둔다. 키는 소유자가 정하는 공개 값이라 무작위로 만들어 두었다. 검색엔진에 키를 등록하는 절차는 없고, 참여 검색엔진끼리 받은 주소를 나눈다. 네이버도 IndexNow를 받는다. 다른 키를 쓰게 되면 파일과 아래 요청의 `key`를 함께 바꾼다. 배포 뒤에는 IndexNow로 바뀐 주소를 알린다. 첫 공개 날에는 세 주소를, 정식 오픈 날에는 홈 주소를 보낸다. 응답이 200이나 202면 접수된 것이다.
 
 ```bash
 curl -i -X POST https://api.indexnow.org/indexnow -H "Content-Type: application/json; charset=utf-8" -d '{"host":"sding.kr","key":"9c7495293e61b2ab93f040374f6033e7","urlList":["https://sding.kr/","https://sding.kr/privacy","https://sding.kr/terms"]}'
@@ -733,7 +746,7 @@ llms.txt는 넣되 효과를 기대하지 않는다. 주요 AI 업체 중 인용
 | 후기·방문기 | 드레스 가상 피팅 후기 | 네이버 블로그 | 직접 겨루지 않는다. 공식 블로그로 보완하고 협찬 글은 협찬임을 표시한다 |
 | 가격·견적·추천 | 웨딩홀 견적, 웨딩 패키지 가격 | 검색광고 | 자연 검색으로 노리지 않는다. 광고를 집행하면 도착 페이지로 쓸 수 있다 |
 
-새 사이트는 네이버가 수집하는 데 약 2주가 걸린다. 수집 전에 Yeti 허용, `noindex` 여부, 사이트맵 제출, 페이지 수집 요청, 대표 도메인 설정을 끝내 둔다. 첫 공개를 정식 오픈 6주 전인 11월 13일로 잡은 이유다.
+새 사이트는 네이버가 수집하는 데 약 2주가 걸린다. 수집 전에 Yeti 허용, `noindex` 여부, 사이트맵 제출, 페이지 수집 요청, www의 301 이동을 끝내 둔다. 첫 공개를 정식 오픈 6주 전인 11월 13일로 잡은 이유다.
 
 ### 오프페이지
 
@@ -749,9 +762,9 @@ llms.txt는 넣되 효과를 기대하지 않는다. 주요 AI 업체 중 인용
 | 도구 | 용도 | 시점 |
 | --- | --- | --- |
 | 구글 서치 콘솔 | 색인, 검색어, 핵심 웹 지표. 도메인 속성으로 등록하고 DNS의 TXT 레코드로 인증한다 | 첫 공개 당일 |
-| 네이버 서치어드바이저 | 수집 요청, 사이트맵 제출, 대표 도메인 | 첫 공개 당일 |
+| 네이버 서치어드바이저 | 소유확인(HTML 태그), 수집 요청, 사이트맵 제출 | 첫 공개 당일 |
 | 빙 웹마스터 도구, IndexNow | 빙·코파일럿 계열 색인 | 첫 공개 당일 |
-| GA4 | 이벤트와 'AI 유입' 채널 그룹. 소스가 chatgpt.com, perplexity.ai, gemini.google.com, claude.ai, copilot.microsoft.com인 세션을 묶는다 | 첫 공개 전 |
+| GA4 | 이벤트와 'AI 유입' 채널 그룹. 소스가 chatgpt.com, perplexity.ai, gemini.google.com, claude.ai, copilot.microsoft.com인 세션을 묶는다 | 방문 통계 동의 창을 만든 뒤(첫 공개에는 켜지 않는다) |
 | 수동 인용 테스트 | 고정 프롬프트 20개를 월 1회 챗GPT, 제미나이, 클로드, 퍼플렉시티, 네이버 AI 브리핑에 넣고 언급 여부, 출처 링크, 표현의 정확도를 기록한다 | 첫 공개 후 매월 |
 
 고정 프롬프트 예시는 다섯 개다: '웨딩 가격 정찰제가 뭐야?', '웨딩홀을 미리 걸어 볼 수 있는 서비스가 있어?', '웨딩드레스를 미리 입어 볼 수 있는 AI 서비스 알려 줘', '스딩이 뭐야?', 'AI 웨딩 플래너 앱 추천해 줘'. 나머지 15개는 사전 신청자 설문과 검색 질의에서 채운다.
@@ -778,9 +791,9 @@ llms.txt는 넣되 효과를 기대하지 않는다. 주요 AI 업체 중 인용
 | 사업자등록번호 | 590-86-03810 | 사업자등록증 |
 | 사업장 주소 | 서울특별시 강남구 압구정로46길 5-10, 3층 302호 (신사동, 압구정로데오스타) | 사업자등록증(본점과 같음) |
 | 통신판매업신고번호 | 비워 둔다 | 신고 전. `mailOrderNo: ''` |
-| 전화번호 | 미정 | 등록증에 없음. 전달 필요 \[확인 필요\] |
-| 이메일 | 미정 | 등록증에 없음. 전달 필요 \[확인 필요\] |
-| 개인정보보호책임자 | 미정 | 처리방침 필수 항목 \[확인 필요\] |
+| 전화번호 | 010-9897-7678 | 2026-11-05 전달 |
+| 이메일 | namu@sding.kr | 2026-11-05 전달. 메일은 Google Workspace로 받으므로 처리방침의 국외 이전 표에 적는다 |
+| 개인정보보호책임자 | 정원창(대표) | 2026-11-05 전달. 대표이사를 지정했다. 처리방침에는 성명, 직위, 연락처를 적는다 |
 | 법인등록번호 | 110111-0970668 | 푸터에는 쓰지 않고 데이터에만 보관한다 |
 | 업태·종목 | 정보통신업, 서비스 / 응용 소프트웨어 개발 및 공급업, 웨딩컨설팅 | 푸터에는 쓰지 않는다 |
 
@@ -792,12 +805,13 @@ llms.txt는 넣되 효과를 기대하지 않는다. 주요 AI 업체 중 인용
 서울특별시 강남구 압구정로46길 5-10, 3층 302호 (신사동, 압구정로데오스타)
 전화 {phone} | 이메일 {email} | 개인정보보호책임자 {privacyOfficer}
 개인정보 처리방침 · 이용약관 · 제휴 문의
-AI 기능은 생성형 AI를 활용하며 결과는 실제와 다를 수 있어요.
+스딩 앱의 AI 기능은 생성형 AI를 활용할 예정이에요. 결과는 실제와 다를 수 있어요.
 © 2026 주식회사 스딩. All rights reserved.
 ```
 
 - 신고가 끝나면 `COMPANY.mailOrderNo`에 번호를 넣는 것 하나로 끝난다. 라벨을 숨기고 싶으면 설정 하나로 바꾼다.
-- 운영 빌드에서는 전화·이메일·책임자가 비어 있으면 빌드가 실패한다(`assertCompany()`). 통신판매업신고번호는 검사에서 뺀다.
+- AI 문구는 이 사이트가 아니라 스딩 앱의 기능이라고 밝힌다. 오픈 전에는 '활용할 예정이에요'를 쓰고, 오픈 뒤(`ctaMode()`가 live)에는 '스딩 앱의 AI 기능은 생성형 AI를 활용해요. 결과는 실제와 다를 수 있어요.'로 바뀐다. 법정 고지를 대신하지 않는 보조 안내다.
+- 운영 빌드에서는 전화·이메일·보호책임자의 성명과 직위가 비어 있으면 빌드가 실패한다(`assertCompany()`). 통신판매업신고번호는 검사에서 뺀다.
 - 법적 표기는 사업자등록증의 법인명 하나만 쓴다. 다른 회사명이나 서비스명을 섞지 않는다.
 
 ### 통신판매업
@@ -816,25 +830,26 @@ AI 기능은 생성형 AI를 활용하며 결과는 실제와 다를 수 있어�
 | --- | --- |
 | 수집 항목 | 휴대폰 번호 하나. 이름과 이메일은 받지 않는다 |
 | 이용 목적 | 정식 오픈 안내 문자 1회 발송 |
-| 보유 기간 | 오픈 안내 발송 후 30일 이내 파기(제안). 동의를 철회하면 즉시 파기 \[확인 필요\] |
+| 보유 기간 | 안내 문자를 보낸 뒤 5일 안에, 오픈이 늦어져도 2027년 6월 30일까지 파기. 보내지 못한 번호도 같은 기한에 지운다. 동의를 철회하면 지체 없이 파기 |
 | 거부 권리 | 동의를 거부할 수 있고, 거부하면 출시 알림을 받을 수 없다고 적는다 |
-| 광고성 정보 | 오픈 안내 문자는 광고성 정보로 볼 수 있다. 요청한 사람에게 보내는 1회 안내는 예외로 볼 여지가 있어 변호사가 정한다. 광고로 처리하면 '광고성 정보 수신동의'를 개인정보 동의와 별도 항목으로 받고, 문자 첫머리에 (광고)·전송자 명칭·연락처, 끝에 무료 수신 거부 방법을 쓰고, 08~21시에 도달하게 보내고, 14일 안에 처리 결과를 알린다 \[확인 필요\] |
+| 광고성 정보 | 비광고로 보낸다. 신청한 사람이 요청한 정식 오픈 안내 1회는 영리목적 광고성 정보의 예외인 '수신자의 요청에 따라 보내는 정보'로 본다. 조건: 한 번만 보낸다(실패한 번호에 다시 보내는 것은 같은 1회다. 연기 안내나 재안내는 보내지 않는다). 내용은 오픈 사실과 sding.kr 주소로 한정하고, 할인·쿠폰·이벤트·추천 코드·홍보 문구·다른 서비스를 넣지 않는다. (광고)를 붙이지 않는다. 08~21시에 닿게 보내고 전송자격인증 업체를 쓴다(비광고에는 의무가 아닌 대비다). 광고로 바꾸려면 11월 13일 전에 정한다. 그때는 '광고성 정보 수신동의'를 별도 항목으로 받고, 완료 화면에 처리 결과를 알리고, 문자 첫머리에 (광고)·전송자 명칭·연락처, 끝에 무료 수신 거부 방법을 쓴다 |
 | 위탁·국외 이전 | 문자 발송 대행사와 해외 서버(DB·호스팅)를 쓰면 처리방침에 수탁자와 이전 항목을 적는다 \[확인 필요\]. Supabase를 서울에 두어도 로그는 EU에 저장되고, 싱가포르·미국으로 이전되며, 주 처리자는 Supabase Pte. Ltd.다. Vercel도 해외 사업자다 |
 | 동의 기록 | 동의 시각과 동의 문구 버전을 번호와 함께 저장한다. IP는 저장하지 않는다 |
 | 스팸 방지 | 허니팟 필드와 Cloudflare Turnstile. 로그인은 두지 않는다. 스딩의 서버 코드는 IP를 읽거나 저장하지 않지만 호스팅 업체의 접속 기록에는 남을 수 있고, Turnstile은 봇 확인을 위해 방문자의 IP, TLS 지문, User-Agent, 페이지 주소를 Cloudflare로 보내고, 쿠키와 로컬 저장소에 기대어 동작한다. 처리방침에 '쿠키가 없다'고 쓰지 않는다 \[확인 필요\] |
-| 책임자 | 개인정보보호책임자의 이름과 연락처를 처리방침에 적는다 \[확인 필요\] |
+| 책임자 | 개인정보 보호책임자 정원창(대표)의 성명, 직위, 연락처를 처리방침에 적는다 |
 
 ### AI 서비스 고지
 
-AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형 AI 서비스임을 미리 알리고, 결과물에 AI 생성 표시를 하고, 실제와 구분하기 어려운 결과물은 명확히 알리도록 정한다. 의무는 AI 서비스를 제공하는 사업자에게 있고 도구를 쓰는 이용자에게는 없다([신&김, 2026-02-26](https://www.shinkim.com/kor/media/newsletter/3142)). 개정안은 7월 21일 시행됐고 정부는 최소 1년의 계도기간을 두었다([kbmaeil, 2026-07-19](https://kbmaeil.com/article/20260719500014)).
+AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형 AI 서비스임을 미리 알리고, 결과물에 AI 생성 표시를 하고, 실제와 구분하기 어려운 결과물은 명확히 알리도록 정한다. 의무는 AI 제품·서비스를 이용자에게 최종적으로 제공하는 사업자에게 있고, 타사 도구로 만든 결과물을 게시만 하는 이용자에게는 없다([과기정통부 「인공지능 투명성 확보 가이드라인」 2쪽](https://www.msit.go.kr/bbs/documentView.do?atchFileNo=52249&fileOrdr=1), [지원데스크 사례집 23쪽 사례 01](https://www.sw.or.kr/common/board/Download.do?bcIdx=65415&cbIdx=390&streFileNm=7516b720-1c92-4fad-ade3-695d4136e77f.pdf)). 개정법은 7월 21일 시행됐다. 법과 시행령 부칙에는 계도기간이 없다. 지원데스크 FAQ가 최소 1년 이상 사실조사·과태료를 유예한다고 안내하지만 종료일은 없고 의무도 그대로이므로(사례집 37쪽 사례 20) 앱 출시 때부터 고지한다.
 
 스딩은 플래너, 드레스 합성, 웨딩홀 시뮬레이션을 직접 제공하므로 사업자로 보고 설계한다. 드레스 합성은 실제와 구분하기 어려운 결과물일 가능성이 커서 가장 눈에 띄게 표시한다.
 
 | 대상 | 표시 | 위치 |
 | --- | --- | --- |
-| 서비스 전체 | 생성형 AI를 활용한 서비스라는 사전 고지 | 이용약관, 푸터 한 줄 |
+| 서비스 전체 | 생성형 AI를 활용한 서비스라는 사전 고지 | 랜딩: 이용약관의 예정 안내와 푸터 한 줄(보조 안내이고 법정 고지를 대신하지 않는다). 앱: 앱 약관과 앱 첫 화면 또는 설치 안내 |
 | 드레스 합성 이미지 | 'AI 합성' 라벨을 이미지 위에 항상 보이게 한다. 내려받거나 공유한 파일에도 남긴다 | 랜딩 데모, 앱 결과 화면과 파일 |
 | 웨딩홀 시뮬레이션 | 'AI 시뮬레이션' 라벨과 '실제와 다를 수 있어요' | 랜딩 데모, 앱 |
+| 파일이 오기 전의 포스터 카드 | AI가 만든 그림이 아니므로 'AI' 라벨을 붙이지 않는다. 합성·시뮬레이션 존은 아래에 기능의 한계를 말하는 문장(`posterNotice`)을 둔다 | 랜딩 존 |
 | AI 플래너 결과 | 'AI 생성' 배지 | 랜딩 데모, 앱 |
 | 소개 영상 | AI로 제작했다면 엔딩 카드나 설명에 'AI로 제작한 영상'이라고 쓴다 | 영상 섹션(`#film`), 유튜브 |
 
@@ -842,7 +857,7 @@ AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형
 
 - '정찰제' 표현은 실제 운영 규칙과 같아야 한다. 근거 자료(가격표, 계약 조건)를 보관한다.
 - 최고·최초·유일·1위·최저가 같은 표현은 근거 없이 쓰지 않는다.
-- AI 가상 인물이 상품을 추천하거나 보증하는 장면에는 '가상인물'을 표기한다. 체험담처럼 말하는 대사는 쓰지 않는다([imweb](https://imweb.me/blog?idx=486), 2026년 6월 1일 시행 지침).
+- AI 가상 인물이 상품을 추천하거나 보증하는 장면에는 그 인물이 나오는 동안 가까운 자리에 '가상인물'을 표기한다. 체험담처럼 말하는 대사는 쓰지 않는다([추천·보증 등에 관한 표시·광고 심사지침 Ⅴ.5](https://www.law.go.kr/LSW/admRulInfoR.do?admRulSeq=2100000280130&chrClsCd=010201), 2026년 6월 1일 시행).
 - 협찬이나 체험단 후기는 대가를 받았음을 밝힌다.
 - 오픈 전에는 후기, 평점, 이용자 수를 쓰지 않는다.
 
@@ -866,8 +881,8 @@ AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형
 - 문구는 `src/content/legal.ts`에 두고 `LegalPage`가 그린다. 본문은 해요체다. 표 대신 라벨과 값의 목록을 써서 320px에서도 가로 스크롤이 없다.
 - 제목은 '주식회사 스딩 개인정보 처리방침'이다. 표준지침 제20조는 명칭을 '개인정보 처리방침'으로 쓰고 글자 크기나 색으로 다른 고지와 구분하라고 정한다. 푸터는 굵기와 색으로 구분한다. 피치 위 `--brand-deep`은 4.26:1이라 쓰지 않는다.
 - 동의 고지의 항목, 목적, 보유 기간은 같은 값을 읽는다. GA 항목은 `NEXT_PUBLIC_GA_ID`가 있을 때, Cloudflare의 미디어 항목은 `NEXT_PUBLIC_MEDIA_BASE`의 도메인이 사이트와 다를 때만 나온다.
-- 시행일(`LEGAL_DATE`), 국외 이전 근거(`TRANSFER_BASIS`), 신청 기록과 자동 처리 정보의 처리 근거(`RECORD_BASIS`, `AUTO_BASIS`), 업체별 이전 유형(`TRANSFER_TYPE`)은 변호사 검토가 끝나야 넣는다. 하나라도 비어 있으면 운영 빌드가 멈춘다(`assertLegal()`). 스테이징과 미리보기에서는 초안이 보인다.
-- 업체가 맡은 일과 업체가 스스로 쓰는 일을 나누어 적는다. 모든 업체를 수탁자로 단정하지 않는다. 지위는 변호사가 정한다.
+- 시행일(`LEGAL_DATE`), 국외 이전 근거(`TRANSFER_BASIS`), 신청 기록과 자동 처리 정보의 처리 근거(`RECORD_BASIS`, `AUTO_BASIS`), 업체별 이전 유형(`TRANSFER_TYPE`)은 검토를 마쳐야 넣는다. 하나라도 비어 있으면 운영 빌드가 멈춘다(`assertLegal()`). 스테이징과 미리보기에서는 초안이 보인다. 2026-11-04 법령 검토로 시행일 밖의 값을 넣었다. 국외 이전은 제28조의8제1항제3호가목으로 두고, 업체마다 이전 사항 다섯 가지(항목, 나라·때·방법, 받는 곳과 연락처, 목적과 보유 기간, 거부 방법과 효과)를 빠짐없이 적어야 성립한다. 시행일은 첫 공개 전에 할 일(`docs/OPEN_ITEMS.md`의 `legal-review`)을 마친 뒤 실제 첫 공개일로 넣는다.
+- 업체가 맡은 일과 업체가 스스로 쓰는 일을 나누어 적는다. 모든 업체를 수탁자로 단정하지 않는다. 맡긴 일에서는 수탁자로 적고, 업체가 스스로 정해 쓰는 일은 '직접 쓰는 목적'으로 따로 적는다(2026-11-04 검토).
 - 구제 기관은 개인정보 분쟁조정위원회, 개인정보침해 신고센터, 경찰청 사이버범죄 신고시스템 세 곳이다. 대검찰청은 2026년 10월 2일 폐지됐다. 공개 직전에 번호와 주소를 다시 확인한다.
 - `/terms`는 회원과 결제가 없는 사이트의 안내다. 방문자에게 의무를 지우는 조항, 포괄 면책, 서비스를 마음대로 바꾸거나 멈출 권한, 이용을 동의로 보는 문장, 관할 조항, 결제와 환불, '정찰제', 문자 수신 동의를 넣지 않는다. 앱을 출시할 때 앱 약관을 따로 쓴다.
 - 없는 주소는 `not-found.tsx`가 '지도에 없는 곳이에요'와 홈 링크를 보인다. canonical과 공유 이미지는 넣지 않는다.
@@ -880,10 +895,12 @@ AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형
 4. 'AI 합성' 표기의 문구·위치·파일 내 표시 방식.
 5. 영상 생성 도구 약관과 가상 인물 표기.
 6. 국외 이전의 근거. 무료 출시 알림 신청이 제28조의8제1항제3호의 계약인지, 1호의 별도 동의가 필요한지. 답에 따라 신청 폼이 바뀔 수 있다.
-7. 보유 기간. '발송 후 30일'이 표준지침 제10조의 '불필요하게 된 때부터 5일 이내'와 맞는지.
+7. 보유 기간. '안내 문자를 보낸 뒤 5일 안에, 오픈이 늦어져도 2027년 6월 30일까지 파기'(2026-11-04 검토 Q19로 정함)가 표준지침 제10조와 법 제21조제1항의 '지체 없이'에 맞는지.
 8. 업체별 지위. Vercel, Supabase, Cloudflare, Google을 수탁자로 적을지, 제3자로 적을지, 쿠키와 Turnstile 신호의 처리 근거를 무엇으로 볼지.
 
 근거와 전체 질문 36개는 `docs/private/legal-facts.md`에 있다. 공개 저장소에는 올리지 않는다.
+
+2026-11-04에 회사의 요청으로 Claude가 이 목록과 질문 36개를 법령과 공식 지침에 대조해 검토했다. 영역마다 다른 검토자가 반박하며 다시 확인했다. 변호사의 법률 의견은 아니다. 검토서는 `docs/private/legal-review.md`에 있고 공개 저장소에는 올리지 않는다. 이 검토로 첫 공개 조건('변호사 검토 뒤 공개')을 채운 것으로 볼지는 사용자가 정한다. 처리방침, 약관, 홍보물에는 '변호사 검토를 마쳤다'고 쓰지 않는다.
 
 ## 개발 사양
 
@@ -903,7 +920,7 @@ AI 기본법은 2026년 1월 22일부터 시행 중이다. 제31조는 생성형
 | 미디어 | 1단계 `public/media/`(같은 도메인), 2단계 Cloudflare R2 | 처음에는 DNS 변경과 CORS 설정 없이 시작하고, 영상이 늘면 옮긴다 |
 | 저장소 | Supabase(Postgres), `@supabase/supabase-js` 2.118.0 | 사전 신청 번호 저장. 스딩 업체 관리 도구의 DB와 섞이지 않게 별도 프로젝트로 만든다. 리전은 'Northeast Asia (Seoul)' `ap-northeast-2`를 특정해 고른다. 만든 뒤에는 옮길 수 없다. 요금제는 Pro를 권한다. Free는 활동이 적으면 멈추고, 멈추면 신청이 모두 실패하며, 자동 백업이 없다 \[확인 필요\] |
 | 스팸 방지 | 허니팟 + Cloudflare Turnstile | 로그인 없이 봇을 거른다 |
-| 분석 | GA4(`@next/third-parties`) | 이벤트는 아래 표를 따른다 |
+| 분석 | GA4(인라인 초기화와 `next/script`의 `lazyOnload`) | 이벤트는 아래 표를 따른다. 첫 공개에는 측정 ID를 넣지 않는다 |
 | QR | `uqr` 0.1.3 | 오픈 후 QR을 서버 컴포넌트에서 SVG로 그린다. 의존성이 없고 브라우저 번들에 들어가지 않는다 |
 
 ### 저장소 구조
@@ -937,7 +954,7 @@ sding.kr/                      GitHub aimbrige-netizen/sding.kr
       Header  HeaderShell  Hero  Film  Intro  Zone  ProgressDots  Faq  CtaSection  Footer
       MediaSlot  VideoProvider  VideoPlayer  PlayButtons  RidePreview  ParkMap  ZonePoster  CompareSlider
       HookMotion  InlineScript  SoundBuddy  RevealArmer  AnchorFocus  Logo
-      WaitlistDialog  WaitlistForm  CtaButton  StoreChoice  QrCode  Spans  Icons  LegalPage
+      WaitlistDialog  WaitlistForm  CtaButton  StoreChoice  QrCode  Spans  Icons  LegalPage  AnalyticsEvents
     content/
       site.ts  zones.ts  faq.ts  media.ts  company.ts  legal.ts
     lib/
@@ -1044,13 +1061,14 @@ export const COMPANY = {
   region: '서울특별시', locality: '강남구', street: '압구정로46길 5-10, 3층 302호 (신사동, 압구정로데오스타)',
   mailOrderNo: '',                          // 통신판매업 신고번호. 신고 완료 전까지 반드시 빈 값
   showMailOrderLabel: true,                 // 번호가 비어 있어도 라벨은 보인다. 숨기려면 false
-  phone: '', email: '', privacyOfficer: '',   // 전달받아 채운다
+  phone: '010-9897-7678', email: 'namu@sding.kr',   // 2026-11-05 전달받은 대표 연락처
+  privacyOfficer: '정원창', privacyOfficerTitle: '대표',   // 개인정보 보호책임자
 };
 export const ADDRESS = `${COMPANY.region} ${COMPANY.locality} ${COMPANY.street}`;
 
 // 운영 빌드에서만 호출한다. mailOrderNo는 검사하지 않는다.
 export function assertCompany() {
-  for (const k of ['phone', 'email', 'privacyOfficer'] as const) {
+  for (const k of ['phone', 'email', 'privacyOfficer', 'privacyOfficerTitle'] as const) {
     if (!COMPANY[k]) throw new Error('COMPANY.' + k + ' is empty');
   }
 }
@@ -1080,6 +1098,7 @@ export const ZONES = [
     headline: '가격은 한눈에, 정찰제로', hl: '정찰제로',   // hl은 headline의 뒤쪽 구절. 형광펜을 칠하고, 한 줄에 안 들어가면 여기서 줄을 바꾼다
     body: '상담을 받아야 알 수 있던 웨딩 가격을 처음부터 보여드려요. 같은 기준으로 놓고 비교해 보세요.', media: 'zone1', icon: 'ticket' },
   // 02~04는 섹션별 상세 기획의 표를 그대로 옮긴다. 합성·시뮬레이션 존은 badge와 notice를 함께 둔다.
+  // badge와 notice는 파일이 있을 때만 그리고, 파일이 오기 전에는 posterNotice를 쓴다(ZONE 03·04).
   // definition은 고정 용어의 한 줄 정의다. FAQ 답변, DefinedTermSet, llms.txt가 같은 값을 읽는다.
 ];
 ```
@@ -1130,6 +1149,10 @@ export const MEDIA = {
   // zone2~4도 같은 모양이다. 슬롯 사양은 영상·미디어 시스템 절의 표를 따른다.
 } satisfies Record<string, MediaSpec>;
 
+// 파일이 들어왔는지. MediaSlot이 파일을 그리는 조건과 같다. 포스터 이미지가 없는 영상은 재생 전까지 포스터 카드를 덮개로 쓰므로 Zone이 빌드를 멈춘다
+export const hasFile = (spec: MediaSpec) =>
+  spec.kind === 'compare' ? Boolean(spec.before && spec.after) : spec.kind === 'phone' ? Boolean(spec.screen.src) : Boolean(spec.src);
+
 // 켤 소리가 있는지. 소리는 소개 영상에만 있으므로 그 파일이 올 때까지 사운드 버디를 그리지 않는다
 export const HAS_SOUND = Boolean(MEDIA.hero.src && MEDIA.hero.hasAudio);
 ```
@@ -1144,7 +1167,7 @@ export const HAS_SOUND = Boolean(MEDIA.hero.src && MEDIA.hero.hasAudio);
 | --- | --- | --- | --- |
 | `NEXT_PUBLIC_SITE_ENV` | 공개 | `production` 또는 `preview` | `production`일 때만 색인을 허용하고 `assertCompany()`와 `assertLegal()`을 실행한다 |
 | `NEXT_PUBLIC_MEDIA_BASE` | 공개 | 영상·이미지 주소의 앞부분 | 운영은 `https://sding.kr/media`처럼 절대 주소. 로컬은 비워 두면 `/media` |
-| `NEXT_PUBLIC_GA_ID` | 공개 | GA4 측정 ID | 비어 있으면 분석 코드를 넣지 않는다 |
+| `NEXT_PUBLIC_GA_ID` | 공개 | GA4 측정 ID | 비어 있으면 GA 스크립트를 넣지 않고 아무것도 보내지 않는다. 빌드 때 읽으므로 바꾸면 다시 배포한다. 첫 공개에는 비운다. 넣으려면 방문 통계 동의 창을 먼저 만든다 |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | 공개 | Turnstile 위젯 키 | 비어 있으면 폼이 전송 단계에서 '잠시 후 다시 시도해 주세요.'를 보인다 |
 | `NEXT_PUBLIC_GOOGLE_VERIFICATION` | 공개 | 구글 서치 콘솔 소유확인 메타 값 | 비어 있으면 태그를 넣지 않는다. 구글은 DNS TXT 인증이 기본이다 |
 | `NEXT_PUBLIC_NAVER_VERIFICATION` | 공개 | 네이버 서치어드바이저 소유확인 메타 값 | 비어 있으면 태그를 넣지 않는다 |
@@ -1154,7 +1177,7 @@ export const HAS_SOUND = Boolean(MEDIA.hero.src && MEDIA.hero.hasAudio);
 
 - 저장소에는 이름만 적은 `.env.example`을 두고, `.env*` 파일은 `.gitignore`에 넣는다.
 - 미리보기 배포에는 운영 DB 키를 넣지 않는다. 키가 없으면 신청 API는 503을 돌려준다. 비공개 값은 Vercel의 Production 범위에 Secret으로만 넣는다. Supabase 프로젝트는 Vercel Marketplace가 아니라 Supabase에서 직접 만든다. Marketplace로 만들면 미리보기로 키가 퍼질 수 있고 주 처리자도 바뀐다.
-- Turnstile 키는 환경마다 다르다. 개발과 미리보기는 Cloudflare가 공개한 시험 키 한 쌍을, 운영은 실제 키 한 쌍을 쓴다. 시험 키와 실제 키를 섞으면 모든 신청이 실패한다. 실제 토큰을 시험 비밀 키로 검증하면 성공이 돌아와도 hostname이 `example.com`이라 운영의 확인에서 막힌다. Vercel 로그에는 `waitlist: turnstile mismatch`나 Cloudflare의 오류 코드로 보인다. 위젯은 Managed 모드, 허용 호스트는 `sding.kr` 하나로 만든다.
+- Turnstile 키는 환경마다 다르다. 개발과 미리보기는 Cloudflare가 공개한 시험 키 한 쌍을, 운영은 실제 키 한 쌍을 쓴다. 시험 키와 실제 키를 섞으면 모든 신청이 실패한다. 시험 비밀 키는 시험용 더미 토큰만 받고 실제 위젯의 토큰은 거절한다. 운영 비밀 키는 더미 토큰을 거절한다. Vercel 로그에는 `waitlist: turnstile mismatch`나 Cloudflare의 오류 코드로 보인다. 위젯은 Managed 모드, 허용 호스트는 `sding.kr` 하나로 만든다.
 - Vercel의 환경 변수는 다시 배포해야 적용된다.
 
 ### CTA 전환
@@ -1191,7 +1214,7 @@ export const launchFull = () => { const [y, m, d] = ymd(); return `${y}년 ${m}�
 export const launchDotted = () => SITE.launchDate.replace(/-/g, '.');                         // 2026.12.25
 ```
 
-- 루트 레이아웃(`src/app/layout.tsx`)에 `export const revalidate = 3600;`을 둔다. 헤더 CTA가 모든 페이지에 있으므로 모든 페이지가 같은 주기로 다시 만들어져야 한다. 오픈일 0시(KST) 이후 첫 재생성에서 자동으로 `live`가 된다. 이 방식을 쓸 수 없는 호스팅이면 그 시각에 배포 훅을 호출한다.
+- 루트 레이아웃(`src/app/layout.tsx`)에 `export const revalidate = 3600;`을 둔다. 헤더 CTA가 모든 페이지에 있으므로 모든 페이지가 같은 주기로 다시 만들어져야 한다. 오픈일 0시(KST) 이후 첫 재생성에서 자동으로 `live`가 된다. 이 방식을 쓸 수 없는 호스팅이면 그 시각에 배포 훅을 호출한다. `public/llms.txt`는 빌드 직전(`prebuild`)에만 만들어 재생성으로 바뀌지 않는다. 오픈일 0시(KST)가 지나면 한 번 다시 배포해 '정식 오픈 예정일'을 '정식 오픈일'로 바꾼다.
 - 수동 전환은 `SITE.ctaOverride`를 바꾸고 배포한다.
 - 날짜가 들어가는 문구는 `launch.ts`의 도우미로 만들고, 문구에 날짜를 직접 쓰지 않는다. 히어로 킥커는 `launchDotted()`, 마지막 CTA 헤드라인은 `launchLabel()`, FAQ 답변은 `launchFull()`, 히어로 D-day 실링은 `daysToLaunch()`(KST 날짜 기준 남은 날수)를 쓴다.
 - CTA 버튼(`CtaButton`)은 `next/link`로 `/#waitlist`를 가리키고, 신청 창은 `onNavigate`에서 연다. `onNavigate`는 일반 클릭에서만 불리므로 Ctrl·Cmd 클릭, 하이드레이션 전 클릭, `dialog`가 없는 브라우저와 JS 끔은 마지막 섹션의 폼으로 이동한다. `data-cta` 속성은 후킹의 눈이 읽으므로 지우지 않는다.
@@ -1200,15 +1223,16 @@ export const launchDotted = () => SITE.launchDate.replace(/-/g, '.');           
 
 ### 사전 신청 API
 
-신청은 `POST /api/waitlist` 하나이며, 휴대폰 번호 한 개와 동의 여부만 받는다. 이름과 이메일은 받지 않고, IP는 읽거나 저장하지 않는다.
+신청은 `POST /api/waitlist` 하나이며, 휴대폰 번호 한 개와 동의 여부만 받는다. 신청 취소도 같은 주소로 `action: 'withdraw'`와 번호만 받는다. 이름과 이메일은 받지 않고, IP는 읽거나 저장하지 않는다.
 
 ```ts
 // 요청 본문
 type WaitlistBody = {
   phone: string;     // '010-2345-6789'처럼 입력한 그대로
-  consent: true;     // 필수 동의 체크
+  consent: true;     // 필수 동의 체크. 신청 취소에는 보내지 않는다
   token: string;     // Turnstile 토큰
   hp?: string;       // 허니팟. 사람은 비워 둔다
+  action?: 'withdraw';   // 신청 취소. 이때는 consent를 보지 않는다
 };
 ```
 
@@ -1218,13 +1242,13 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { SITE } from '@/content/site';
 import { normalizePhone } from '@/lib/phone';
-import { TURNSTILE_ACTION } from '@/lib/turnstile';
+import { TURNSTILE_ACTION, TURNSTILE_WITHDRAW } from '@/lib/turnstile';
 
 // 응답 표와 동작은 PLAN '사전 신청 API'를 따른다. 번호와 요청 본문은 어디에도 남기지 않는다.
 // 로그에는 오류 코드와 HTTP 상태만 쓴다. Supabase의 error.details에는 행의 값이 들어갈 수 있다
 export const maxDuration = 15;   // 확인 6초와 저장 5초를 넘기면 끊는다. 기본 300초로 두면 폼이 그만큼 기다린다
 
-const CONSENT_VERSION = '2026-11-v1';   // 동의 문구나 처리방침이 바뀌면 올린다
+const CONSENT_VERSION = '2026-11-v4';   // 동의 문구나 처리방침이 바뀌면 올린다
 const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const VERIFY_TIMEOUT = 3000;
 const HOSTNAME = new URL(SITE.url).hostname;
@@ -1232,7 +1256,7 @@ const HOSTNAME = new URL(SITE.url).hostname;
 const fail = (status: number, code: string) => NextResponse.json({ ok: false, code }, { status });
 
 // ok: 사람. bad: 토큰이 틀렸다. down: Cloudflare 장애나 키 설정 문제라 방문자 잘못이 아니다
-async function humanCheck(token: string): Promise<'ok' | 'bad' | 'down'> {
+async function humanCheck(token: string, action: string): Promise<'ok' | 'bad' | 'down'> {
   if (!token || token.length > 2048) return 'bad';
   const body = new URLSearchParams({
     secret: process.env.TURNSTILE_SECRET_KEY ?? '',
@@ -1245,7 +1269,7 @@ async function humanCheck(token: string): Promise<'ok' | 'bad' | 'down'> {
       const result = (await res.json()) as { success?: boolean; hostname?: string; action?: string; 'error-codes'?: string[] };
       if (result.success === true) {
         if (process.env.NEXT_PUBLIC_SITE_ENV !== 'production') return 'ok';   // 시험 키의 hostname과 action은 다른 값이다
-        if (result.hostname === HOSTNAME && result.action === TURNSTILE_ACTION) return 'ok';
+        if (result.hostname === HOSTNAME && result.action === action) return 'ok';
         console.error('waitlist: turnstile mismatch');   // www로 열렸거나 키 쌍이 어긋났다. 방문자는 다시 눌러도 통과하지 못한다
         return 'bad';
       }
@@ -1265,6 +1289,33 @@ async function humanCheck(token: string): Promise<'ok' | 'bad' | 'down'> {
   return 'down';
 }
 
+const client = (url: string, key: string) => createClient(url, key, {
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  db: { timeout: 5000 },
+});
+
+// 신청 취소(같은 폼). 번호가 있든 없든 같은 답을 준다. 등록 여부를 드러내지 않는다.
+// 번호는 rpc 본문으로만 보낸다. Data API에 번호로 거르면 주소에 번호가 남아 게이트웨이 로그에 쌓인다
+async function withdraw(body: Record<string, unknown>, url: string, key: string) {
+  if (body.hp) return NextResponse.json({ ok: true });
+  const phone = typeof body.phone === 'string' ? normalizePhone(body.phone) : null;
+  if (!phone) return fail(400, 'phone');
+
+  const human = await humanCheck(typeof body.token === 'string' ? body.token : '', TURNSTILE_WITHDRAW);
+  if (human === 'down') return fail(503, 'server');
+  if (human === 'bad') return fail(400, 'challenge');
+
+  try {
+    // 지운 행이 있으면 함수가 날짜별 건수만 번호 없이 기록한다(파기 기록)
+    const { error, status } = await client(url, key).rpc('waitlist_withdraw', { p_phone: phone });
+    if (!error) return NextResponse.json({ ok: true });
+    console.error('waitlist: withdraw', error.code, status);
+  } catch {
+    console.error('waitlist: withdraw unavailable');
+  }
+  return fail(500, 'server');
+}
+
 export async function POST(req: Request) {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY;
@@ -1272,20 +1323,18 @@ export async function POST(req: Request) {
 
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== 'object' || Array.isArray(body)) return fail(400, 'invalid');
+  if (body.action === 'withdraw') return withdraw(body, url, key);   // 동의 검사보다 앞에서 나눈다. 취소에는 동의가 필요 없다
   if (body.hp) return NextResponse.json({ ok: true });       // 봇: 저장하지 않고 성공처럼 답한다
   if (body.consent !== true) return fail(400, 'consent');
   const phone = typeof body.phone === 'string' ? normalizePhone(body.phone) : null;
   if (!phone) return fail(400, 'phone');
 
-  const human = await humanCheck(typeof body.token === 'string' ? body.token : '');
+  const human = await humanCheck(typeof body.token === 'string' ? body.token : '', TURNSTILE_ACTION);
   if (human === 'down') return fail(503, 'server');
   if (human === 'bad') return fail(400, 'challenge');
 
   try {
-    const db = createClient(url, key, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-      db: { timeout: 5000 },
-    });
+    const db = client(url, key);
     // 이미 있는 번호는 첫 동의를 그대로 두고 조용히 넘어간다. insert로 23505를 받으면 번호가 Postgres 로그에 남는다
     const { error, status } = await db.from('waitlist').upsert(
       { phone, consent_at: new Date().toISOString(), consent_version: CONSENT_VERSION },
@@ -1341,6 +1390,33 @@ alter table public.waitlist enable row level security;   -- 정책을 만들지 
 revoke all on table public.waitlist from anon, authenticated, service_role;
 grant insert on table public.waitlist to service_role;
 grant select (phone) on table public.waitlist to service_role;   -- ON CONFLICT (phone)에 필요하다
+
+-- 신청 취소(같은 폼). 서버가 비밀 키로 rpc를 부른다. 번호는 요청 본문으로만 받아 주소와 게이트웨이 로그에 남지 않는다
+create table public.waitlist_purge_log (
+  day date primary key,                    -- 한국 시간 날짜
+  n integer not null                       -- 그날 신청 취소로 지운 건수. 번호는 남기지 않는다(파기 기록)
+);
+alter table public.waitlist_purge_log enable row level security;
+revoke all on table public.waitlist_purge_log from anon, authenticated, service_role;
+grant select (day, n), insert, update (n) on table public.waitlist_purge_log to service_role;
+grant delete on table public.waitlist to service_role;   -- 함수가 부른 쪽(service_role) 권한으로 지운다
+
+create function public.waitlist_withdraw(p_phone text) returns void
+language plpgsql security invoker set search_path = '' as $$
+declare
+  gone integer;
+begin
+  delete from public.waitlist where phone = p_phone;
+  get diagnostics gone = row_count;
+  if gone > 0 then
+    insert into public.waitlist_purge_log as l (day, n)
+    values ((now() at time zone 'Asia/Seoul')::date, gone)
+    on conflict (day) do update set n = l.n + excluded.n;
+  end if;
+end;
+$$;
+revoke execute on function public.waitlist_withdraw(text) from public, anon, authenticated;   -- 새 함수는 PUBLIC이 실행할 수 있다
+grant execute on function public.waitlist_withdraw(text) to service_role;
 ```
 
 응답은 아래 표를 따른다. 이미 있는 번호와 허니팟은 일부러 정상 신청과 같은 응답을 준다.
@@ -1350,6 +1426,7 @@ grant select (phone) on table public.waitlist to service_role;   -- ON CONFLICT 
 | 정상 신청 | 200 | `{ ok: true }` | 신청이 완료됐어요. 오픈하는 날 문자로 알려 드릴게요. |
 | 이미 신청한 번호 | 200 | `{ ok: true }` | 정상 신청과 같다. 번호가 등록돼 있는지 드러내지 않는다 |
 | 허니팟이 차 있음 | 200 | `{ ok: true }` | 정상 신청과 같다. 저장하지 않는다 |
+| 신청 취소(`action: 'withdraw'`) | 200 | `{ ok: true }` | 번호가 있든 없든 '신청 취소를 처리했어요. 이 번호로 한 신청이 있었다면 목록에서 지웠어요.' 번호 형식 오류, 봇 확인 실패, 서버 오류는 신청과 같다 |
 | 번호 형식 오류 | 400 | `code: 'phone'` | 휴대폰 번호를 다시 확인해 주세요. |
 | 동의하지 않음 | 400 | `code: 'consent'` | 개인정보 수집·이용에 동의해 주세요. |
 | 봇 확인 실패 | 400 | `code: 'challenge'` | 확인에 실패했어요. 다시 시도해 주세요. |
@@ -1366,10 +1443,10 @@ grant select (phone) on table public.waitlist to service_role;   -- ON CONFLICT 
 - 스크립트(`api.js?render=explicit&onload=…`)는 폼에 처음 입력할 때 한 번만 불러오고, 제출 때 아직 없으면 그때 불러온다. 주입한 스크립트는 `async`가 되어 `turnstile.ready()`를 쓸 수 없다. 복사하거나 프록시하지 않는다.
 - 서버는 번호와 동의를 먼저 확인하고 토큰을 검증한다. 잘못된 입력에 토큰을 쓰지 않기 위해서다. 그 전에 DB를 건드리지 않으므로 Cloudflare 튜토리얼의 순서와 달라도 안전하다.
 - 번호와 요청 본문은 로그에 남기지 않는다. 오류는 코드와 HTTP 상태만 남긴다. Supabase의 `error.details`에는 행의 값이 들어갈 수 있다. 게이트웨이 오류에는 `code`가 없어, 잘못된 키나 멈춘 프로젝트, 시간 초과(상태 0)는 상태로 가른다. Turnstile은 Cloudflare의 고정 오류 코드와 hostname·action 불일치를 남긴다. `insert`로 23505를 받으면 `Key (phone)=(…)`가 Postgres 로그에 남아 EU로 가므로 `upsert`로 넘긴다. 다시 신청해도 첫 동의 시각과 버전이 그대로다. 이 방식은 `service_role`에 `phone` 읽기 권한이 있어야 해서, 비밀 키가 새면 번호를 읽을 수 있다.
-- 이 표의 쓰기는 Data API로, 내려받기와 삭제는 SQL 편집기로 한다. Data API에 번호로 거르면 주소에 번호가 남아 게이트웨이 로그에 쌓인다. SQL 편집기는 입력을 자동 저장하므로 번호를 통째로 적지 않고, 뒤 네 자리로 찾아 `id`로 지운다.
-- 문자는 이 저장소에서 보내지 않는다. 오픈 당일 번호를 내려받아 문자 대행사로 보내고 `notified_at`을 채운다. CTA는 0시에 바뀌지만 문자는 08~21시에 도달하게 보낸다. 광고로 처리하면 문자 형식은 '사전 신청의 개인정보' 표를 따른다. 대행사는 전송자격인증 업체여야 하고, 연락처(`contact`)가 비어 있으면 문자도 보낼 수 없다.
-- 보유 기간 제안은 발송 후 30일이다. 그 뒤 `delete from public.waitlist where notified_at < now() - interval '30 days';`를 실행한다 \[확인 필요\]. `notified_at`이 빈 행(발송 실패, 늦은 신청)은 이 문장으로 지워지지 않으므로 마지막 파기 때 함께 지운다. 프로젝트를 지워도 데이터는 30일 안에 삭제되므로 곧바로 사라지지는 않는다.
-- 동의 철회나 삭제 요청은 개인정보보호책임자 연락처로 받고, 해당 번호를 바로 지운다.
+- 이 표의 쓰기와 신청 취소의 삭제는 Data API(`upsert`와 `rpc('waitlist_withdraw')`, 번호는 본문으로만)로 하고, 내려받기와 그 밖의 삭제는 SQL 편집기로 한다. Data API에 번호로 거르면 주소에 번호가 남아 게이트웨이 로그에 쌓인다. SQL 편집기는 입력을 자동 저장하므로 번호를 통째로 적지 않고, 뒤 네 자리로 찾아 `id`로 지운다.
+- 문자는 이 저장소에서 보내지 않는다. 오픈 당일 번호를 내려받아 문자 대행사로 보내고 `notified_at`을 채운다. CTA는 0시에 바뀌지만 문자는 08~21시에 도달하게 보낸다. 광고로 처리하면 문자 형식은 '사전 신청의 개인정보' 표를 따른다. 대행사는 전송자격인증 업체여야 하고.
+- 보유 기간은 안내 문자를 보낸 뒤 5일 안, 늦어도 2027년 6월 30일까지다. 발송과 실패 재발송을 마친 뒤 보낸 날부터 5일 안에 `delete from public.waitlist;`로 행 전체를 지운다. `notified_at`이 빈 행(발송 실패, 늦은 신청)도 함께 지워진다. 오픈이 늦어지면 2027년 6월 30일까지 같은 문장을 실행한다. 지운 날짜, 건수, 방법, 확인자를 파기 기록에 남긴다. 문자를 보내려고 내려받은 파일은 문자 업체에 넘긴 날 지우고, 업체에 올린 발송 목록도 같은 5일 안에 지우게 한다. 업체가 법령에 따라 보관하는 발송 기록(수신 번호, 발송 일시)은 처리방침의 업체 항목에 그 근거와 기간을 적는다. 프로젝트를 지워도 데이터는 30일 안에 삭제되므로 곧바로 사라지지는 않는다.
+- 동의 철회나 삭제 요청은 신청 폼 아래 '신청 취소하기'와 개인정보보호책임자 연락처로 받는다. 취소 폼으로 온 요청은 받은 때 신청 목록에서 지우고, 메일과 전화로 온 요청은 지체 없이 지운다. 지운 행은 백업 보관 기간이 끝날 때까지 백업에 남는다(사실표 7-3, 검토서 P4). 취소 폼은 `{ action: 'withdraw', phone, token, hp }`를 같은 주소로 보내고, 서버는 동의 검사보다 앞에서 나눈다. 허니팟, 번호 형식, Turnstile(action `withdraw`)을 신청과 같은 순서로 확인한 뒤 `rpc('waitlist_withdraw', { p_phone })`를 부른다. 번호는 요청 본문으로만 가서 주소와 게이트웨이 로그에 남지 않는다. 번호가 있든 없든 `{ ok: true }`로 답한다. 운영에서는 action이 맞아야 해서, 신청 토큰으로 취소하거나 취소 토큰으로 신청할 수 없다. 함수는 지운 행이 있으면 한국 시간 날짜별 건수만 `waitlist_purge_log`에 더한다(파기 기록, 번호 없음).
 
 ### 분석 이벤트
 
@@ -1377,17 +1454,24 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 
 | 이벤트 | 보내는 때 | 매개변수 |
 | --- | --- | --- |
-| `cta_click` | 헤더·히어로·마지막 섹션·신청 창의 버튼을 누를 때 | `location`: header, hero, final, dialog. `mode`: waitlist, live |
+| `cta_click` | 헤더·히어로의 CTA, 마지막 섹션·신청 창의 신청 버튼과 스토어 링크를 누를 때 | `location`: header, hero, final, dialog. `mode`: waitlist, live |
 | `sound_toggle` | 사운드 버디를 누를 때 | `state`: on, off |
 | `video_play` | 영상이 처음 재생될 때(페이지당 한 번) | `media_id`: hero, zone1 \~ zone4 |
-| `video_progress` | 재생이 25·50·75·100%를 지날 때 | `media_id`, `percent` |
+| `video_milestone` | 재생이 3초와 25·50·75·100%를 지날 때(영상마다 한 번씩). 반복 재생은 끝에서 처음으로 돌아가는 순간이 100%다 | `media_id`, `mark`: 3s, 25%, 50%, 75%, 100% |
 | `video_fallback` | 자동 재생 대신 포스터와 재생 버튼을 보일 때 | `reason`: reduced\_motion, save\_data, low\_power, rejected |
-| `zone_view` | 존이 화면의 50% 이상 보일 때(존당 한 번) | `zone_id`: zone-1 \~ zone-4 |
+| `zone_view` | 존의 50% 이상이 보이거나 존이 화면 높이의 50% 이상을 차지할 때(존당 한 번) | `zone_id`: zone-1 \~ zone-4 |
 | `faq_open` | FAQ 항목을 열 때 | `faq_id`: what, price-rule, planner, dress, hall, when, where, fee, phone |
-| `form_submit` | 신청 요청의 결과가 나올 때. 요청 전에 Turnstile이 실패하면 `challenge`다 | `result`: success, phone, consent, challenge, invalid, server |
+| `waitlist_submit` | 신청 결과가 나올 때. 요청 전에 막힌 잘못된 번호와 빠진 동의는 `phone`, `consent`, Turnstile 실패는 `challenge`다. 확인 중에 창을 닫으면 보내지 않는다 | `result`: success, phone, consent, challenge, invalid, server |
 
 - 번호와 입력값은 어떤 매개변수에도 넣지 않는다.
 - 이벤트 이름은 영문 소문자와 밑줄만 쓴다.
+- 코드는 `src/lib/analytics.ts`에 있고, 여러 컴포넌트에 걸친 CTA, FAQ, 존 이벤트는 `AnalyticsEvents`가 문서에서 듣는다. GA ID가 없으면 스크립트와 이 컴포넌트를 그리지 않고 아무것도 보내지 않는다. 코드는 번들에 남는다.
+- '한 번'은 페이지를 다시 불러올 때까지다. 다른 페이지에 갔다가 홈으로 돌아와도 같은 영상과 존의 이벤트를 다시 보내지 않는다.
+- `gtag` 초기화는 `<head>`의 인라인 스크립트가 맡고, `gtag.js`는 `next/script`의 `lazyOnload`로 로드가 끝난 뒤에 받는다. 그 사이의 이벤트는 `dataLayer`에 쌓였다가 함께 나간다. 스크립트를 받기 전에 페이지를 떠나면 쌓인 이벤트는 사라진다.
+- `allow_google_signals`와 `allow_ad_personalization_signals`는 코드에서 `false`로 둔다. `allow_google_signals`는 관리 화면보다 우선하지만 광고 개인화는 관리 화면의 설정도 끈다. `cookie_domain`을 `'none'`으로 두어 `_ga` 쿠키가 미디어 서브도메인으로 가지 않게 한다.
+- `form_submit`, `form_start`, `video_progress`, `click`, `scroll`, `page_view`는 GA의 웹 예약 이름이라 쓰지 않는다.
+- 이벤트 매개변수는 맞춤 측정기준으로 등록해야 보고서에 나온다. 등록 전 데이터는 보고서에 나오지 않으므로 GA를 켜기 48시간 전까지 등록한다. 첫 공개에는 GA를 켜지 않는다.
+- 자동 `page_view`는 주소가 바뀔 때마다 생기므로 앵커 이동도 잡힐 수 있다. 실제 데이터를 보고 관리 화면의 설정을 정한다.
 - 처리방침의 자동 수집 장치(쿠키) 항목에 GA4를, 위탁·국외 이전 항목에 Google, Cloudflare, Supabase, 호스팅 업체를 올린다 \[확인 필요\].
 
 ### 성능과 접근성 기준
@@ -1399,7 +1483,7 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 | LCP | 2.5초 이하 | 포스터 이미지가 오기 전에는 첫 화면에서 가장 큰 글자인 후킹('Coming Soon')이 LCP 후보이고, 낮은 화면에서는 히어로 H1도 후보가 된다. 둘 다 등장은 투명도 0에서 시작하지 않고(이동만), 웹폰트 대기는 HTML 안의 스크립트가 최대 700ms로 맡는다. 후킹 글자가 든 글꼴 묶음(91번, 'Coming Soon'일 때 74번)은 preload한다. 포스터가 오면 첫 화면에 보이는 윗부분도 LCP 후보가 되므로 `preload`와 `fetchpriority='high'`를 걸고, 영상 파일은 포스터가 그려진 뒤에 붙인다 |
 | INP | 200ms 이하 | 공개 후 PageSpeed Insights의 실사용 데이터 |
 | CLS | 0.1 이하 | 모든 영상·이미지에 `aspect-ratio`를 지정한다 |
-| Lighthouse 모바일 | 성능 90 이상, 접근성 95 이상, SEO 100 | 성능과 접근성은 배포 미리보기마다 실행한다. SEO는 첫 공개 당일 `sding.kr`에서 잰다. 미리보기는 `noindex`이고 canonical이 다른 도메인이라 `is-crawlable`과 `canonical`이 실패하므로, 미리보기에서는 이 두 항목을 빼고 본다 |
+| Lighthouse 모바일 | 성능 90 이상, 접근성 95 이상, SEO 100 | 성능과 접근성은 배포 미리보기마다 실행한다. SEO는 첫 공개 당일 `sding.kr`에서 잰다. 미리보기는 `noindex`라 `is-crawlable`이 실패하므로, 미리보기에서는 이 항목을 빼고 본다 |
 | 자체 JS | 170KB 이하(gzip) | Next 16의 `next build`는 크기를 출력하지 않는다. 빌드 뒤 `.next/diagnostics/route-bundle-stats.json`에서 `/`의 `firstLoadChunkPaths` 파일을 gzip으로 합산하거나, Lighthouse·DevTools의 스크립트 전송 크기로 확인한다. GA4와 Turnstile은 늦게 불러오므로 제외한다 |
 | JS 없이 보기 | 모든 문구가 HTML에 있다 | 등장 효과의 숨김 상태는 JS가 켜진 뒤에만 건다 |
 
@@ -1412,7 +1496,7 @@ GA4 이벤트는 8개이며, 모두 `track(name, params)` 하나로 보낸다. G
 | 터치 영역 | 모든 버튼, 링크, 체크박스 줄이 44×44px 이상 |
 | 영상 | 일시정지 버튼 상시 노출, 자막, 대본 |
 | 모션 | `prefers-reduced-motion`을 따른다 |
-| 확대 | `maximum-scale`을 두지 않고, 200% 확대에서도 가로 스크롤이 없다. 신청 창은 높이를 고정하지 않고 카드 안에서 세로로 스크롤한다 |
+| 확대 | `maximum-scale`을 두지 않고, 200% 확대에서도 가로 스크롤이 없다. 360px 화면의 200%에 해당하는 180px 폭의 히어로는 예외로 두었다(`docs/OPEN_ITEMS.md`). WCAG 재배치 기준인 320px에서는 없다. 신청 창은 높이를 고정하지 않고 카드 안에서 세로로 스크롤한다 |
 | 폼 | 보이는 라벨, 오류 문구와 전송 중 상태는 처음부터 있는 `aria-live='polite'` 영역에 넣고, 칸에 `aria-invalid`와 `aria-describedby`를 달고 포커스를 옮긴다. 색만으로 오류를 알리지 않는다 |
 | 구조 | `lang='ko'`, `h1` 하나, 제목 순서 유지, `header`·`main`·`footer`, 본문 바로가기 링크 |
 
@@ -1507,8 +1591,8 @@ const nextConfig: NextConfig = {
 | iOS 16.x(지원 하한) | 신청 창의 포커스 시작과 복귀, 배경 어둡게, 키보드 |
 | Android Chrome(데이터 절약 켬·끔) | 자동 재생과 대체 화면, 소리 켜기, 신청 창, 자동 완성으로 넣은 번호 |
 | 삼성 인터넷 | 자동 재생, 소리, 신청 창 |
-| 카카오톡 인앱 브라우저 | 링크 공유 미리보기(OG), 자동 재생, 신청 창, 실제 키로 신청 한 번(Turnstile), 새 탭으로 여는 자세히 보기 |
-| 네이버 앱 인앱 브라우저 | 자동 재생, 신청 창, 실제 키로 신청 한 번(Turnstile), 새 탭으로 여는 자세히 보기 |
+| 카카오톡 인앱 브라우저 | 링크 공유 미리보기(OG), 자동 재생, 신청 창, 실제 키로 신청과 신청 취소 한 번씩(Turnstile), 새 탭으로 여는 처리방침·이용약관 링크 |
+| 네이버 앱 인앱 브라우저 | 자동 재생, 신청 창, 실제 키로 신청과 신청 취소 한 번씩(Turnstile), 새 탭으로 여는 처리방침·이용약관 링크 |
 | 모든 모바일 환경 | 키보드가 올라와도 입력칸과 제출 버튼에 닿을 수 있고, 뒤 페이지가 움직이지 않고(iOS는 주소창이 접힌 때와 키보드가 뜬 때 둘 다, 최신 버전과 iOS 18에서), 닫으면 포커스가 돌아오는지 |
 | 데스크톱 Chrome·Safari·Whale·Edge | 1440·1920px 레이아웃, 키보드만으로 전체 조작, 소리 켜기 |
 | 화면 폭 | 360, 390, 430, 768, 1024, 1440, 1920px에서 깨짐과 가로 스크롤이 없는지 |
@@ -1557,7 +1641,7 @@ const nextConfig: NextConfig = {
 - 12월 4일, **영상 납품(D-21)**: 늦어도 이 날까지 영상을 받아 `public/media/`에 넣고 `media.ts`의 주소를 바꾼다. 영상이 있어야 사전 신청 홍보에 쓸 수 있다.
 - 12월 11일, **사전 신청 홍보(D-14)**: 사전 신청 모집을 본격적으로 알린다. 채널은 아직 정해지지 않았다 \[확인 필요\].
 - 12월 18일, **최종 점검(D-7)**: 성능·접근성 기준 표와 테스트 매트릭스를 다시 통과시키고, 오픈 안내 문자의 문구와 발송 대행사(전송자격인증, 무료 수신 거부 제공)를 확인한다.
-- 12월 25일, **정식 오픈(D-0)**: CTA를 오픈 상태로 바꾸고 스토어 주소를 넣는다. JSON-LD에 앱 노드를 더하고, IndexNow로 홈 주소를 다시 알리고, 공유 이미지가 바뀐 것을 확인한 뒤 카카오 공유 캐시를 지우고, 오픈 안내 문자를 보내고(08~21시 도달), 보도자료를 낸다.
+- 12월 25일, **정식 오픈(D-0)**: CTA를 오픈 상태로 바꾸고 스토어 주소를 넣는다. 0시가 지난 뒤 한 번 다시 배포해 llms.txt를 바꾼다. JSON-LD에 앱 노드를 더하고, IndexNow로 홈 주소를 다시 알리고, 공유 이미지가 바뀐 것을 확인한 뒤 카카오 공유 캐시를 지우고, 오픈 안내 문자를 보내고(08~21시 도달), 보도자료를 낸다.
 
 ## Claude Code 핸드오프
 
@@ -1630,11 +1714,11 @@ docs/PLAN.md와 CLAUDE.md를 먼저 끝까지 읽어 줘.
 | --- | --- | --- |
 | 1. 골격 | `create-next-app`, `tokens.css`, Pretendard, `layout.tsx`, `Header`, `Footer`, 임시 `Logo`, `src/content/` 5개 파일, `launch.ts`(`faq.ts`가 쓴다) | `npm run build`가 통과하고, 크림 바탕의 헤더와 푸터가 모바일·데스크톱에서 보인다 |
 | 2. 히어로와 영상 시스템 | `Hero`(B안 후킹), `Film`(영상 섹션), `MediaSlot`, `VideoProvider`, `SoundBuddy` | `docs/design/hero-b.html`과 같은 첫 화면이 나오고 `docs/design/README.md`의 반영 목록을 지킨다. 파일이 없으면 포스터 카드가 보이고, 임시 mp4를 넣으면 자동 재생·일시정지·소리 켜기가 영상·미디어 시스템 절대로 동작한다 |
-| 3. 소개와 존 4개 | `Intro`, `Zone` 4개, `ProgressDots`, 앵커 | 앵커로 이동하고, 존이 보일 때만 영상이 재생되며, 합성·시뮬레이션 존에 `badge`와 `notice`가 있다 |
+| 3. 소개와 존 4개 | `Intro`, `Zone` 4개, `ProgressDots`, 앵커 | 앵커로 이동하고, 존이 보일 때만 영상이 재생되며, 합성·시뮬레이션 존에 `badge`와 `notice`가 있다. 파일이 오기 전에는 라벨 없이 `posterNotice`가 보인다 |
 | 4. FAQ와 검색 대응 | `Faq`, 메타 태그와 소유확인 메타, JSON-LD, `robots.ts`, `sitemap.ts`, `llms.txt`, `manifest.ts`, `opengraph-image.tsx`, IndexNow 키 파일, 임시 아이콘 | 페이지 소스에 `h1` 하나와 JSON-LD(Organization, WebSite, WebPage, FAQPage, DefinedTermSet, 영상이 오면 VideoObject)가 보이고, JSON으로 파싱된다 |
 | 5. 사전 신청 | `CtaButton`(`ctaMode()` 연결), `WaitlistDialog`, `WaitlistForm`, `CtaSection`, `/api/waitlist` | Supabase에 저장되고, 중복 번호도 같은 성공 화면이 뜨며, 잘못된 번호는 오류 문구가 뜬다. JS를 끄면 마지막 섹션으로 이동한다 |
 | 6. 법적 페이지 | `/privacy`, `/terms` 초안, `not-found.tsx` | 푸터에서 연결되고, 변호사 검토 전 초안이라는 점이 `docs/OPEN_ITEMS.md`에 적혀 있다. 없는 주소는 한국어 안내와 홈 링크를 보인다 |
-| 7. 분석과 점검 | `analytics.ts`의 이벤트 8개, Lighthouse, 접근성, 테스트 매트릭스 | 성능과 접근성 기준 표를 통과한다(SEO는 첫 공개 당일 `sding.kr`에서 잰다) |
+| 7. 분석과 점검 | `analytics.ts`의 이벤트 8개, Lighthouse, 접근성, 테스트 매트릭스 | 이벤트 8개가 나가고, 자동 접근성 검사가 기준을 넘는다. Lighthouse는 로컬에서 재서 `docs/OPEN_ITEMS.md`에 기록하고, 기준은 배포 미리보기에서 확인한다. INP, 실기기, 영상이 필요한 항목도 그 파일의 날짜에 확인한다(SEO는 첫 공개 당일 `sding.kr`에서 잰다) |
 | 8. 자료 반영 | 로고 SVG, 연락처, 영상, SNS 주소, 스토어 주소 | 운영 빌드에서 `assertCompany()`와 `assertLegal()`이 통과하고, `docs/OPEN_ITEMS.md`에는 의도한 항목만 남는다 |
 
 ### 완료 기준
@@ -1657,9 +1741,9 @@ docs/PLAN.md와 CLAUDE.md를 먼저 끝까지 읽어 줘.
 본문에서 인용한 자료다. 개발 사양의 제품 동작(Turnstile 토큰 수명, Vercel 설정, 브라우저 지원 버전)은 출처를 달지 않았으므로 구현 전에 각 공식 문서로 확인한다.
 
 - [위디(Wedi)](https://wedi.co.kr/): 레퍼런스 분석. 2026-10-28에 추출한 페이지 텍스트.
-- [신&김, 2026-02-26](https://www.shinkim.com/kor/media/newsletter/3142): AI 기본법 시행과 사업자 의무.
-- [kbmaeil, 2026-07-19](https://kbmaeil.com/article/20260719500014): AI 기본법 개정안 시행과 계도기간.
-- [imweb](https://imweb.me/blog?idx=486): 2026년 6월 1일 시행 추천·보증 심사지침과 가상 인물 표기.
+- [과기정통부 「인공지능 투명성 확보 가이드라인」(2026. 1.)](https://www.msit.go.kr/bbs/documentView.do?atchFileNo=52249&fileOrdr=1): AI 고지·표시 의무의 주체와 방법.
+- [인공지능기본법 지원데스크 사례집(2026. 3. 31. 게시)](https://www.sw.or.kr/common/board/Download.do?bcIdx=65415&cbIdx=390&streFileNm=7516b720-1c92-4fad-ade3-695d4136e77f.pdf): 이용자 판단 사례와 유예 기간 중의 의무. 스스로 유권해석이 아니라고 밝힌다.
+- [추천·보증 등에 관한 표시·광고 심사지침](https://www.law.go.kr/LSW/admRulInfoR.do?admRulSeq=2100000280130&chrClsCd=010201): 가상인물 표시(2026년 6월 1일 시행).
 - [Anagram, 2026-06-05](https://www.anagram.ai/blog/ai-crawlers-explained-gptbot-claudebot-perplexitybot-and-how-to-let-them-in-2026): AI 크롤러별 허용 방식.
 - [Crocoblock, 2026-10-09 갱신](https://crocoblock.com/blog/llms-txt-for-wordpress-full-guide/): llms.txt의 채택률과 효과.
 - [네이버 보도자료](https://navercorp.com/media/pressReleasesDetail?seq=32374): AI 브리핑 시작(2025년 3월 27일).

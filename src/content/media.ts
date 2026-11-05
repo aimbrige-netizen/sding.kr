@@ -26,5 +26,9 @@ export const MEDIA = {
   zone4: { kind: 'video', src: '', srcMobile: '', poster: '', alt: '웨딩홀 입구에서 버진로드까지 1인칭으로 걸어가는 AI 시뮬레이션 영상', aspect: '16/9' },
 } satisfies Record<string, MediaSpec>;
 
+// 파일이 들어왔는지. MediaSlot이 파일을 그리는 조건과 같다. 포스터 이미지가 없는 영상은 재생 전까지 포스터 카드를 덮개로 쓰므로 Zone이 빌드를 멈춘다
+export const hasFile = (spec: MediaSpec) =>
+  spec.kind === 'compare' ? Boolean(spec.before && spec.after) : spec.kind === 'phone' ? Boolean(spec.screen.src) : Boolean(spec.src);
+
 // 켤 소리가 있는지. 소리는 소개 영상에만 넣으므로(PLAN '소리와 사운드 버디') 그 파일이 올 때까지 사운드 버디를 그리지 않는다
 export const HAS_SOUND = Boolean(MEDIA.hero.src && MEDIA.hero.hasAudio);

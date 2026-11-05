@@ -13,6 +13,7 @@ export function Header() {
       <div className="mx-auto flex h-full max-w-site items-center justify-between">
         <Logo href="/#top" label={COPY.homeLabel} />
         <CtaButton
+          location="header"
           className="inline-flex min-h-(--tap) items-center rounded-pill bg-brand-deep px-5 text-cap font-bold tracking-normal text-white transition-[scale,box-shadow] duration-200 ease-brand hover:scale-103 hover:shadow-(--shadow-lift) active:scale-98 active:duration-100 motion-reduce:hover:scale-100 motion-reduce:active:scale-100 forced-colors:border"
         >
           {COPY.cta[mode]}

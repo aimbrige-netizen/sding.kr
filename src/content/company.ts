@@ -6,13 +6,14 @@ export const COMPANY = {
   region: '서울특별시', locality: '강남구', street: '압구정로46길 5-10, 3층 302호 (신사동, 압구정로데오스타)',
   mailOrderNo: '',                          // 통신판매업 신고번호. 신고 완료 전까지 반드시 빈 값
   showMailOrderLabel: true,                 // 번호가 비어 있어도 라벨은 보인다. 숨기려면 false
-  phone: '', email: '', privacyOfficer: '',   // TODO(contact): 전화번호, 대표 이메일, 개인정보보호책임자를 전달받아 채운다
+  phone: '010-9897-7678', email: 'namu@sding.kr',   // 2026-11-05 전달받은 대표 연락처
+  privacyOfficer: '정원창', privacyOfficerTitle: '대표',   // 개인정보 보호책임자. 대표자를 지정했다(법 제31조, 시행령 제32조제2항)
 };
 export const ADDRESS = `${COMPANY.region} ${COMPANY.locality} ${COMPANY.street}`;
 
 // 운영 빌드에서만 호출한다. mailOrderNo는 검사하지 않는다.
 export function assertCompany() {
-  for (const k of ['phone', 'email', 'privacyOfficer'] as const) {
+  for (const k of ['phone', 'email', 'privacyOfficer', 'privacyOfficerTitle'] as const) {
     if (!COMPANY[k]) throw new Error('COMPANY.' + k + ' is empty');
   }
 }

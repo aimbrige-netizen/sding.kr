@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type ChangeEvent, type FormEvent } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type ChangeEvent, type FormEvent } from 'react';
 import { flushSync } from 'react-dom';
 import { Sparkle } from './Icons';
 import { Spans } from './Spans';
+import { WithdrawForm } from './WithdrawForm';
 import { COPY } from '@/content/site';
+import { track, type FormResult } from '@/lib/analytics';
 import { formatPhone, normalizePhone } from '@/lib/phone';
 import { getToken, hasTurnstileKey, loadTurnstile } from '@/lib/turnstile';
 
@@ -13,6 +15,7 @@ const noop = () => () => {};
 const SEND_WAIT = 20_000;   // 서버 한도 15초보다 길다. 연결이 끊겨도 '보내는 중'에 갇히지 않게 한다. 다시 눌러도 번호는 한 번만 저장된다
 
 type Failure = keyof typeof copy.errors;
+const report = (result: FormResult) => track('waitlist_submit', { result });
 
 // 응답 표(PLAN '사전 신청 API')를 화면 상태로 옮긴다. 413, 504처럼 JSON이 아닌 응답과 망 오류, 시간 초과는 server다
 async function send(phone: string, token: string, hp: string): Promise<Failure | null> {
@@ -24,10 +27,16 @@ async function send(phone: string, token: string, hp: string): Promise<Failure |
       signal: AbortSignal.timeout(SEND_WAIT),
     });
     const { ok, code } = (await res.json()) as { ok?: boolean; code?: string };
-    if (ok) return null;
-    if (code === 'phone' || code === 'invalid') return 'phone';
-    if (code === 'consent' || code === 'challenge') return code;
+    if (ok) {
+      report('success');
+      return null;
+    }
+    if (code === 'phone' || code === 'invalid' || code === 'consent' || code === 'challenge') {
+      report(code);
+      return code === 'invalid' ? 'phone' : code;
+    }
   } catch {}
+  report('server');
   return 'server';
 }
 
@@ -41,6 +50,7 @@ export function WaitlistForm() {
   const [pending, setPending] = useState(false);
   const [interact, setInteract] = useState(false);
   const [done, setDone] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
   const hydrated = useSyncExternalStore(noop, () => true, () => false);   // 하이드레이션 전과 JS 끔에는 제출 버튼을 끈다
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -50,6 +60,7 @@ export function WaitlistForm() {
   const statusRef = useRef<HTMLParagraphElement>(null);
   const slotRef = useRef<HTMLDivElement>(null);
   const doneRef = useRef<HTMLParagraphElement>(null);
+  const switchRef = useRef<HTMLButtonElement>(null);
   const attempt = useRef<AbortController | null>(null);   // 진행 중인 요청. disabled를 쓰지 않아 포커스가 버튼에 남으므로 이중 제출은 이것으로 막는다
 
   useEffect(() => {
@@ -81,6 +92,24 @@ export function WaitlistForm() {
     (field === 'phone' ? phoneRef : consentRef).current?.focus();
   }
 
+  // 신청 취소는 신청한 자리에서 같은 방법으로 연다. 권리 행사가 신청보다 어렵지 않아야 한다(검토서 Q22, P4).
+  // 보내는 중에는 바꾸지 않는다. 돌아오면 누른 버튼으로 포커스를 돌린다. 입력칸으로 돌리면 터치 기기에서 키보드가 뜬다
+  function openWithdraw() {
+    if (!attempt.current) setWithdrawing(true);
+  }
+  const closeWithdraw = useCallback(() => {
+    flushSync(() => setWithdrawing(false));
+    switchRef.current?.focus();
+  }, []);
+  // 취소가 끝나면 신청 쪽의 완료 문구와 입력을 거둔다. 돌아왔을 때 지운 신청이 끝난 것처럼 보이지 않게 한다
+  const resetSignup = useCallback(() => {
+    setDone(false);
+    setPhone('');
+    setAgreed(false);
+    setError(null);
+    rootRef.current?.style.removeProperty('min-height');
+  }, []);
+
   // 스크립트는 입력을 시작한 사람만 미리 받는다. 지나가는 방문자의 IP가 Cloudflare로 가지 않게 한다. 실패하면 제출할 때 다시 시도한다
   function preloadTurnstile() {
     if (hasTurnstileKey) loadTurnstile().catch(() => {});
@@ -89,8 +118,12 @@ export function WaitlistForm() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (attempt.current) return;
-    if (!normalizePhone(phone)) return showField('phone');
-    if (!agreed) return showField('consent');
+    // 잘못된 번호와 빠진 동의는 요청 전에 막힌다. 여기서 보내지 않으면 이 두 결과는 집계되지 않는다
+    const invalid = !normalizePhone(phone) ? 'phone' : !agreed ? 'consent' : null;
+    if (invalid) {
+      report(invalid);
+      return showField(invalid);
+    }
 
     const abort = new AbortController();
     attempt.current = abort;
@@ -99,8 +132,10 @@ export function WaitlistForm() {
 
     let failure: Failure | null = null;
     let closed = false;
-    if (!hasTurnstileKey) failure = 'server';
-    else {
+    if (!hasTurnstileKey) {
+      failure = 'server';
+      report('server');
+    } else {
       try {
         const slot = slotRef.current!;
         const token = await getToken(slot, abort.signal, () => {
@@ -112,6 +147,7 @@ export function WaitlistForm() {
       } catch {
         closed = abort.signal.aborted;   // send()는 던지지 않으므로 여기는 getToken뿐이다
         failure = 'challenge';
+        if (!closed) report('challenge');
       }
     }
 
@@ -138,6 +174,7 @@ export function WaitlistForm() {
 
   return (
     <div ref={rootRef} className="wl">
+      {withdrawing ? <WithdrawForm onBack={closeWithdraw} onWithdrawn={resetSignup} /> : (<>
       {done ? (
         <p ref={doneRef} tabIndex={-1} className="wl-done">
           <span className="btn-orb" aria-hidden="true">
@@ -201,13 +238,20 @@ export function WaitlistForm() {
               />
               <span><Spans parts={copy.consent} className="nb" /></span>
             </label>
-            {/* 입력한 번호를 지키려고 새 탭으로 연다. 라벨 안에 링크를 두면 누를 때 체크가 바뀐다 */}
-            <a href="/privacy" target="_blank" rel="noopener" className="wl-more">
-              {copy.more}<span className="sr-only">{copy.moreSr}</span>
-            </a>
           </div>
           <p id={`${id}-consent-error`} aria-live="polite" aria-atomic="true" className="wl-error">
             {error === 'consent' ? copy.errors.consent : ''}
+          </p>
+          {/* 입력한 번호를 지키려고 새 탭으로 연다. 라벨 안에 두면 누를 때 체크가 바뀌고,
+              체크박스 설명(aria-describedby)에 넣으면 낭독기가 동의 설명과 함께 읽으므로 동의 줄 아래 따로 둔다 */}
+          <p className="wl-docs">
+            <a href="/privacy" target="_blank" rel="noopener" className="wl-more">
+              {copy.more}<span className="sr-only">{copy.moreSr}</span>
+            </a>
+            {' '}<span aria-hidden="true">·</span>{' '}
+            <a href="/terms" target="_blank" rel="noopener" className="wl-more">
+              {copy.termsLink}<span className="sr-only">{copy.moreSr}</span>
+            </a>
           </p>
 
           {/* 사람은 비워 둔다. 숨겨 자동 완성이 채우지 못하게 하고, 이름은 휴대폰으로 읽히지 않게 정했다 */}
@@ -240,6 +284,14 @@ export function WaitlistForm() {
       <p ref={statusRef} role="status" aria-live="polite" aria-atomic="true" data-error={failed ? '' : undefined} className="wl-status">{status}</p>
       <p role="status" className="sr-only">{pending && !interact ? copy.sending : ''}</p>
       <div ref={slotRef} data-open={interact ? '' : undefined} className="wl-slot" />
+      {/* JS가 있어야 열 수 있어 JS 끔에는 CSS가 숨긴다. 그때는 처리방침의 메일과 전화로 받는다 */}
+      <p className="wl-switch">
+        {copy.withdraw.ask}{' '}
+        <button ref={switchRef} type="button" aria-disabled={pending ? true : undefined} className="wl-more" onClick={openWithdraw}>
+          {copy.withdraw.open}
+        </button>
+      </p>
+      </>)}
     </div>
   );
 }

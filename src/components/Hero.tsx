@@ -94,7 +94,7 @@ export function Hero() {
         <p className="kicker rise" style={order(0)}>
           <Sparkle className="kicker-icon" />
           <span>
-            {launchDotted()} {COPY.hero.kicker}
+            {launchDotted()} {mode === 'live' ? COPY.hero.kicker : COPY.hero.kickerSoon}
           </span>
         </p>
 
@@ -140,7 +140,7 @@ export function Hero() {
           ))}
         </p>
         <div className="hero-cta rise" style={order(6)}>
-          <CtaButton className="btn-primary">
+          <CtaButton location="hero" className="btn-primary">
             <span>{COPY.cta[mode]}</span>
             <span className="btn-orb" aria-hidden="true">
               <Sparkle />
