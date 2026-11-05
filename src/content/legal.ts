@@ -27,7 +27,7 @@ const TRANSFER_TYPE = { vercel: '처리위탁, 보관', supabase: '처리위탁,
 // 문의 메일과 전화로 받은 정보를 얼마나 갖고 있을지. 회사가 정한다(제안: 답한 날부터 1년). 비어 있으면 운영 빌드가 멈춘다
 const INQUIRY_RETENTION = '';   // TODO(inquiry-data)
 // 문의 메일을 받는 서비스. 업체 묶음(VENDORS)에 이전 사항 다섯 가지를 다 적은 뒤 그 이름을 넣는다. 비어 있으면 운영 빌드가 멈춘다
-const MAIL_VENDOR = '';   // TODO(inquiry-data): 지금 namu@sding.kr은 Google Workspace로 받는다. 국내 메일로 옮기면 국내 위탁 묶음으로 적는다
+const MAIL_VENDOR = '';   // TODO(inquiry-data): 2026-11-05에 대한민국에서 저장·처리하는 메일 서비스로 옮기기로 했다. 계약 상대의 법인명을 넣고 국내 위탁 묶음을 더한다
 
 const GA_ON = Boolean(GA_ID);
 // 사이트와 같은 도메인의 미디어는 Vercel이 전송한다. R2의 다른 도메인으로 옮겨야 Cloudflare 항목이 나온다
