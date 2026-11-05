@@ -7,7 +7,7 @@ export const COMPANY = {
   mailOrderNo: '',                          // 통신판매업 신고번호. 신고 완료 전까지 반드시 빈 값
   showMailOrderLabel: true,                 // 번호가 비어 있어도 라벨은 보인다. 숨기려면 false
   phone: '010-9897-7678', email: 'namu@sding.kr',   // 2026-11-05 전달받은 대표 연락처
-  privacyOfficer: '정원창', privacyOfficerTitle: '대표',   // 개인정보 보호책임자. 대표이사를 지정했다(법 제31조, 시행령 제32조제2항)
+  privacyOfficer: '정원창', privacyOfficerTitle: '대표',   // 개인정보 보호책임자. 대표자를 지정했다(법 제31조, 시행령 제32조제2항)
 };
 export const ADDRESS = `${COMPANY.region} ${COMPANY.locality} ${COMPANY.street}`;
 
