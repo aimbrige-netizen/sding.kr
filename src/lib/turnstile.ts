@@ -9,6 +9,7 @@ const TOKEN_WAIT = 20_000;   // 위젯이 아무 신호도 주지 않을 때 '�
 
 export const hasTurnstileKey = SITE_KEY !== '';
 export const TURNSTILE_ACTION = 'waitlist';   // API가 운영에서 같은 값인지 확인한다
+export const TURNSTILE_WITHDRAW = 'withdraw';   // 신청 취소의 토큰. 신청 토큰으로 취소할 수 없게 나눈다
 
 type Turnstile = {
   render: (slot: HTMLElement, options: Record<string, unknown>) => string | null | undefined;
@@ -36,7 +37,7 @@ export function loadTurnstile(): Promise<void> {
 
 // 평소에는 보이지 않고, 사람 확인이 필요할 때만 slot 안에 나타난다. 위젯 모드는 대시보드의 Managed다.
 // retry를 끄면 실패가 곧바로 reject로 와서 방문자가 버튼을 다시 누를 수 있다
-export function getToken(slot: HTMLElement, signal: AbortSignal, onInteract: () => void): Promise<string> {
+export function getToken(slot: HTMLElement, signal: AbortSignal, onInteract: () => void, action = TURNSTILE_ACTION): Promise<string> {
   let id: string | null | undefined;
   let timer: ReturnType<typeof setTimeout>;
   let over = false;
@@ -47,7 +48,7 @@ export function getToken(slot: HTMLElement, signal: AbortSignal, onInteract: () 
       if (over || signal.aborted) return;   // 스크립트를 기다리는 동안 끝났다. 위젯을 남기지 않는다
       id = (window as TurnstileWindow).turnstile?.render(slot, {
         sitekey: SITE_KEY,
-        action: TURNSTILE_ACTION,
+        action,
         theme: 'light',
         language: 'ko',
         appearance: 'interaction-only',

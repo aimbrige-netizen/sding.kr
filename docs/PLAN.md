@@ -1,4 +1,4 @@
-# 스딩 랜딩페이지 기획서 v1.10
+# 스딩 랜딩페이지 기획서 v1.11
 
 Oct 28, 2026 · @tae hyeung kwon
 
@@ -21,6 +21,8 @@ Oct 28, 2026 · @tae hyeung kwon
 **v1.9 변경(2026-11-04)**: 처리방침, 이용약관, 동의 문구를 Claude가 법령과 공식 지침에 대조해 검토하고, 다른 검토자의 반박 검토를 거친 수정을 반영했다. 변호사의 법률 의견은 아니다(검토서는 `docs/private/legal-review.md`). 동의 고지는 이용 목적 줄도 굵게 보이고, `CONSENT_VERSION`을 `2026-11-v2`로 올렸다. FAQ의 번호 답은 동의 고지의 보유 기간 값을 읽는다. 처리방침은 업체마다 국외 이전 사항과 거부 방법을 채우고, 아동, 보유 기간, 권리, 쿠키, 구제, 변경 절을 법령의 항목에 맞췄다. 국외 이전 근거(제28조의8제1항제3호가목), 처리 근거, 이전 유형을 넣었고 시행일만 남겼다. 출시 문자는 비광고 1회 안내로 보낸다. 법률사무소 소식지, 언론, 업체 블로그 출처는 공식 자료로 바꿨다. 보유 기간의 상한 날짜, 푸터 AI 문구, 검토가 낸 기획 변경은 사용자 결정을 기다린다(`docs/OPEN_ITEMS.md`).
 
 **v1.10 변경(2026-11-04)**: 사용자가 검토의 권장안을 승인해 반영했다. 보유 기간은 '안내 문자를 보낸 뒤 5일 안에, 오픈이 늦어져도 2027년 6월 30일까지 파기'이고 `CONSENT_VERSION`은 `2026-11-v3`이다. 파일이 오기 전의 포스터 카드에는 'AI' 라벨을 붙이지 않고, 합성·시뮬레이션 존은 기능의 한계를 말하는 문장(`posterNotice`)을 둔다. 신청 폼의 동의 줄 아래에 '개인정보 처리방침 보기'와 '이용약관 보기'를 둔다. 오픈 전에는 히어로 날짜 줄, 마지막 CTA 제목, llms.txt, 푸터 AI 문구에 '예정'을 쓴다. 첫 공개는 GA4 없이 하고, 그동안의 지표는 Supabase 신청 건수와 검색 도구로 본다. 정찰제 표현, 같은 폼의 신청 취소, 1자 방문 합계는 아직 정하지 않았다.
+
+**v1.11 변경(2026-11-05)**: 대표 연락처(전화, 이메일)와 개인정보 보호책임자(대표 정원창)를 받아 넣었다. 처리방침의 책임자 절에는 성명, 직위, 연락처를 적는다. 신청 폼 아래 '신청 취소하기'로 같은 자리에서 신청을 취소하게 했다(검토 P4). 서버는 같은 주소에서 `action: 'withdraw'`를 나눠 받고, Supabase 함수 `waitlist_withdraw`가 행을 지우고 날짜별 건수만 번호 없이 남긴다. 처리방침에 신청 취소와 문의·요구를 받을 때 처리하는 정보를 더했다. 문의 정보의 보유 기간은 회사가 정하고, 비어 있으면 운영 빌드가 멈춘다. `CONSENT_VERSION`은 `2026-11-v4`다.
 
 ## 요약
 
@@ -48,7 +50,7 @@ Oct 28, 2026 · @tae hyeung kwon
 본문의 \[확인 필요\]는 이 목록의 항목이거나 변호사·세무사 확인이 필요한 항목에 달았다. 정해지기 전에도 기본값으로 개발은 시작할 수 있으며, 항목별 쓰임과 기본값은 자료 체크리스트와 일정 절의 표와 `docs/OPEN_ITEMS.md`에 있다.
 
 - **개발 시작 전(11월 4일까지)**: 로고 SVG 원본(받은 값은 `Layer 2` 위치뿐이다), 영문 표기(Sding 또는 SDING), 도메인 등록처와 DNS 위치, 사전 신청 수집 항목(휴대폰 번호 또는 이메일).
-- **첫 공개 전(11월 12일까지)**: 전화번호·대표 이메일·개인정보보호책임자, 업종과 상시 근로자 수(소상공인 여부), 처리방침에 적을 실제 안전조치, 웨딩 가격 정찰제의 실제 규칙과 문구, 변호사 검토(끝나야 첫 공개를 할 수 있다), 법인 설립등기일, 구글·네이버 소유확인 값, Turnstile 키, Supabase 프로젝트와 요금제, Vercel 요금제, AI 웨딩홀 시뮬레이션 정의 문장과 '가상 피팅' 표현(임시로 넣었고 사용자가 직접 고친다).
+- **첫 공개 전(11월 12일까지)**: 업종과 상시 근로자 수(소상공인 여부), 처리방침에 적을 실제 안전조치, 웨딩 가격 정찰제의 실제 규칙과 문구, 변호사 검토(끝나야 첫 공개를 할 수 있다), 법인 설립등기일, 구글·네이버 소유확인 값, Turnstile 키, Supabase 프로젝트와 요금제, Vercel 요금제, AI 웨딩홀 시뮬레이션 정의 문장과 '가상 피팅' 표현(임시로 넣었고 사용자가 직접 고친다).
 - **영상과 오픈**: 영상 제작 도구의 상업 이용 조건(납품 전), 영상 파일(12월 4일), ZONE 02 입력 항목, ZONE 03 모델 초상권과 드레스 브랜드 사용 허락, ZONE 04 웨딩홀 사용 허락(납품 전), 12월 25일 오픈의 의미, 스토어 주소와 지원 기기, 오픈 후 후킹 문구(12월 11일), 공식 스토어 배지와 Apple 크레딧 줄(12월 11일), 앱에 맞춘 약관과 처리방침(12월 11일), 사용자 사진 처리 정책(오픈 전), 문자 발송 업체와 내려받는 파일의 삭제 절차(번호를 내려받기 전).
 - **정해지면**: 서비스 지역과 요금 정책, SNS 계정 주소, 통신판매업 신고 시점, GA4 ID(방문 통계 동의 창을 만든 뒤). 위디 영상 사용 방식의 직접 확인은 선택이다.
 
@@ -441,6 +443,7 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 | 동의 고지 | 체크박스 바로 옆에 접지 않고 보인다. 동의를 받을 때 알릴 사항(「개인정보 보호법」 제15조제2항)과 눈에 띄게 표시할 중요한 내용(제22조제2항, 시행령 제17조제3항, 「개인정보 처리 방법에 관한 고시」 제4조)을 체크하기 전에 분명히 볼 수 있어야 하므로 링크나 접기 뒤에 두지 않는다. 항목은 휴대폰 번호, 목적은 정식 오픈 안내 문자 1회 발송(굵게), 보유 기간은 '안내 문자를 보낸 뒤 5일 안에, 오픈이 늦어져도 2027년 6월 30일까지 파기'(굵게. 공개 뒤 상한 날짜를 늦추려면 다시 동의를 받는다), 거부 권리와 불이익, '만 14세 미만은 신청할 수 없어요.'(나이는 묻지 않는다). 체크 라벨은 '개인정보 수집·이용에 동의해요 (필수)'이고 기본은 해제다. 동의 줄 아래에 '개인정보 처리방침 보기'와 '이용약관 보기'를 한 줄로 두고 둘 다 새 탭으로 연다. 약관 동의 체크는 두지 않는다. 새 탭으로 여는 것은 입력한 번호를 지키고, 신청 창이 열린 채 페이지가 바뀌지 않게 하기 위해서다. 출시 문자는 광고가 아닌 1회 안내로 보내므로 광고성 정보 수신 동의는 두지 않는다. 광고로 바꾸려면 11월 13일 전에 정한다 |
 | 상태 | 입력, 전송 중, 성공, 오류. 성공 문구는 '신청이 완료됐어요. 오픈하는 날 문자로 알려 드릴게요.'다. Turnstile이 사람 확인을 요구하면 위젯이 카드 안에 나타나고 '확인을 마치면 신청이 끝나요.'를 보인다. JS가 꺼져 있으면 제출 버튼이 꺼지고 'JavaScript를 켜야 신청할 수 있어요.'를 보인다. 전송 중에는 번호와 체크를 잠가 보낸 값과 화면이 어긋나지 않게 하고, 버튼의 반짝임이 4.9초까지 돌고, 성공하면 폼 자리에 반짝임이 D-day 실링처럼 찍힌다(신청 창에서는 페이드). 패널은 성공해도 높이를 지켜 아래가 뛰지 않는다 |
 | 중복 번호 | 이미 있는 번호도 같은 성공 문구를 보여 준다. 번호가 등록돼 있는지 드러내지 않는다 |
+| 신청 취소 | 카드 맨 아래 '이미 신청했나요? 신청 취소하기'(글자 버튼)를 누르면 같은 자리에 취소 폼이 나온다. 설명 '입력한 번호로 한 출시 알림 신청을 취소해요.', 휴대폰 번호 한 칸, 주 버튼 '신청 취소', '신청 화면으로 돌아가기'. 번호가 있든 없든 완료 문구는 '신청 취소를 처리했어요. 이 번호로 한 신청이 있었다면 목록에서 지웠어요.'다. 동의 체크는 없고 Turnstile은 신청과 같은 방식이다(action `withdraw`). 열면 포커스는 설명으로, 돌아가면 '신청 취소하기' 버튼으로 간다(입력칸으로 돌리면 터치 기기에서 키보드가 뜬다). 취소가 끝나면 신청 쪽의 완료 문구와 입력도 거둔다. 요청을 보낸 뒤에는 돌아갈 수 없고, 신청 창을 닫으면 신청 화면으로 돌아간다. 취소용으로 넣은 번호는 돌아가면 사라진다. 분석 이벤트는 보내지 않는다. JS가 꺼져 있으면 숨기고 처리방침의 메일과 전화로 받는다. 권리 행사가 신청보다 어렵지 않게 하려는 장치다(2026-11-04 검토 Q22, P4) |
 | 오픈 후 | 폼 대신 App Store·Google Play 링크와 QR 코드를 보여 준다. 설명은 FAQ의 '어디서 쓸 수 있나요?' 답과 같다. 주소가 있는 곳만 보이고 App Store를 앞에 둔다. 공식 배지 파일을 받기 전에는 'App Store에서 받기' 같은 글자 링크를 쓴다. 로고를 그린 자체 버튼은 만들지 않는다. 배지와 QR은 그림을 바꾸면 안 되거나 코드가 만드는 그림이라 `MediaSlot`을 쓰지 않는다 |
 | QR | 스토어가 둘이어도 하나만 둔다. `https://sding.kr/#waitlist`를 담아 폰에서 이 자리의 링크를 누르게 한다. 기기를 판별하는 리다이렉트 라우트나 외부 업체가 필요 없다. 1024px 이상이면서 hover와 정밀 포인터가 있는 화면에서만 보인다. 자기 화면의 코드는 찍을 수 없다 |
 | 제휴 문의 | 패널 아래 작은 글씨로 '웨딩 업체이신가요? 제휴 문의' `mailto:` 링크를 둔다 |
@@ -453,7 +456,7 @@ FAQ는 `details` 요소로 만들고, 답변은 닫혀 있어도 HTML에 들어 
 | 구성 | 로고, 회사 정보 블록, 링크 3개(개인정보 처리방침, 이용약관, 제휴 문의), 있는 채널만 SNS 아이콘, 저작권 |
 | 스타일 | `--peach` 배경, `--ink-600` 글자 `--fs-cap`(13~14px). 어두운 푸터는 쓰지 않는다 |
 | 회사 정보 | 항목과 값은 회사정보·법적 표기 절에서 정한다. 통신판매업 신고번호는 값을 비워 둔다 |
-| 제휴 문의 | `mailto:` 링크. 주소는 \[확인 필요\] |
+| 제휴 문의 | `mailto:` 링크. 주소는 `namu@sding.kr`(2026-11-05 전달) |
 
 ### 전역 요소
 
@@ -786,9 +789,9 @@ llms.txt는 넣되 효과를 기대하지 않는다. 주요 AI 업체 중 인용
 | 사업자등록번호 | 590-86-03810 | 사업자등록증 |
 | 사업장 주소 | 서울특별시 강남구 압구정로46길 5-10, 3층 302호 (신사동, 압구정로데오스타) | 사업자등록증(본점과 같음) |
 | 통신판매업신고번호 | 비워 둔다 | 신고 전. `mailOrderNo: ''` |
-| 전화번호 | 미정 | 등록증에 없음. 전달 필요 \[확인 필요\] |
-| 이메일 | 미정 | 등록증에 없음. 전달 필요 \[확인 필요\] |
-| 개인정보보호책임자 | 미정 | 처리방침 필수 항목 \[확인 필요\] |
+| 전화번호 | 010-9897-7678 | 2026-11-05 전달 |
+| 이메일 | namu@sding.kr | 2026-11-05 전달. 메일은 Google Workspace로 받으므로 처리방침의 국외 이전 표에 적는다 |
+| 개인정보보호책임자 | 정원창(대표) | 2026-11-05 전달. 대표이사를 지정했다. 처리방침에는 성명, 직위, 연락처를 적는다 |
 | 법인등록번호 | 110111-0970668 | 푸터에는 쓰지 않고 데이터에만 보관한다 |
 | 업태·종목 | 정보통신업, 서비스 / 응용 소프트웨어 개발 및 공급업, 웨딩컨설팅 | 푸터에는 쓰지 않는다 |
 
@@ -806,7 +809,7 @@ llms.txt는 넣되 효과를 기대하지 않는다. 주요 AI 업체 중 인용
 
 - 신고가 끝나면 `COMPANY.mailOrderNo`에 번호를 넣는 것 하나로 끝난다. 라벨을 숨기고 싶으면 설정 하나로 바꾼다.
 - AI 문구는 이 사이트가 아니라 스딩 앱의 기능이라고 밝힌다. 오픈 전에는 '활용할 예정이에요'를 쓰고, 오픈 뒤(`ctaMode()`가 live)에는 '스딩 앱의 AI 기능은 생성형 AI를 활용해요. 결과는 실제와 다를 수 있어요.'로 바뀐다. 법정 고지를 대신하지 않는 보조 안내다.
-- 운영 빌드에서는 전화·이메일·책임자가 비어 있으면 빌드가 실패한다(`assertCompany()`). 통신판매업신고번호는 검사에서 뺀다.
+- 운영 빌드에서는 전화·이메일·보호책임자의 성명과 직위가 비어 있으면 빌드가 실패한다(`assertCompany()`). 통신판매업신고번호는 검사에서 뺀다.
 - 법적 표기는 사업자등록증의 법인명 하나만 쓴다. 다른 회사명이나 서비스명을 섞지 않는다.
 
 ### 통신판매업
@@ -831,7 +834,7 @@ llms.txt는 넣되 효과를 기대하지 않는다. 주요 AI 업체 중 인용
 | 위탁·국외 이전 | 문자 발송 대행사와 해외 서버(DB·호스팅)를 쓰면 처리방침에 수탁자와 이전 항목을 적는다 \[확인 필요\]. Supabase를 서울에 두어도 로그는 EU에 저장되고, 싱가포르·미국으로 이전되며, 주 처리자는 Supabase Pte. Ltd.다. Vercel도 해외 사업자다 |
 | 동의 기록 | 동의 시각과 동의 문구 버전을 번호와 함께 저장한다. IP는 저장하지 않는다 |
 | 스팸 방지 | 허니팟 필드와 Cloudflare Turnstile. 로그인은 두지 않는다. 스딩의 서버 코드는 IP를 읽거나 저장하지 않지만 호스팅 업체의 접속 기록에는 남을 수 있고, Turnstile은 봇 확인을 위해 방문자의 IP, TLS 지문, User-Agent, 페이지 주소를 Cloudflare로 보내고, 쿠키와 로컬 저장소에 기대어 동작한다. 처리방침에 '쿠키가 없다'고 쓰지 않는다 \[확인 필요\] |
-| 책임자 | 개인정보보호책임자의 이름과 연락처를 처리방침에 적는다 \[확인 필요\] |
+| 책임자 | 개인정보 보호책임자 정원창(대표)의 성명, 직위, 연락처를 처리방침에 적는다 |
 
 ### AI 서비스 고지
 
@@ -1056,13 +1059,14 @@ export const COMPANY = {
   region: '서울특별시', locality: '강남구', street: '압구정로46길 5-10, 3층 302호 (신사동, 압구정로데오스타)',
   mailOrderNo: '',                          // 통신판매업 신고번호. 신고 완료 전까지 반드시 빈 값
   showMailOrderLabel: true,                 // 번호가 비어 있어도 라벨은 보인다. 숨기려면 false
-  phone: '', email: '', privacyOfficer: '',   // 전달받아 채운다
+  phone: '010-9897-7678', email: 'namu@sding.kr',   // 2026-11-05 전달받은 대표 연락처
+  privacyOfficer: '정원창', privacyOfficerTitle: '대표',   // 개인정보 보호책임자
 };
 export const ADDRESS = `${COMPANY.region} ${COMPANY.locality} ${COMPANY.street}`;
 
 // 운영 빌드에서만 호출한다. mailOrderNo는 검사하지 않는다.
 export function assertCompany() {
-  for (const k of ['phone', 'email', 'privacyOfficer'] as const) {
+  for (const k of ['phone', 'email', 'privacyOfficer', 'privacyOfficerTitle'] as const) {
     if (!COMPANY[k]) throw new Error('COMPANY.' + k + ' is empty');
   }
 }
@@ -1143,6 +1147,10 @@ export const MEDIA = {
   // zone2~4도 같은 모양이다. 슬롯 사양은 영상·미디어 시스템 절의 표를 따른다.
 } satisfies Record<string, MediaSpec>;
 
+// 파일이 들어왔는지. MediaSlot이 파일을 그리는 조건과 같다. 포스터 이미지가 없는 영상은 재생 전까지 포스터 카드를 덮개로 쓰므로 Zone이 빌드를 멈춘다
+export const hasFile = (spec: MediaSpec) =>
+  spec.kind === 'compare' ? Boolean(spec.before && spec.after) : spec.kind === 'phone' ? Boolean(spec.screen.src) : Boolean(spec.src);
+
 // 켤 소리가 있는지. 소리는 소개 영상에만 있으므로 그 파일이 올 때까지 사운드 버디를 그리지 않는다
 export const HAS_SOUND = Boolean(MEDIA.hero.src && MEDIA.hero.hasAudio);
 ```
@@ -1213,15 +1221,16 @@ export const launchDotted = () => SITE.launchDate.replace(/-/g, '.');           
 
 ### 사전 신청 API
 
-신청은 `POST /api/waitlist` 하나이며, 휴대폰 번호 한 개와 동의 여부만 받는다. 이름과 이메일은 받지 않고, IP는 읽거나 저장하지 않는다.
+신청은 `POST /api/waitlist` 하나이며, 휴대폰 번호 한 개와 동의 여부만 받는다. 신청 취소도 같은 주소로 `action: 'withdraw'`와 번호만 받는다. 이름과 이메일은 받지 않고, IP는 읽거나 저장하지 않는다.
 
 ```ts
 // 요청 본문
 type WaitlistBody = {
   phone: string;     // '010-2345-6789'처럼 입력한 그대로
-  consent: true;     // 필수 동의 체크
+  consent: true;     // 필수 동의 체크. 신청 취소에는 보내지 않는다
   token: string;     // Turnstile 토큰
   hp?: string;       // 허니팟. 사람은 비워 둔다
+  action?: 'withdraw';   // 신청 취소. 이때는 consent를 보지 않는다
 };
 ```
 
@@ -1231,13 +1240,13 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { SITE } from '@/content/site';
 import { normalizePhone } from '@/lib/phone';
-import { TURNSTILE_ACTION } from '@/lib/turnstile';
+import { TURNSTILE_ACTION, TURNSTILE_WITHDRAW } from '@/lib/turnstile';
 
 // 응답 표와 동작은 PLAN '사전 신청 API'를 따른다. 번호와 요청 본문은 어디에도 남기지 않는다.
 // 로그에는 오류 코드와 HTTP 상태만 쓴다. Supabase의 error.details에는 행의 값이 들어갈 수 있다
 export const maxDuration = 15;   // 확인 6초와 저장 5초를 넘기면 끊는다. 기본 300초로 두면 폼이 그만큼 기다린다
 
-const CONSENT_VERSION = '2026-11-v3';   // 동의 문구나 처리방침이 바뀌면 올린다
+const CONSENT_VERSION = '2026-11-v4';   // 동의 문구나 처리방침이 바뀌면 올린다
 const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const VERIFY_TIMEOUT = 3000;
 const HOSTNAME = new URL(SITE.url).hostname;
@@ -1245,7 +1254,7 @@ const HOSTNAME = new URL(SITE.url).hostname;
 const fail = (status: number, code: string) => NextResponse.json({ ok: false, code }, { status });
 
 // ok: 사람. bad: 토큰이 틀렸다. down: Cloudflare 장애나 키 설정 문제라 방문자 잘못이 아니다
-async function humanCheck(token: string): Promise<'ok' | 'bad' | 'down'> {
+async function humanCheck(token: string, action: string): Promise<'ok' | 'bad' | 'down'> {
   if (!token || token.length > 2048) return 'bad';
   const body = new URLSearchParams({
     secret: process.env.TURNSTILE_SECRET_KEY ?? '',
@@ -1258,7 +1267,7 @@ async function humanCheck(token: string): Promise<'ok' | 'bad' | 'down'> {
       const result = (await res.json()) as { success?: boolean; hostname?: string; action?: string; 'error-codes'?: string[] };
       if (result.success === true) {
         if (process.env.NEXT_PUBLIC_SITE_ENV !== 'production') return 'ok';   // 시험 키의 hostname과 action은 다른 값이다
-        if (result.hostname === HOSTNAME && result.action === TURNSTILE_ACTION) return 'ok';
+        if (result.hostname === HOSTNAME && result.action === action) return 'ok';
         console.error('waitlist: turnstile mismatch');   // www로 열렸거나 키 쌍이 어긋났다. 방문자는 다시 눌러도 통과하지 못한다
         return 'bad';
       }
@@ -1278,6 +1287,33 @@ async function humanCheck(token: string): Promise<'ok' | 'bad' | 'down'> {
   return 'down';
 }
 
+const client = (url: string, key: string) => createClient(url, key, {
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  db: { timeout: 5000 },
+});
+
+// 신청 취소(같은 폼). 번호가 있든 없든 같은 답을 준다. 등록 여부를 드러내지 않는다.
+// 번호는 rpc 본문으로만 보낸다. Data API에 번호로 거르면 주소에 번호가 남아 게이트웨이 로그에 쌓인다
+async function withdraw(body: Record<string, unknown>, url: string, key: string) {
+  if (body.hp) return NextResponse.json({ ok: true });
+  const phone = typeof body.phone === 'string' ? normalizePhone(body.phone) : null;
+  if (!phone) return fail(400, 'phone');
+
+  const human = await humanCheck(typeof body.token === 'string' ? body.token : '', TURNSTILE_WITHDRAW);
+  if (human === 'down') return fail(503, 'server');
+  if (human === 'bad') return fail(400, 'challenge');
+
+  try {
+    // 지운 행이 있으면 함수가 날짜별 건수만 번호 없이 기록한다(파기 기록)
+    const { error, status } = await client(url, key).rpc('waitlist_withdraw', { p_phone: phone });
+    if (!error) return NextResponse.json({ ok: true });
+    console.error('waitlist: withdraw', error.code, status);
+  } catch {
+    console.error('waitlist: withdraw unavailable');
+  }
+  return fail(500, 'server');
+}
+
 export async function POST(req: Request) {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SECRET_KEY;
@@ -1285,20 +1321,18 @@ export async function POST(req: Request) {
 
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== 'object' || Array.isArray(body)) return fail(400, 'invalid');
+  if (body.action === 'withdraw') return withdraw(body, url, key);   // 동의 검사보다 앞에서 나눈다. 취소에는 동의가 필요 없다
   if (body.hp) return NextResponse.json({ ok: true });       // 봇: 저장하지 않고 성공처럼 답한다
   if (body.consent !== true) return fail(400, 'consent');
   const phone = typeof body.phone === 'string' ? normalizePhone(body.phone) : null;
   if (!phone) return fail(400, 'phone');
 
-  const human = await humanCheck(typeof body.token === 'string' ? body.token : '');
+  const human = await humanCheck(typeof body.token === 'string' ? body.token : '', TURNSTILE_ACTION);
   if (human === 'down') return fail(503, 'server');
   if (human === 'bad') return fail(400, 'challenge');
 
   try {
-    const db = createClient(url, key, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-      db: { timeout: 5000 },
-    });
+    const db = client(url, key);
     // 이미 있는 번호는 첫 동의를 그대로 두고 조용히 넘어간다. insert로 23505를 받으면 번호가 Postgres 로그에 남는다
     const { error, status } = await db.from('waitlist').upsert(
       { phone, consent_at: new Date().toISOString(), consent_version: CONSENT_VERSION },
@@ -1354,6 +1388,33 @@ alter table public.waitlist enable row level security;   -- 정책을 만들지 
 revoke all on table public.waitlist from anon, authenticated, service_role;
 grant insert on table public.waitlist to service_role;
 grant select (phone) on table public.waitlist to service_role;   -- ON CONFLICT (phone)에 필요하다
+
+-- 신청 취소(같은 폼). 서버가 비밀 키로 rpc를 부른다. 번호는 요청 본문으로만 받아 주소와 게이트웨이 로그에 남지 않는다
+create table public.waitlist_purge_log (
+  day date primary key,                    -- 한국 시간 날짜
+  n integer not null                       -- 그날 신청 취소로 지운 건수. 번호는 남기지 않는다(파기 기록)
+);
+alter table public.waitlist_purge_log enable row level security;
+revoke all on table public.waitlist_purge_log from anon, authenticated, service_role;
+grant select (day, n), insert, update (n) on table public.waitlist_purge_log to service_role;
+grant delete on table public.waitlist to service_role;   -- 함수가 부른 쪽(service_role) 권한으로 지운다
+
+create function public.waitlist_withdraw(p_phone text) returns void
+language plpgsql security invoker set search_path = '' as $$
+declare
+  gone integer;
+begin
+  delete from public.waitlist where phone = p_phone;
+  get diagnostics gone = row_count;
+  if gone > 0 then
+    insert into public.waitlist_purge_log as l (day, n)
+    values ((now() at time zone 'Asia/Seoul')::date, gone)
+    on conflict (day) do update set n = l.n + excluded.n;
+  end if;
+end;
+$$;
+revoke execute on function public.waitlist_withdraw(text) from public, anon, authenticated;   -- 새 함수는 PUBLIC이 실행할 수 있다
+grant execute on function public.waitlist_withdraw(text) to service_role;
 ```
 
 응답은 아래 표를 따른다. 이미 있는 번호와 허니팟은 일부러 정상 신청과 같은 응답을 준다.
@@ -1363,6 +1424,7 @@ grant select (phone) on table public.waitlist to service_role;   -- ON CONFLICT 
 | 정상 신청 | 200 | `{ ok: true }` | 신청이 완료됐어요. 오픈하는 날 문자로 알려 드릴게요. |
 | 이미 신청한 번호 | 200 | `{ ok: true }` | 정상 신청과 같다. 번호가 등록돼 있는지 드러내지 않는다 |
 | 허니팟이 차 있음 | 200 | `{ ok: true }` | 정상 신청과 같다. 저장하지 않는다 |
+| 신청 취소(`action: 'withdraw'`) | 200 | `{ ok: true }` | 번호가 있든 없든 '신청 취소를 처리했어요. 이 번호로 한 신청이 있었다면 목록에서 지웠어요.' 번호 형식 오류, 봇 확인 실패, 서버 오류는 신청과 같다 |
 | 번호 형식 오류 | 400 | `code: 'phone'` | 휴대폰 번호를 다시 확인해 주세요. |
 | 동의하지 않음 | 400 | `code: 'consent'` | 개인정보 수집·이용에 동의해 주세요. |
 | 봇 확인 실패 | 400 | `code: 'challenge'` | 확인에 실패했어요. 다시 시도해 주세요. |
@@ -1379,10 +1441,10 @@ grant select (phone) on table public.waitlist to service_role;   -- ON CONFLICT 
 - 스크립트(`api.js?render=explicit&onload=…`)는 폼에 처음 입력할 때 한 번만 불러오고, 제출 때 아직 없으면 그때 불러온다. 주입한 스크립트는 `async`가 되어 `turnstile.ready()`를 쓸 수 없다. 복사하거나 프록시하지 않는다.
 - 서버는 번호와 동의를 먼저 확인하고 토큰을 검증한다. 잘못된 입력에 토큰을 쓰지 않기 위해서다. 그 전에 DB를 건드리지 않으므로 Cloudflare 튜토리얼의 순서와 달라도 안전하다.
 - 번호와 요청 본문은 로그에 남기지 않는다. 오류는 코드와 HTTP 상태만 남긴다. Supabase의 `error.details`에는 행의 값이 들어갈 수 있다. 게이트웨이 오류에는 `code`가 없어, 잘못된 키나 멈춘 프로젝트, 시간 초과(상태 0)는 상태로 가른다. Turnstile은 Cloudflare의 고정 오류 코드와 hostname·action 불일치를 남긴다. `insert`로 23505를 받으면 `Key (phone)=(…)`가 Postgres 로그에 남아 EU로 가므로 `upsert`로 넘긴다. 다시 신청해도 첫 동의 시각과 버전이 그대로다. 이 방식은 `service_role`에 `phone` 읽기 권한이 있어야 해서, 비밀 키가 새면 번호를 읽을 수 있다.
-- 이 표의 쓰기는 Data API로, 내려받기와 삭제는 SQL 편집기로 한다. Data API에 번호로 거르면 주소에 번호가 남아 게이트웨이 로그에 쌓인다. SQL 편집기는 입력을 자동 저장하므로 번호를 통째로 적지 않고, 뒤 네 자리로 찾아 `id`로 지운다.
-- 문자는 이 저장소에서 보내지 않는다. 오픈 당일 번호를 내려받아 문자 대행사로 보내고 `notified_at`을 채운다. CTA는 0시에 바뀌지만 문자는 08~21시에 도달하게 보낸다. 광고로 처리하면 문자 형식은 '사전 신청의 개인정보' 표를 따른다. 대행사는 전송자격인증 업체여야 하고, 연락처(`contact`)가 비어 있으면 문자도 보낼 수 없다.
+- 이 표의 쓰기와 신청 취소의 삭제는 Data API(`upsert`와 `rpc('waitlist_withdraw')`, 번호는 본문으로만)로 하고, 내려받기와 그 밖의 삭제는 SQL 편집기로 한다. Data API에 번호로 거르면 주소에 번호가 남아 게이트웨이 로그에 쌓인다. SQL 편집기는 입력을 자동 저장하므로 번호를 통째로 적지 않고, 뒤 네 자리로 찾아 `id`로 지운다.
+- 문자는 이 저장소에서 보내지 않는다. 오픈 당일 번호를 내려받아 문자 대행사로 보내고 `notified_at`을 채운다. CTA는 0시에 바뀌지만 문자는 08~21시에 도달하게 보낸다. 광고로 처리하면 문자 형식은 '사전 신청의 개인정보' 표를 따른다. 대행사는 전송자격인증 업체여야 하고.
 - 보유 기간은 안내 문자를 보낸 뒤 5일 안, 늦어도 2027년 6월 30일까지다. 발송과 실패 재발송을 마친 뒤 보낸 날부터 5일 안에 `delete from public.waitlist;`로 행 전체를 지운다. `notified_at`이 빈 행(발송 실패, 늦은 신청)도 함께 지워진다. 오픈이 늦어지면 2027년 6월 30일까지 같은 문장을 실행한다. 지운 날짜, 건수, 방법, 확인자를 파기 기록에 남긴다. 문자를 보내려고 내려받은 파일은 문자 업체에 넘긴 날 지우고, 업체에 올린 발송 목록도 같은 5일 안에 지우게 한다. 업체가 법령에 따라 보관하는 발송 기록(수신 번호, 발송 일시)은 처리방침의 업체 항목에 그 근거와 기간을 적는다. 프로젝트를 지워도 데이터는 30일 안에 삭제되므로 곧바로 사라지지는 않는다.
-- 동의 철회나 삭제 요청은 개인정보보호책임자 연락처로 받고, 해당 번호를 바로 지운다.
+- 동의 철회나 삭제 요청은 신청 폼 아래 '신청 취소하기'와 개인정보보호책임자 연락처로 받는다. 취소 폼으로 온 요청은 받은 때 신청 목록에서 지우고, 메일과 전화로 온 요청은 지체 없이 지운다. 지운 행은 백업 보관 기간이 끝날 때까지 백업에 남는다(사실표 7-3, 검토서 P4). 취소 폼은 `{ action: 'withdraw', phone, token, hp }`를 같은 주소로 보내고, 서버는 동의 검사보다 앞에서 나눈다. 허니팟, 번호 형식, Turnstile(action `withdraw`)을 신청과 같은 순서로 확인한 뒤 `rpc('waitlist_withdraw', { p_phone })`를 부른다. 번호는 요청 본문으로만 가서 주소와 게이트웨이 로그에 남지 않는다. 번호가 있든 없든 `{ ok: true }`로 답한다. 운영에서는 action이 맞아야 해서, 신청 토큰으로 취소하거나 취소 토큰으로 신청할 수 없다. 함수는 지운 행이 있으면 한국 시간 날짜별 건수만 `waitlist_purge_log`에 더한다(파기 기록, 번호 없음).
 
 ### 분석 이벤트
 
@@ -1527,8 +1589,8 @@ const nextConfig: NextConfig = {
 | iOS 16.x(지원 하한) | 신청 창의 포커스 시작과 복귀, 배경 어둡게, 키보드 |
 | Android Chrome(데이터 절약 켬·끔) | 자동 재생과 대체 화면, 소리 켜기, 신청 창, 자동 완성으로 넣은 번호 |
 | 삼성 인터넷 | 자동 재생, 소리, 신청 창 |
-| 카카오톡 인앱 브라우저 | 링크 공유 미리보기(OG), 자동 재생, 신청 창, 실제 키로 신청 한 번(Turnstile), 새 탭으로 여는 처리방침·이용약관 링크 |
-| 네이버 앱 인앱 브라우저 | 자동 재생, 신청 창, 실제 키로 신청 한 번(Turnstile), 새 탭으로 여는 처리방침·이용약관 링크 |
+| 카카오톡 인앱 브라우저 | 링크 공유 미리보기(OG), 자동 재생, 신청 창, 실제 키로 신청과 신청 취소 한 번씩(Turnstile), 새 탭으로 여는 처리방침·이용약관 링크 |
+| 네이버 앱 인앱 브라우저 | 자동 재생, 신청 창, 실제 키로 신청과 신청 취소 한 번씩(Turnstile), 새 탭으로 여는 처리방침·이용약관 링크 |
 | 모든 모바일 환경 | 키보드가 올라와도 입력칸과 제출 버튼에 닿을 수 있고, 뒤 페이지가 움직이지 않고(iOS는 주소창이 접힌 때와 키보드가 뜬 때 둘 다, 최신 버전과 iOS 18에서), 닫으면 포커스가 돌아오는지 |
 | 데스크톱 Chrome·Safari·Whale·Edge | 1440·1920px 레이아웃, 키보드만으로 전체 조작, 소리 켜기 |
 | 화면 폭 | 360, 390, 430, 768, 1024, 1440, 1920px에서 깨짐과 가로 스크롤이 없는지 |

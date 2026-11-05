@@ -14,7 +14,8 @@ export function AnalyticsEvents({ mode }: { mode: CtaMode }) {
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
       const press = (event.target as Element).closest<HTMLElement>('[data-cta], .wl-submit, .store-link');
-      if (!press || press.getAttribute('aria-disabled') === 'true') return;
+      // 신청 취소 폼의 버튼도 같은 모양(.wl-submit)이지만 세지 않는다. 취소는 번호와 이어진 행동이다
+      if (!press || press.getAttribute('aria-disabled') === 'true' || press.closest('[data-withdraw]')) return;
       const location = press.dataset.cta === 'header' || press.dataset.cta === 'hero' ? press.dataset.cta : press.closest('dialog') ? 'dialog' : 'final';
       track('cta_click', { location, mode });
     };

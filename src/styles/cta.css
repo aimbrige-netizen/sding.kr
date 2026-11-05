@@ -177,6 +177,13 @@
   .wl-nojs { display: none; margin-top: var(--sp-2); }
   html:not(.js) .wl-nojs { display: block; }
 
+  /* 신청 취소로 바꾸는 글자 버튼과 돌아가는 버튼. 카드 맨 아래 한 줄이라 바뀌어도 위의 내용이 움직이지 않는다.
+     JS가 있어야 열 수 있으므로 JS 끔에는 숨긴다 */
+  .wl-switch { margin-top: var(--sp-2); color: var(--ink-600); font-size: var(--fs-cap); line-height: 1.4; }
+  .wl-switch button { cursor: pointer; }
+  html:not(.js) .wl-switch { display: none; }
+  .wl-lead { margin-bottom: var(--sp-4); color: var(--ink-900); font-weight: 600; }   /* 신청 창의 설명(--ink-600) 아래에 와도 이 폼의 일로 읽힌다 */
+
   /* Turnstile. 카드의 맨 끝이라 패널에서는 나타나도 위의 내용이 움직이지 않고, 드문 일에 빈자리를 두지 않는다.
      getToken이 clientWidth로 크기를 고르므로 display: none을 쓰지 않는다. 내용 폭이 300px보다 좁으면 그만큼만 카드 여백으로 넓힌다.
      332px부터 flexible(300px 이상 x 65)이고, 그 아래는 compact(150 x 140)가 가운데에 온다 */
@@ -354,7 +361,7 @@
     .cta-head { padding: 0 0 var(--sp-4); }
     .cta-title { color: var(--ink-900); }
     .cta-card { padding: 0; }
-    .wl-submit, .wl-status, .wl-slot, html:not(.js) .wl-nojs, .wl-dialog[open] { display: none; }
+    .wl-submit, .wl-status, .wl-slot, .wl-switch, html:not(.js) .wl-nojs, .wl-dialog[open] { display: none; }
     .store-link { min-height: 0; padding: 0; background: none; color: var(--ink-900); box-shadow: none; }
     .store-link .btn-orb { display: none; }
   }

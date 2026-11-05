@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useId, useRef, useState, useSyncExternalStore, type ChangeEvent, type FormEvent } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type ChangeEvent, type FormEvent } from 'react';
 import { flushSync } from 'react-dom';
 import { Sparkle } from './Icons';
 import { Spans } from './Spans';
+import { WithdrawForm } from './WithdrawForm';
 import { COPY } from '@/content/site';
 import { track, type FormResult } from '@/lib/analytics';
 import { formatPhone, normalizePhone } from '@/lib/phone';
@@ -49,6 +50,7 @@ export function WaitlistForm() {
   const [pending, setPending] = useState(false);
   const [interact, setInteract] = useState(false);
   const [done, setDone] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
   const hydrated = useSyncExternalStore(noop, () => true, () => false);   // 하이드레이션 전과 JS 끔에는 제출 버튼을 끈다
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,7 @@ export function WaitlistForm() {
   const statusRef = useRef<HTMLParagraphElement>(null);
   const slotRef = useRef<HTMLDivElement>(null);
   const doneRef = useRef<HTMLParagraphElement>(null);
+  const switchRef = useRef<HTMLButtonElement>(null);
   const attempt = useRef<AbortController | null>(null);   // 진행 중인 요청. disabled를 쓰지 않아 포커스가 버튼에 남으므로 이중 제출은 이것으로 막는다
 
   useEffect(() => {
@@ -88,6 +91,24 @@ export function WaitlistForm() {
     flushSync(() => setError(field));
     (field === 'phone' ? phoneRef : consentRef).current?.focus();
   }
+
+  // 신청 취소는 신청한 자리에서 같은 방법으로 연다. 권리 행사가 신청보다 어렵지 않아야 한다(검토서 Q22, P4).
+  // 보내는 중에는 바꾸지 않는다. 돌아오면 누른 버튼으로 포커스를 돌린다. 입력칸으로 돌리면 터치 기기에서 키보드가 뜬다
+  function openWithdraw() {
+    if (!attempt.current) setWithdrawing(true);
+  }
+  const closeWithdraw = useCallback(() => {
+    flushSync(() => setWithdrawing(false));
+    switchRef.current?.focus();
+  }, []);
+  // 취소가 끝나면 신청 쪽의 완료 문구와 입력을 거둔다. 돌아왔을 때 지운 신청이 끝난 것처럼 보이지 않게 한다
+  const resetSignup = useCallback(() => {
+    setDone(false);
+    setPhone('');
+    setAgreed(false);
+    setError(null);
+    rootRef.current?.style.removeProperty('min-height');
+  }, []);
 
   // 스크립트는 입력을 시작한 사람만 미리 받는다. 지나가는 방문자의 IP가 Cloudflare로 가지 않게 한다. 실패하면 제출할 때 다시 시도한다
   function preloadTurnstile() {
@@ -153,6 +174,7 @@ export function WaitlistForm() {
 
   return (
     <div ref={rootRef} className="wl">
+      {withdrawing ? <WithdrawForm onBack={closeWithdraw} onWithdrawn={resetSignup} /> : (<>
       {done ? (
         <p ref={doneRef} tabIndex={-1} className="wl-done">
           <span className="btn-orb" aria-hidden="true">
@@ -262,6 +284,14 @@ export function WaitlistForm() {
       <p ref={statusRef} role="status" aria-live="polite" aria-atomic="true" data-error={failed ? '' : undefined} className="wl-status">{status}</p>
       <p role="status" className="sr-only">{pending && !interact ? copy.sending : ''}</p>
       <div ref={slotRef} data-open={interact ? '' : undefined} className="wl-slot" />
+      {/* JS가 있어야 열 수 있어 JS 끔에는 CSS가 숨긴다. 그때는 처리방침의 메일과 전화로 받는다 */}
+      <p className="wl-switch">
+        {copy.withdraw.ask}{' '}
+        <button ref={switchRef} type="button" aria-disabled={pending ? true : undefined} className="wl-more" onClick={openWithdraw}>
+          {copy.withdraw.open}
+        </button>
+      </p>
+      </>)}
     </div>
   );
 }
