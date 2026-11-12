@@ -1,0 +1,26 @@
+/* AI 드레스 합성(시안 M185–196, M332–336). 화면 폭 가득한 --gray-100 띠 안에 원본과 AI 합성 3:4 두 장을 나란히 둔다.
+   두 파일이 모두 오기 전에는 두 칸에 걸친 3:2 포스터 카드 한 장이다. 카드 테두리의 모서리는 프레임의 --r-frame을 따른다.
+   띠 위 글자에는 --gray-500을 쓰지 않는다(띠 위 4.40). 라벨은 --orange-ink-band, 고지는 .note의 --gray-700이다 */
+@layer components {
+  .dress {
+    margin-top: var(--band-gap); padding: var(--band-pad) 0;
+    background: var(--gray-100);
+    scroll-margin-top: calc(var(--sp-6) - var(--band-pad));   /* 앵커로 오면 라벨이 머리글 --sp-6 아래에 온다 */
+  }
+  .dress .label { color: var(--orange-ink-band); }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); margin-top: var(--gap-media); }
+  .pair-frame { position: relative; aspect-ratio: 3 / 4; border-radius: var(--r-frame); overflow: hidden; }
+  .pair-cap {
+    margin-top: var(--gap-label);
+    font-family: var(--ff-display); font-weight: var(--w-strong); font-size: var(--fs-figure);
+    line-height: 1.4; letter-spacing: var(--track-tight); color: var(--ink);
+  }
+  .pair-poster { position: relative; aspect-ratio: 3 / 2; margin-top: var(--gap-media); border-radius: var(--r-frame); overflow: hidden; }
+  .dress-note { margin-top: var(--sp-11); }
+
+  @media (max-width: 899px) {
+    .pair { gap: var(--sp-2_5); }
+    .dress-note { margin-top: var(--sp-7); }
+  }
+}

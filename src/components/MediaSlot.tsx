@@ -1,79 +1,96 @@
-import type { ReactNode } from 'react';
-import { preload } from 'react-dom';
-import { CompareSlider } from './CompareSlider';
-import { ParkMap } from './ParkMap';
-import { RidePreview } from './RidePreview';
+import { PosterCard } from './PosterCard';
 import { VideoPlayer } from './VideoPlayer';
-import { ZonePoster } from './ZonePoster';
-import { MEDIA, type MediaSpec } from '@/content/media';
+import { FEATURES } from '@/content/features';
+import { MEDIA, mediaUrl, previewUrl, type Art, type ImageSpec, type MediaId, type MediaSpec } from '@/content/media';
 import { COPY } from '@/content/site';
-import { ZONES } from '@/content/zones';
+import { present } from '@/lib/media-files';
 
-type VideoSpec = Extract<MediaSpec, { kind: 'video' }>;
-type ImageSpec = Extract<MediaSpec, { kind: 'image' }>;
+type Props = { id: MediaId; part?: 'before' | 'after'; priority?: boolean };
 
-const filmLabels = { play: COPY.film.play, pause: COPY.film.pause };
-// 재생 버튼이 페이지에 여럿이라 스크린리더 목록에서 구별되게 존 이름을 붙인다
-const zoneLabels = (name: string) => ({ play: `${name} ${filmLabels.play}`, pause: `${name} ${filmLabels.pause}` });
+// 빌드할 때 멈춘다. 파일만 넣고 대체 텍스트를 빠뜨리거나, 폰 크롭을 반만 채우는 실수를 배포 전에 잡는다
+function check(spec: MediaSpec, id: MediaId) {
+  if (spec.kind === 'pair') {
+    check(spec.before, id);
+    check(spec.after, id);
+    return;
+  }
+  if (spec.kind === 'video') {
+    // 포스터 이미지가 없으면 재생 전 영상 자리에 보일 그림이 없다
+    if (spec.src && !spec.poster) throw new Error(`MEDIA.${id}: 영상 주소가 있으면 poster도 있어야 한다`);
+    return;
+  }
+  if (spec.desktop.file && !spec.alt.trim()) throw new Error(`MEDIA.${id}: 이미지 파일이 있으면 alt를 써야 한다`);
+  if (spec.desktop.file && spec.phone && !spec.phone.file) throw new Error(`MEDIA.${id}: phone 크롭의 file이 비어 있다`);
+}
 
-function VideoSlot({ id, spec, art, labels }: { id: keyof typeof MEDIA; spec: VideoSpec; art: ReactNode; labels: typeof filmLabels }) {
-  const hero = id === 'hero';
-  // 소개 영상은 파일이 오기 전에도 같은 재생 버튼으로 포스터 카드의 라이드를 보여 준다
-  if (!spec.src) return hero ? <RidePreview labels={labels}>{art}</RidePreview> : art;
-  // 포스터 윗부분이 첫 화면에 보이므로 지연 로드하지 않고 먼저 받는다(PLAN '성능과 접근성 기준'의 LCP)
-  if (hero && spec.poster) preload(spec.poster, { as: 'image', fetchPriority: 'high' });
+// 파일 이름은 `${file}-${너비}.${avif|webp}`(scripts/media.mjs). 무료 요금제 사진은 /media/preview/에서 읽는다
+function Picture({ spec, priority = false }: { spec: ImageSpec; priority?: boolean }) {
+  const url = (art: Art, w: number, ext: 'avif' | 'webp') => {
+    const name = `${art.file}-${w}.${ext}`;
+    return spec.preview ? previewUrl(name) : mediaUrl(name);
+  };
+  const srcSet = (art: Art, ext: 'avif' | 'webp') => art.widths.map((w) => `${url(art, w, ext)} ${w}w`).join(', ');
+  const { desktop, phone } = spec;
+  const width = desktop.widths[desktop.widths.length - 1];
+  const [rw, rh] = desktop.ratio.split('/').map(Number);
+  const height = Math.round((width * rh) / rw);
+  // 첫 화면 사진(LCP)은 먼저 받고, 나머지는 화면에 가까워질 때 받는다
+  const load = priority
+    ? ({ fetchPriority: 'high', decoding: 'auto' } as const)
+    : ({ loading: 'lazy', decoding: 'async' } as const);
   return (
-    <VideoPlayer
-      mediaId={id}
-      src={spec.src}
-      srcMobile={spec.srcMobile || undefined}
-      poster={spec.poster || undefined}
-      alt={spec.alt}
-      hasAudio={spec.hasAudio}
-      captions={spec.captions || undefined}
-      captionsLabel={COPY.film.captions}
-      labels={labels}
-      preload={hero ? 'auto' : 'none'}
-      priority={hero}
-    >
-      {spec.poster ? null : art}
-    </VideoPlayer>
+    <picture>
+      {phone ? <source media="(max-width: 899px)" type="image/avif" srcSet={srcSet(phone, 'avif')} sizes={phone.sizes} /> : null}
+      {phone ? <source media="(max-width: 899px)" type="image/webp" srcSet={srcSet(phone, 'webp')} sizes={phone.sizes} /> : null}
+      <source type="image/avif" srcSet={srcSet(desktop, 'avif')} sizes={desktop.sizes} />
+      {/* next/image를 쓰지 않는다: scripts/media.mjs가 미리 줄인 AVIF와 WebP를 picture로 고르고, 이미지 최적화 서버를 쓰지 않는다.
+          @next/next/no-img-element는 picture 안의 img를 검사하지 않으므로 eslint-disable 주석을 두지 않는다 */}
+      <img
+        className="media-fill"
+        src={url(desktop, width, 'webp')}
+        srcSet={srcSet(desktop, 'webp')}
+        sizes={desktop.sizes}
+        width={width}
+        height={height}
+        alt={spec.alt}
+        {...load}
+      />
+    </picture>
   );
 }
 
-function ImageSlot({ spec, art }: { spec: ImageSpec; art: ReactNode }) {
-  if (!spec.src) return art;
-  // eslint-disable-next-line @next/next/no-img-element -- 존 이미지는 슬롯 사양의 크기로 미리 줄여 올린다
-  return <img className="media-fill" src={spec.src} alt={spec.alt} loading="lazy" decoding="async" />;
-}
-
-// 영상과 이미지는 이 컴포넌트로만 넣는다. 주소가 비어 있으면 브랜드 포스터 카드를 그린다.
-// 비율(aspect-ratio)은 부모가 정하고, 슬롯은 부모를 가득 채운다. children은 화면 위에 얹는 'AI' 라벨이다
-export function MediaSlot({ id, children }: { id: keyof typeof MEDIA; children?: ReactNode }) {
-  const spec = MEDIA[id] as MediaSpec;   // 지금 없는 종류(image)도 다루도록 넓혀 둔다
-  const zone = ZONES.find((z) => z.media === id);
-  const art = zone ? <ZonePoster zone={zone} /> : <ParkMap label={MEDIA.hero.alt} />;
-  const labels = zone ? zoneLabels(zone.name) : filmLabels;
+// 영상과 이미지는 이 컴포넌트로만 넣는다(CLAUDE.md). 그릴 파일이 없으면 브랜드 포스터 카드를 그린다.
+// 파일이 있는지는 present()만 정한다. file 문자열이 비었는지로 정하지 않는다(무료 요금제 사진은 이 PC에만 있다).
+// 비율은 부모 프레임이 정하고, 슬롯은 프레임을 가득 채운다
+export function MediaSlot({ id, part, priority = false }: Props) {
+  const spec = MEDIA[id] as MediaSpec;   // satisfies가 좁힌 유니온을 넓힌다. 지금 없는 종류(video)도 다룬다
+  check(spec, id);
 
   switch (spec.kind) {
-    case 'video':
-      return <><VideoSlot id={id} spec={spec} art={art} labels={labels} />{children}</>;
+    case 'pair':
+      // 두 장이 모두 있어야 비교가 된다. 그 전에는 묶음 전체에 카드 하나를 그린다
+      if (!part || !present(spec)) return <PosterCard />;
+      return <Picture spec={spec[part]} />;
     case 'image':
-      return <><ImageSlot spec={spec} art={art} />{children}</>;
-    case 'phone':
+      if (!present(spec)) return <PosterCard />;
+      return <Picture spec={spec} priority={priority} />;
+    case 'video': {
+      if (!present(spec)) return <PosterCard />;
+      // 재생 버튼이 페이지에 여럿이면 스크린리더 목록에서 구별되게 기능 이름을 붙인다
+      const name = FEATURES.find((f) => f.id === id)?.feature ?? COPY.film.title;
       return (
-        <div className="phone">
-          <div className="phone-screen">
-            {spec.screen.kind === 'video'
-              ? <VideoSlot id={id} spec={spec.screen} art={art} labels={labels} />
-              : <ImageSlot spec={spec.screen} art={art} />}
-            {children}
-          </div>
-        </div>
+        <VideoPlayer
+          mediaId={id}
+          src={spec.src}
+          srcMobile={spec.srcMobile || undefined}
+          poster={spec.poster}
+          alt={spec.alt}
+          captions={spec.captions || undefined}
+          captionsLabel={COPY.film.captions}
+          labels={{ play: `${name} ${COPY.film.play}`, pause: `${name} ${COPY.film.pause}` }}
+          preload="none"
+        />
       );
-    case 'compare':
-      // 비교할 파일이 없으면 조작할 것도 없으므로 포스터만 그린다. 라벨은 Zone이 파일이 있을 때만 넘긴다
-      if (!spec.before || !spec.after) return <>{art}{children}</>;
-      return <><CompareSlider before={spec.before} after={spec.after} alt={spec.alt} labels={COPY.compare} />{children}</>;
+    }
   }
 }

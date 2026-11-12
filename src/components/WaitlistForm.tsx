@@ -1,8 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type ChangeEvent, type FormEvent } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
-import { Sparkle } from './Icons';
 import { Spans } from './Spans';
 import { WithdrawForm } from './WithdrawForm';
 import { COPY } from '@/content/site';
@@ -41,8 +40,9 @@ async function send(phone: string, token: string, hp: string): Promise<Failure |
 }
 
 // 마지막 CTA와 신청 창이 같은 폼을 쓴다. 번호를 쓰는 곳이 둘이라 id는 useId로 만든다.
-// 번호는 어디에도 저장하지 않는다. 창을 닫아도 값이 남는 것은 컴포넌트가 살아 있기 때문이다
-export function WaitlistForm() {
+// 번호는 어디에도 저장하지 않는다. 창을 닫아도 값이 남는 것은 컴포넌트가 살아 있기 때문이다.
+// aside는 블록 아래 줄에서 신청 취소 옆에 놓인다. 마지막 CTA만 제휴 문의를 넘기고, 신청 창은 넘기지 않는다
+export function WaitlistForm({ aside }: { aside?: ReactNode } = {}) {
   const id = useId();
   const [phone, setPhone] = useState('');
   const [agreed, setAgreed] = useState(false);
@@ -161,7 +161,7 @@ export function WaitlistForm() {
       statusRef.current?.scrollIntoView({ block: 'nearest' });   // 키보드나 카드 끝에 가려져도 결과가 보이게 한다
       return;
     }
-    // 패널에서는 폼이 줄어들어도 아래가 뛰지 않게 높이를 지킨다
+    // 마지막 CTA에서는 폼이 줄어들어도 아래가 뛰지 않게 높이를 지킨다. 회색 블록이 늘어나 그 높이를 채운다(cta.css .wl)
     const root = rootRef.current;
     if (root && !root.closest('dialog')) root.style.minHeight = `${root.offsetHeight}px`;
     // 누른 버튼이 사라지므로 포커스를 옮긴다
@@ -174,12 +174,11 @@ export function WaitlistForm() {
 
   return (
     <div ref={rootRef} className="wl">
-      {withdrawing ? <WithdrawForm onBack={closeWithdraw} onWithdrawn={resetSignup} /> : (<>
+      {withdrawing ? <WithdrawForm onBack={closeWithdraw} onWithdrawn={resetSignup} aside={aside} /> : (<>
+      {/* 블록(마지막 CTA의 회색 면)에는 폼이나 완료 문구와, 누른 뒤에 생기는 상태 줄과 Turnstile 자리가 들어간다 */}
+      <div className="wl-block">
       {done ? (
         <p ref={doneRef} tabIndex={-1} className="wl-done">
-          <span className="btn-orb" aria-hidden="true">
-            <Sparkle />
-          </span>
           <strong>{copy.done[0]}</strong> <span>{copy.done[1]}</span>
         </p>
       ) : (
@@ -211,7 +210,7 @@ export function WaitlistForm() {
             {copy.notice.map((row) => (
               <div key={row.label} className={row.strong ? 'wl-notice-strong' : undefined}>
                 <dt>{row.label}</dt>
-                <dd>{row.strong ? <span className="hl">{row.value}</span> : row.value}</dd>
+                <dd>{row.strong ? <strong>{row.value}</strong> : row.value}</dd>
               </div>
             ))}
           </dl>
@@ -245,11 +244,11 @@ export function WaitlistForm() {
           {/* 입력한 번호를 지키려고 새 탭으로 연다. 라벨 안에 두면 누를 때 체크가 바뀌고,
               체크박스 설명(aria-describedby)에 넣으면 낭독기가 동의 설명과 함께 읽으므로 동의 줄 아래 따로 둔다 */}
           <p className="wl-docs">
-            <a href="/privacy" target="_blank" rel="noopener" className="wl-more">
+            <a href="/privacy" target="_blank" rel="noopener">
               {copy.more}<span className="sr-only">{copy.moreSr}</span>
             </a>
-            {' '}<span aria-hidden="true">·</span>{' '}
-            <a href="/terms" target="_blank" rel="noopener" className="wl-more">
+            {' '}
+            <a href="/terms" target="_blank" rel="noopener">
               {copy.termsLink}<span className="sr-only">{copy.moreSr}</span>
             </a>
           </p>
@@ -271,26 +270,27 @@ export function WaitlistForm() {
           </div>
 
           {/* Firefox는 새로 고침 때 풀린 disabled까지 되살려 하이드레이션 전에도 눌린다. autocomplete가 그 복원을 끈다. React 타입에 없어 펼쳐서 넘긴다 */}
-          <button type="submit" {...{ autoComplete: 'off' }} disabled={!hydrated} aria-disabled={pending ? true : undefined} className="btn-primary wl-submit">
+          <button type="submit" {...{ autoComplete: 'off' }} disabled={!hydrated} aria-disabled={pending ? true : undefined} className="btn wl-submit">
             <span>{pending ? copy.sending : COPY.cta.waitlist}</span>
-            <span className="btn-orb" aria-hidden="true">
-              <Sparkle />
-            </span>
           </button>
           <p className="wl-nojs">{copy.noJs}</p>
         </form>
       )}
-      {/* 누른 뒤에 생기는 것은 모두 버튼 아래에 나온다. 패널은 아래로만 자라 위의 내용이 움직이지 않는다. 상태 줄은 폼 밖에 두어 성공 뒤에도 남는다 */}
+      {/* 누른 뒤에 생기는 것은 모두 버튼 아래에 나온다. 블록은 아래로만 자라 위의 내용이 움직이지 않는다. 상태 줄은 폼 밖에 두어 성공 뒤에도 남는다 */}
       <p ref={statusRef} role="status" aria-live="polite" aria-atomic="true" data-error={failed ? '' : undefined} className="wl-status">{status}</p>
       <p role="status" className="sr-only">{pending && !interact ? copy.sending : ''}</p>
       <div ref={slotRef} data-open={interact ? '' : undefined} className="wl-slot" />
-      {/* JS가 있어야 열 수 있어 JS 끔에는 CSS가 숨긴다. 그때는 처리방침의 메일과 전화로 받는다 */}
+      </div>
+      {/* 블록 아래 한 줄. 신청 취소는 JS가 있어야 열 수 있어 JS 끔에는 CSS가 숨긴다. 그때는 처리방침의 메일과 전화로 받는다 */}
+      <div className="wl-after">
       <p className="wl-switch">
         {copy.withdraw.ask}{' '}
-        <button ref={switchRef} type="button" aria-disabled={pending ? true : undefined} className="wl-more" onClick={openWithdraw}>
+        <button ref={switchRef} type="button" aria-disabled={pending ? true : undefined} onClick={openWithdraw}>
           {copy.withdraw.open}
         </button>
       </p>
+      {aside}
+      </div>
       </>)}
     </div>
   );

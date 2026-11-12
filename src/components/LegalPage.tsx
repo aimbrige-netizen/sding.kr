@@ -44,7 +44,7 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
     <main id="main" tabIndex={-1} className="legal outline-none">
       <div className="legal-in">
         <header className="legal-head">
-          <h1 className="zone-title legal-title">{doc.title}</h1>
+          <h1 className="legal-title">{doc.title}</h1>
           <p className="legal-lead">{doc.lead}</p>
         </header>
         <nav className="legal-toc" aria-labelledby="legal-toc-title">

@@ -1,6 +1,6 @@
 import { ADDRESS, COMPANY } from './company';
+import { FEATURES } from './features';
 import { COPY, SITE } from './site';
-import { ZONES } from './zones';
 import { GA_ID } from '@/lib/analytics';
 import { launchFull } from '@/lib/launch';
 
@@ -49,8 +49,8 @@ const contactRows = rows(
 const effectiveRows = rows({ label: '시행일', value: LEGAL_DATE });
 
 const [item, purpose, retention] = COPY.waitlist.notice;   // 동의 고지와 글자까지 같아야 한다
-const [, planner, dress, hall] = ZONES;
-const aiFeatures = [planner, dress, hall].map((zone) => zone.feature).join(', ');
+const [, planner, dress, hall] = FEATURES;
+const aiFeatures = [planner, dress, hall].map((f) => f.feature).join(', ');
 
 const TLS = 'TLS 지문(브라우저의 연결 방식 정보)';
 const USAGE = '쿠키 식별자, IP 주소, 대략적인 위치, 기기와 브라우저 정보, 유입 경로, 페이지 방문과 버튼 누름 같은 이용 기록, 신청 결과(성공, 또는 번호 형식 오류·동의 누락·봇 확인 실패·서버 오류 같은 실패 이유)';
@@ -188,7 +188,7 @@ const privacy: LegalDoc = {
       ] },
     ] },
     { id: 'cookies', title: '자동으로 수집하는 정보와 쿠키', blocks: [
-      { p: `쿠키는 웹사이트가 브라우저에 저장하는 작은 파일로, 다시 접속할 때 서버로 전송돼요. ${GA_ON ? '스딩이 설치한 Google 애널리틱스 태그가 sding.kr에 쿠키를 만들어요.' : '스딩이 직접 만드는 쿠키는 없어요.'} 소리 안내 말풍선을 다시 보이지 않으려고 브라우저에 임시 표시를 하나 남길 수 있는데, 이 표시는 서버로 보내지 않고 탭을 닫으면 지워져요.` },
+      { p: `쿠키는 웹사이트가 브라우저에 저장하는 작은 파일로, 다시 접속할 때 서버로 전송돼요. ${GA_ON ? '스딩이 설치한 Google 애널리틱스 태그가 sding.kr에 쿠키를 만들어요.' : '스딩이 직접 만드는 쿠키는 없어요.'}` },
       { rows: rows({ label: '처리 근거', value: AUTO_BASIS }) },
       { groups: [
         group('사이트 접속 기록',

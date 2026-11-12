@@ -1,0 +1,15 @@
+/* 웨딩홀 시뮬레이션(시안 M199–210, M338–340). 글 블록 아래 화면 폭 가득 16:9 미디어(모서리 0), 그 아래 컨테이너 선에 고지.
+   지금은 이미지 자리이고 파일이 오기 전에는 포스터 카드다. 가운데 재생 버튼(시안 M204–209)은 영상이 생길 때 media.css가 맡는다 */
+@layer components {
+  .hall {
+    padding-top: var(--section-feature);
+    scroll-margin-top: calc(var(--sp-6) - var(--section-feature));   /* 앵커로 오면 라벨이 머리글 --sp-6 아래에 온다 */
+  }
+  .hall-copy { padding-bottom: var(--gap-media); }
+  .hall-frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--r-bleed); }
+  .hall-cap { padding-top: var(--sp-5); }
+
+  @media (max-width: 899px) {
+    .hall-cap { padding-top: var(--sp-3_5); }
+  }
+}

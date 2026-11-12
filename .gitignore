@@ -51,3 +51,5 @@ next-env.d.ts
 
 # legal research notes, kept out of the public repository
 /docs/private/
+# 무료 요금제 사진의 검토용 사본. 로컬 커밋도 하지 않는다
+/public/media/preview/

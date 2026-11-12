@@ -15,35 +15,21 @@ export const SITE = {
 // 화면 문구. 날짜가 들어가는 부분은 lib/launch.ts의 도우미로 만들어 붙인다.
 export const COPY = {
   skipLink: '본문으로 건너뛰기',
-  homeLabel: '스딩 홈',
+  homeLabel: '스딩 Sding 홈',                             // 로고 링크 이름(머리글, 푸터). 워드마크에 보이는 'Sding'을 이름에 넣는다(WCAG 2.5.3). TODO(hero-copy)
+  nav: { label: '기능' },                                 // 머리글 바로가기의 aria-label
   cta: { waitlist: '출시 알림 받기', live: '앱 시작하기' },
   hero: {
-    kicker: '정식 오픈',                                 // 앞에 launchDotted(). 오픈 뒤 히어로 날짜 줄과 실링 라벨
-    kickerSoon: '정식 오픈 예정',                        // 오픈 전 히어로 날짜 줄. 아직 오지 않은 날을 확정처럼 쓰지 않는다
-    hook: { waitlist: 'Coming Soon', live: 'Now Open' }, // TODO(live-hook): 'Now Open'은 승인 전 제안값
-    ddayLabel: '오픈까지',
-    ddayPrefix: 'D-',                                  // 실링의 'D-58'. 숫자는 daysToLaunch()
-    ddaySr: ['오픈까지 ', '일'],                         // 스크린리더용 '오픈까지 58일'. 숫자 앞뒤 문구
-    h1: '웨딩 준비, 스딩에서 놀듯이',                     // 모바일은 쉼표 뒤에서 두 줄로 나눈다
-    sub: '가격은 한눈에, 드레스는 미리, 웨딩홀은 걸어본 듯이.',   // 쉼표로 나눈 구절은 줄바꿈으로 가르지 않는다
+    kicker: '정식 오픈',                                  // 오픈 뒤 날짜 줄. 앞에 launchDotted()
+    kickerSoon: '정식 오픈 예정',                         // 오픈 전 날짜 줄. 아직 오지 않은 날을 확정처럼 쓰지 않는다
+    h1: ['가격이 보이는', '결혼 준비'],                   // TODO(hero-copy) TODO(price-rule). 어느 폭에서나 두 줄
+    sub: ['스딩은 웨딩 가격을 정찰제로 공개하고,', 'AI로 플래닝과 드레스, 웨딩홀을 미리 경험하게 해요.'],   // TODO(hero-copy) TODO(price-rule). 첫 줄 뒤에서 늘 줄을 바꾼다
   },
-  film: {
-    title: '스딩 소개 영상',
-    play: '영상 재생',
-    pause: '영상 일시정지',
-    transcript: '영상 내용 글로 보기',
-    captions: '한국어',
-  },
-  intro: {
-    kicker: '스딩이란',
-    keep: ['정찰제로 투명하게', '플래닝·드레스·웨딩홀을', '미리 경험하게 하는', '웨딩 플랫폼이에요.'],   // SITE.definition에서 줄바꿈으로 가르지 않는 구절
-    hl: ['정찰제로 투명하게', '미리 경험하게'],   // keep 구절 안에서 형광펜을 칠하는 부분
-  },
-  zones: { nav: '존 바로가기' },
-  compare: { label: '원본과 AI 합성 비교', before: '원본', after: 'AI 합성' },
+  media: { aiCaption: 'AI로 만든 예시 이미지예요.' },      // AI로 만든 사진 바로 아래 한 줄(PLAN 'AI 서비스 고지')
+  film: { title: '스딩 소개 영상', play: '영상 재생', pause: '영상 일시정지', transcript: '영상 내용 글로 보기', captions: '한국어' },   // 영상 슬롯 버튼 이름, VideoObject 이름, M2 영상 창
+  compare: { label: '원본과 AI 합성 비교', before: '원본', after: 'AI 합성' },   // 드레스 비교 묶음 이름과 캡션
   faq: { title: '자주 묻는 질문' },
   final: {
-    title: [',', '스딩이 문을 열 예정이에요'],           // 첫 칸 앞에 launchLabel(). 날짜가 혼자 한 줄을 쓴다
+    title: [',', '스딩이 문을', '열 예정이에요'],          // 첫 칸 앞에 launchLabel(). 날짜 줄 뒤에서 늘, 둘째 칸 뒤에서는 900px 이상에서만 줄을 바꾼다
     titleLive: '지금 스딩을 시작해 보세요',
     lead: ['전화번호를 남기면 오픈하는 날 문자로 알려 드려요.', '로그인은 필요 없어요.'],   // 문장마다 나눈다. 넓은 화면은 문장마다 한 줄이다
     partner: ['웨딩 업체이신가요?', '제휴 문의'],
@@ -94,21 +80,14 @@ export const COPY = {
   },
   notFound: {
     metaTitle: '페이지를 찾을 수 없어요 | 스딩',
-    title: '지도에 없는 곳이에요',
+    title: '페이지를 찾을 수 없어요',                     // 파크 문구 '지도에 없는 곳이에요' 대신 metaTitle과 같은 말을 쓴다
     lead: '주소가 바뀌었거나 잘못 입력된 것 같아요.',
     home: '스딩 홈으로 가기',
   },
   terms: '스딩 기능 용어',   // 구조화 데이터의 DefinedTermSet 이름
   llms: { launch: '정식 오픈일', launchSoon: '정식 오픈 예정일', features: '기능', company: '회사 정보', legalName: '법인명', address: '주소', links: '링크', home: '홈' },
-  sound: {
-    label: '영상 소리',
-    turnOn: '소리 켜기',
-    turnOff: '소리 끄기',
-    waiting: '영상이 보이면 소리가 나요',
-    stopped: '영상을 재생하면 소리가 나요',   // 켜짐·대기 중 소리 영상이 화면에 있지만 멈춰 있을 때
-    bubble: '소리 켜 볼까요?',
-  },
   footer: {
+    navLabel: '사이트 정보',   // 푸터 링크 nav의 이름. 머리글 nav('기능')와 구별한다. TODO(hero-copy)
     labels: {
       ceo: '대표', bizRegNo: '사업자등록번호', mailOrderNo: '통신판매업신고번호',
       phone: '전화', email: '이메일', privacyOfficer: '개인정보보호책임자',

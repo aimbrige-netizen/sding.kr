@@ -1,7 +1,7 @@
 import { ctaMode, launchFull } from './launch';
 import { ADDRESS, COMPANY } from '@/content/company';
+import { FEATURES } from '@/content/features';
 import { COPY, SITE } from '@/content/site';
-import { ZONES } from '@/content/zones';
 
 // public/llms.txt의 내용. 정의 문장, 기능 4개, 회사 정보, 링크 3개를 content 파일에서 읽는다(PLAN 'llms.txt')
 export function llmsText() {
@@ -16,7 +16,7 @@ export function llmsText() {
     '',
     `## ${llms.features}`,
     '',
-    ...ZONES.map((zone) => `- ${zone.feature}: ${zone.definition}`),
+    ...FEATURES.map((f) => `- ${f.feature}: ${f.definition}`),
     '',
     `## ${llms.company}`,
     '',

@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>스딩</title>
+<link rel="stylesheet" href="/fonts.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<style>
+:root{
+  /* primitives: true neutrals + one orange. The only raw colour values on the page live here. */
+  --orange:#FF5719;
+  --orange-press:#EC4A0F;
+  --orange-ink:#D63A00;        /* small orange text on white (4.7:1) */
+  --orange-ink-band:#C23400;   /* small orange text on #F4F4F5 (5.0:1) */
+  --ink:#111113;
+  --gray-700:#3F3F46;
+  --gray-500:#71717A;
+  --gray-400:#A1A1AA;
+  --gray-200:#E4E4E7;
+  --gray-100:#F4F4F5;
+  --white:#FFFFFF;
+  --slot:#26262A;
+
+  /* semantic roles: component rules reference these, never raw values */
+  --on-accent:var(--white);              /* labels on orange fills, 20px bold only (3.2:1) */
+  --on-dark:var(--white);                /* controls on the dark slot and the film layer */
+  --slot-note:rgb(255 255 255 / .7);     /* placeholder notes on #26262A */
+  --veil-strong:rgb(255 255 255 / .66);  /* hero poster veil at the left edge */
+  --veil-soft:rgb(255 255 255 / .42);
+  --veil-clear:rgb(255 255 255 / 0);
+  --scrim:rgb(17 17 19 / .88);           /* behind the brand film layer */
+  --header-bg:rgb(255 255 255 / .86);    /* sticky header; solid white where backdrop-filter is missing */
+  --focus-ring:var(--ink);               /* 18.9:1 on white, 17.2:1 on #F4F4F5 */
+  --focus-ring-on-dark:var(--white);     /* 15:1 on #26262A */
+  --edge-forced:ButtonText;              /* forced-colours mode only: the header button's border */
+
+  /* type: Wanted Sans for display, Pretendard for reading. Three weights only. */
+  --font-display:'Wanted Sans Variable','Pretendard Variable',system-ui,sans-serif;
+  --font-body:'Pretendard Variable',system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;
+  --w-body:500;
+  --w-strong:700;
+  --w-display:800;
+
+  --fs-h1:92px;
+  --fs-close:clamp(56px,6vw,76px); /* sized so '열 예정이에요' always fits the 5/12 signup column */
+  --fs-h2:60px;
+  --fs-q:23px;
+  --fs-lead:21px;
+  --fs-body:20px;
+  --fs-label:18px;
+  --fs-small:14px;
+
+  /* layout */
+  --container:1240px;
+  --gutter:40px;
+  --edge:max(var(--gutter), calc((100% - var(--container)) / 2));
+  --header-h:72px;          /* the frosted band ends above the groom's hair (y 82 at 1440x900) */
+  --gap-media:72px;         /* a text block to the media under it */
+  --section:200px;          /* the long pause, only before the FAQ and the signup */
+  --section-feature:160px;  /* between feature scenes */
+  --band-gap:144px;         /* white before the grey dress band */
+
+  /* shape: sharp */
+  --radius-bleed:0;
+  --radius-frame:4px;
+  --radius-control:8px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:var(--header-h)}
+body{
+  margin:0;background:var(--white);color:var(--ink);
+  font-family:var(--font-body);font-weight:var(--w-body);
+  font-size:var(--fs-body);line-height:1.75;letter-spacing:-0.01em;
+  -webkit-font-smoothing:antialiased;
+  word-break:keep-all;overflow-wrap:anywhere;
+}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+h1,h2,h3,p,figure,dl,dd{margin:0}
+h1,h2,h3{font-family:var(--font-display);font-weight:var(--w-display);color:var(--ink);text-wrap:balance}
+p,dd,li{text-wrap:pretty}
+strong{font-weight:var(--w-strong)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}
+.wrap{width:min(100% - var(--gutter) * 2, var(--container));margin-inline:auto}
+
+/* shared text roles */
+.label{
+  display:block;font-family:var(--font-display);font-weight:var(--w-strong);
+  font-size:var(--fs-label);line-height:1.4;letter-spacing:-0.01em;color:var(--orange-ink);
+}
+.h2{margin-top:18px;font-size:var(--fs-h2);line-height:1.15;letter-spacing:-0.035em}
+.body{margin-top:26px;max-width:34em;font-size:var(--fs-body);line-height:1.75;color:var(--gray-700)}
+.cap{font-size:var(--fs-small);line-height:1.5;letter-spacing:0;color:var(--gray-500)}
+
+/* controls: orange is a fill, never a hover colour; the one orange ring is the phone header CTA (#D63A00 outline) */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:64px;padding:0 34px;border:0;border-radius:var(--radius-control);
+  background:var(--orange);color:var(--on-accent);
+  font-family:var(--font-display);font-weight:var(--w-strong);font-size:20px;line-height:1;letter-spacing:-0.01em;
+  text-decoration:none;white-space:nowrap;cursor:pointer;
+  transition:background-color .2s ease,transform .2s ease;
+}
+.btn:hover{background:var(--orange-press)}
+.btn:active{transform:translateY(1px)}
+.btn-compact{height:48px;padding:0 24px}
+
+/* header: sticky so the CTA stays one tap away; the negative margin keeps it laid over the hero at load */
+.site-header{
+  position:sticky;top:0;z-index:20;
+  height:var(--header-h);margin-bottom:calc(-1 * var(--header-h));
+  background:var(--header-bg);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+}
+@supports not ((backdrop-filter:blur(14px)) or (-webkit-backdrop-filter:blur(14px))){
+  .site-header{background:var(--white)}
+}
+.site-header .wrap{display:flex;align-items:center;justify-content:space-between;height:100%}
+/* desktop windows under 860px tall (1280x720, 1366x768, 1440x789, 1536x730): a 60px bar. The groom's hair sits at
+   98/1080 of the scaled photo: y65 at 1280x720, y74 at 1440x789. From 860px tall it is at y78 or lower, clear of the 72px bar. */
+@media (min-width:900px) and (max-height:859px){
+  :root{--header-h:60px}
+  .btn-compact{height:44px}
+}
+.brand{display:block}
+.brand img{height:32px;width:auto}
+.site-nav{display:flex;align-items:center;gap:44px}
+.site-nav ul{display:flex;gap:36px;margin:0;padding:0;list-style:none}
+.site-nav ul a{font-size:16px;line-height:1;text-decoration:none;white-space:nowrap}
+.site-nav ul a:hover{color:var(--ink);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:6px}
+
+/* hero: the brand film's poster as the whole first frame; the film itself opens in #film */
+.hero{position:relative;display:flex;align-items:flex-end;min-height:max(640px,100svh);overflow:hidden;isolation:isolate}
+.hero-media{position:absolute;inset:0;z-index:-1}
+/* anchored to the top: in windows wider than 16:9 the crop comes off the floor, never off the couple's heads */
+.hero-media img{width:100%;height:100%;object-fit:cover;object-position:24% 0}
+.hero-media::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,var(--veil-strong) 0%,var(--veil-soft) 26%,var(--veil-clear) 50%);
+}
+.hero-copy{padding-bottom:96px}
+.hero-date{font-family:var(--font-display);font-weight:var(--w-strong);font-size:18px;line-height:1.4;letter-spacing:0}
+.hero h1{margin-top:22px;font-size:var(--fs-h1);line-height:1.1;letter-spacing:-0.04em}
+.hero-sub{margin-top:30px;font-size:var(--fs-lead);line-height:1.65;color:var(--gray-700)}
+.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:32px;margin-top:44px}
+.play-link{
+  display:inline-flex;align-items:center;gap:10px;height:64px;padding:0;border:0;background:none;cursor:pointer;
+  font-family:var(--font-display);font-weight:var(--w-strong);font-size:18px;line-height:1;letter-spacing:-0.01em;color:var(--ink);
+}
+.play-link i{font-size:22px}
+.play-link:hover span{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:6px}
+.cap-row{padding-top:16px}
+
+/* brand film layer: 16:9 at any viewport, never behind the hero copy */
+.film{max-width:none;max-height:none;margin:auto;padding:0;border:0;background:none;overflow:visible}
+.film::backdrop{background:var(--scrim)}
+.film video{display:block;width:min(92vw,160vh);height:auto;aspect-ratio:16/9;border-radius:var(--radius-frame);background:var(--ink)}
+.film-close{
+  position:fixed;top:16px;right:16px;
+  display:grid;place-items:center;width:56px;height:56px;padding:0;border:0;border-radius:var(--radius-control);
+  background:none;color:var(--on-dark);font-size:28px;cursor:pointer;
+}
+.film :focus-visible{outline-color:var(--focus-ring-on-dark)}
+
+/* 1. price: copy on white in the container, then the showroom full-bleed with nothing on it, then its caption */
+.price{padding-top:176px}
+.price-media{margin-top:var(--gap-media)}
+.price-media img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:var(--radius-bleed)}
+.price-media figcaption{padding-top:16px}
+.br-d{display:inline}
+.br-m{display:none}
+
+/* 2. planner: 5/7 split, the photo bleeds off the right edge, copy on the container line */
+.planner{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:center;padding-top:var(--section-feature)}
+.planner-copy{padding-left:max(var(--gutter),calc(100% * 1.2 - var(--container) / 2));padding-right:56px}
+.planner-media img{width:100%;aspect-ratio:9/10;object-fit:cover;object-position:32% 50%}
+/* the caption starts on the container line, like every other caption: (figure = 7/12 of the page, so 6/7 of it is half the page) */
+.planner-media figcaption{padding-top:16px;margin-left:calc(max(var(--gutter), 100% * 6 / 7 - var(--container) / 2) - 100% * 5 / 7)}
+
+/* 3. dress: grey band, before/after pair */
+.dress{margin-top:var(--band-gap);padding:var(--section-feature) 0;background:var(--gray-100)}
+.dress .label{color:var(--orange-ink-band)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:var(--gap-media)}
+.compare figcaption{
+  margin-top:18px;font-family:var(--font-display);font-weight:var(--w-strong);
+  font-size:18px;line-height:1.4;letter-spacing:-0.01em;color:var(--ink);
+}
+.slot{position:relative;background:var(--slot);border-radius:var(--radius-frame);overflow:hidden}
+.slot-3x4{aspect-ratio:3/4}
+.slot-note{position:absolute;left:28px;right:28px;bottom:24px;font-size:15px;line-height:1.5;letter-spacing:0;color:var(--slot-note)}
+.slot-note span{display:block}
+.dress .notice{margin-top:44px;font-size:var(--fs-small);line-height:1.6;letter-spacing:0;color:var(--gray-700)}
+
+/* 4. hall: copy on white, then the one dark scene, a full-bleed 16:9 video frame with nothing on it but the play control */
+.hall{padding-top:var(--section-feature)}
+.hall-copy{padding:0 0 var(--gap-media)}
+.hall-frame{position:relative;display:block;aspect-ratio:16/9;background:var(--slot)}
+.hall-frame .slot-note{top:auto;bottom:32px;left:var(--edge);right:auto}
+.hall-frame :focus-visible{outline-color:var(--focus-ring-on-dark)}
+.play-btn{
+  position:absolute;left:50%;top:50%;translate:-50% -50%;
+  display:grid;place-items:center;width:72px;height:72px;border:0;border-radius:var(--radius-control);
+  background:var(--white);color:var(--ink);font-size:28px;cursor:pointer;transition:transform .2s ease;
+}
+.play-btn:hover{transform:scale(1.04)}
+.hall-notice{padding-top:20px}
+
+/* faq */
+.faq{padding-top:var(--section)}
+.faq-list{max-width:1000px;margin-top:64px}
+.faq details{border-top:1px solid var(--gray-200)}
+.faq details:last-child{border-bottom:1px solid var(--gray-200)}
+.faq summary{
+  display:flex;align-items:center;justify-content:space-between;gap:40px;padding:34px 0;
+  list-style:none;cursor:pointer;
+  font-family:var(--font-display);font-weight:var(--w-strong);font-size:var(--fs-q);line-height:1.45;letter-spacing:-0.02em;color:var(--ink);
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:hover span{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:6px}
+.faq summary span{text-wrap:balance}
+.faq summary i{flex:none;font-size:26px;transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+.faq details[open] summary i{transform:rotate(45deg)}
+.faq .answer{max-width:42em;padding:0 64px 38px 0;font-size:19px;line-height:1.75;color:var(--gray-700)}
+
+/* signup: title and lead on white in the left 5/12; the form in the right 7/12, in reading order:
+   field, what is collected, the refusal lines, consent, submit, then the two side links */
+.signup{padding:var(--section) 0 176px}
+.signup-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:start;column-gap:64px}
+.signup h2{font-size:var(--fs-close);line-height:1.12;letter-spacing:-0.04em}
+.signup h2 .date{color:var(--orange)} /* display size only: 3.2:1 on white passes as large text */
+.signup-lead{margin-top:32px}
+.signup-lead p{font-size:var(--fs-lead);line-height:1.7;color:var(--gray-700)}
+.form-block{padding:56px;border-radius:var(--radius-frame);background:var(--gray-100)}
+.field-label{display:block;font-family:var(--font-display);font-weight:var(--w-strong);font-size:16px;line-height:1.4;letter-spacing:-0.01em}
+.field-input{
+  display:block;width:100%;height:64px;margin-top:12px;padding:0 20px;
+  border:1px solid var(--gray-500);border-radius:var(--radius-control);background:var(--white);
+  font:inherit;font-size:20px;letter-spacing:0.01em;color:var(--ink);
+}
+.field-input::placeholder{color:var(--gray-500)}
+.field-input:focus{outline:3px solid var(--focus-ring);outline-offset:2px;border-color:var(--ink)}
+.terms{display:grid;grid-template-columns:auto 1fr;gap:12px 28px;margin-top:40px;font-size:15px;line-height:1.6;letter-spacing:-0.005em}
+.terms dt{color:var(--gray-700)}
+.terms dd{color:var(--ink)}
+.fine{margin-top:20px;font-size:14px;line-height:1.65;letter-spacing:0;color:var(--gray-700)}
+.f-consent{margin-top:36px}
+.consent{display:flex;align-items:flex-start;gap:12px;font-size:16px;line-height:1.5;cursor:pointer}
+.box{position:relative;flex:none;width:24px;height:24px}
+.box input{
+  appearance:none;-webkit-appearance:none;display:block;width:24px;height:24px;margin:0;
+  border:1.5px solid var(--gray-500);border-radius:var(--radius-frame);background:var(--white);cursor:pointer;
+}
+.box input:checked{border-color:var(--orange);background:var(--orange)}
+.box i{position:absolute;inset:0;display:grid;place-items:center;font-size:16px;color:var(--on-accent);opacity:0;pointer-events:none}
+.box input:checked + i{opacity:1}
+.doc-links{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:12px;padding-left:36px;font-size:15px;line-height:1.5}
+.doc-links a{color:var(--gray-700);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+.doc-links a:hover{color:var(--ink)}
+.form-block .btn{width:100%;margin-top:36px}
+.form-after{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;margin-top:24px;font-size:15px;line-height:1.6;color:var(--gray-700)}
+.form-after a{margin-left:8px;color:var(--ink);font-weight:var(--w-strong);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+
+/* footer */
+.site-footer{border-top:1px solid var(--gray-200);padding:72px 0 88px;font-size:14px;line-height:1.75;letter-spacing:0;color:var(--gray-500)}
+.foot-top{display:flex;justify-content:space-between;align-items:flex-start;gap:40px}
+.foot-brand img{height:26px;width:auto}
+.foot-name{margin-top:22px;font-size:15px;font-weight:var(--w-strong);color:var(--ink)}
+.foot-info{display:flex;flex-wrap:wrap;gap:2px 24px;max-width:780px;margin:8px 0 0;padding:0;list-style:none}
+.foot-links{display:flex;gap:28px;margin:0;padding:0;list-style:none;font-size:15px;white-space:nowrap}
+.foot-links a{color:var(--gray-700);text-decoration:none}
+.foot-links a:hover{text-decoration:underline;text-underline-offset:4px}
+.foot-links .privacy{font-weight:var(--w-strong);color:var(--ink)}
+.foot-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;margin-top:48px;padding-top:28px;border-top:1px solid var(--gray-200)}
+
+/* phones and narrow tablets */
+@media (max-width:899px){
+  :root{
+    --gutter:20px;--section:112px;--section-feature:112px;--band-gap:112px;
+    --header-h:64px;--gap-media:36px;
+    --fs-h1:clamp(44px,11.3vw,64px);
+    /* '스딩이 문을 열 예정이에요' is about 9.7em wide: this keeps it on one line at any phone width (34px at 390) */
+    --fs-close:min(56px, calc((100vw - 2 * var(--gutter)) / 10.3));
+    --fs-h2:clamp(32px,8.2vw,48px);
+    --fs-q:19px;--fs-lead:17px;--fs-body:17px;--fs-label:15px;--fs-small:13px;
+  }
+  .brand img{height:24px}
+  .site-nav ul{display:none}
+  /* the 1.5px outline is an inset ring: Chrome floors a 1.5px border to 1px (forced colours: a real border, see the end) */
+  .btn.btn-compact{
+    height:40px;padding:0 14px;box-shadow:inset 0 0 0 1.5px var(--orange-ink);
+    background:var(--white);color:var(--orange-ink);font-size:16px;
+  }
+  /* hover only where a pointer hovers (a tap would leave it on); on the grey fill, text and ring step down to orange-ink-band (5.05:1) */
+  @media (hover:hover){
+    .btn.btn-compact:hover{background:var(--gray-100);color:var(--orange-ink-band);box-shadow:inset 0 0 0 1.5px var(--orange-ink-band)}
+  }
+
+  .hero{display:block;min-height:0;overflow:visible}
+  .hero-copy{padding:96px 0 0}
+  .hero-date{font-size:15px}
+  .hero h1{margin-top:14px;line-height:1.2;letter-spacing:-0.035em}
+  .hero-sub{margin-top:18px;line-height:1.65}
+  .hero-actions{gap:22px;margin-top:28px}
+  .btn{height:56px;padding:0 24px}
+  .play-link{height:56px;font-size:16px}
+  .play-link i{font-size:20px}
+  .hero-media{position:relative;inset:auto;z-index:auto;margin-top:var(--gap-media)}
+  .hero-media img{height:auto;aspect-ratio:4/5;object-position:80% 50%}
+  .hero-media::after{display:none}
+  .cap-row{padding-top:12px}
+
+  .br-d{display:none}
+  .br-m{display:inline}
+  .label{font-size:var(--fs-label)}
+  .h2{margin-top:12px;line-height:1.25;letter-spacing:-0.03em}
+  .body{margin-top:18px;line-height:1.7}
+
+  .price{padding-top:var(--section)}
+  .price-media img{aspect-ratio:4/3}
+  .price-media figcaption{padding-top:12px}
+
+  .planner{grid-template-columns:1fr;padding-top:var(--section)}
+  .planner-copy{padding:0 var(--gutter)}
+  .planner-media{margin-top:var(--gap-media)}
+  .planner-media img{aspect-ratio:4/5;object-position:30% 50%}
+  .planner-media figcaption{margin-left:0;padding:12px var(--gutter) 0}
+
+  .dress{padding:104px 0}
+  .compare{gap:10px}
+  .slot-note{left:14px;right:14px;bottom:14px}
+  .compare figcaption{margin-top:12px;font-size:16px}
+  .dress .notice{margin-top:28px}
+
+  .hall-frame .slot-note{bottom:14px}
+  .play-btn{width:56px;height:56px;font-size:22px}
+  .hall-notice{padding-top:14px}
+
+  .faq-list{margin-top:36px}
+  .faq summary{gap:20px;padding:24px 0;letter-spacing:-0.015em}
+  .faq summary i{font-size:22px}
+  .faq .answer{padding:0 0 28px;font-size:16.5px;line-height:1.7}
+
+  .signup{padding:var(--section) 0 112px}
+  .signup-grid{grid-template-columns:minmax(0,1fr)}
+  .signup h2{line-height:1.2;letter-spacing:-0.035em}
+  .signup-lead{margin-top:20px}
+  .signup-form{margin-top:32px}
+  .form-block{margin:0 calc(var(--gutter) * -1);padding:36px var(--gutter) 32px;border-radius:0}
+  .field-input{height:56px;font-size:18px}
+  /* narrow label column so '오픈이 늦어져도 2027년 6월 30일까지 파기' keeps to one line under '5일 안에,' */
+  .terms{align-items:baseline;gap:10px 12px;margin-top:28px;font-size:16px}
+  .terms dt{font-size:14px}
+  .fine{margin-top:20px;font-size:16px;line-height:1.6}
+  .f-consent{margin-top:28px}
+  .doc-links{font-size:14px}
+  .form-block .btn{margin-top:28px}
+  .form-after{flex-direction:column;margin-top:20px;font-size:14px}
+
+  .site-footer{padding:56px 0 64px;font-size:13px}
+  .foot-top{flex-direction:column;gap:28px}
+  .foot-links{flex-wrap:wrap;gap:10px 24px;font-size:14px}
+  .foot-bottom{flex-direction:column;margin-top:32px}
+}
+
+/* forced colours (Windows contrast themes) drop box-shadow and fills: the header button keeps a real 1.5px outline */
+@media (forced-colors:active){
+  .btn.btn-compact{border:1.5px solid var(--edge-forced)}
+}
+</style>
+</head>
+<body>
+<!--
+THESIS: Sding as film stills. Each of the four features is a large photographic scene; heavy Wanted Sans titles sit beside or above the media, never on it. Only the hero copy sits on the bright empty wall of its own poster. Refuses the cream card grid, the centered SaaS hero and the repeated text/card zigzag.
+OWN-WORLD: daylight studio white, ink #111113 type, one orange: #FF5719 as a fill (wordmark, buttons, checked box) and as the display-size signup date, #D63A00 / #C23400 for the small feature labels and the phone header button outline; focus rings are ink (white on the dark slot); cool neutrals only; sharp geometry: bleed 0, frames 4px, controls 8px.
+STORY: price shown up front, then planner, dress, hall as scenes; questions answered; a phone number left for the 12.25 opening.
+FIRST VIEWPORT: full-bleed couple photo (the brand film's poster) under a sticky frosted-white header: orange wordmark top-left, nav and orange button top-right (phone: wordmark and an outlined button); date, 2-line 92px H1, sub and orange CTA on the bright lower-left wall.
+-->
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="/assets/logo-orange.svg" width="71" height="30" alt="스딩"></a>
+    <nav class="site-nav" aria-label="기능">
+      <ul>
+        <li><a href="#price">정찰제</a></li>
+        <li><a href="#planner">AI 플래너</a></li>
+        <li><a href="#dress">드레스</a></li>
+        <li><a href="#hall">웨딩홀</a></li>
+      </ul>
+      <a class="btn btn-compact" href="#signup">출시 알림 받기</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!--
+  Brand film (16:9, being made by the owner): never autoplay it behind .hero-copy. hero.jpg stays the resting poster and
+  '소개 영상 보기' opens the film in its own 16:9 layer (#film, end of body).
+  Shoot note: keep the left ~40% of the film's first frame bright and empty, so a frame grab can replace hero.jpg as the poster.
+  -->
+  <section class="hero" id="top">
+    <div class="hero-copy wrap">
+      <p class="hero-date">2026.12.25 정식 오픈 예정</p>
+      <h1>가격이 보이는<br>결혼 준비</h1>
+      <p class="hero-sub">스딩은 웨딩 가격을 정찰제로 공개하고,<br>AI로 플래닝과 드레스, 웨딩홀을 미리 경험하게 해요.</p>
+      <div class="hero-actions">
+        <a class="btn" href="#signup">출시 알림 받기</a>
+        <button class="play-link" type="button" commandfor="film" command="show-modal" aria-haspopup="dialog"><i class="ph ph-play" aria-hidden="true"></i><span>소개 영상 보기</span></button>
+      </div>
+    </div>
+    <figure class="hero-media">
+      <img src="/assets/hero.jpg" width="1920" height="1080" alt="흰 스튜디오에서 주황색 꽃다발을 들고 웃는 신랑과 신부">
+    </figure>
+  </section>
+  <div class="wrap cap-row"><p class="cap">AI로 만든 예시 이미지예요.</p></div>
+
+  <section class="price" id="price" aria-labelledby="price-title">
+    <div class="wrap">
+      <p class="label">웨딩 가격 정찰제</p>
+      <h2 class="h2" id="price-title">웨딩 가격,<br>묻지 않아도 보여요</h2>
+      <p class="body">상담을 받아야 알 수 있던 웨딩 가격을 처음부터 보여&nbsp;드려요.<br class="br-d"> 같은 기준으로 놓고 비교해 보세요.</p>
+    </div>
+    <figure class="price-media">
+      <img src="/assets/price.jpg" width="1920" height="1080" alt="드레스, 반지, 부케, 청첩장, 턱시도에 같은 모양의 빈 가격표가 걸린 흰 쇼룸">
+      <figcaption class="cap wrap">AI로 만든 예시 이미지예요.</figcaption>
+    </figure>
+  </section>
+
+  <section class="planner" id="planner" aria-labelledby="planner-title">
+    <div class="planner-copy">
+      <p class="label">AI 웨딩 플래너</p>
+      <h2 class="h2" id="planner-title">날짜와 예산만<br>알려 주세요</h2>
+      <p class="body">결혼식 날짜와 예산에 맞춰 준비 순서와&nbsp;일정을 AI가&nbsp;짜&nbsp;드려요. 투어와 피팅 일정도 한곳에서 챙길&nbsp;수&nbsp;있어요.</p>
+    </div>
+    <figure class="planner-media">
+      <img src="/assets/planner.jpg" width="1920" height="1080" alt="소파에 앉아 휴대폰 하나를 함께 보며 웃는 커플">
+      <figcaption class="cap">AI로 만든 예시 이미지예요.</figcaption>
+    </figure>
+  </section>
+
+  <section class="dress" id="dress" aria-labelledby="dress-title">
+    <div class="wrap">
+      <p class="label">AI 드레스 합성</p>
+      <h2 class="h2" id="dress-title">내 사진으로<br>드레스를 입어 보세요</h2>
+      <p class="body">내 사진에 드레스를 입혀 어울리는 스타일을 미리&nbsp;확인해요.<br class="br-d"> 피팅 전에 후보를 좁힐 수 있어요.</p>
+      <div class="compare">
+        <figure>
+          <div class="slot slot-3x4">
+            <p class="slot-note"><span>원본 사진</span><span>같은 사람, 같은 자세, 옷만 바뀐 사진</span></p>
+          </div>
+          <figcaption>원본</figcaption>
+        </figure>
+        <figure>
+          <div class="slot slot-3x4">
+            <p class="slot-note"><span>AI 합성 사진</span><span>같은 사람, 같은 자세, 옷만 바뀐 사진</span></p>
+          </div>
+          <figcaption>AI 합성</figcaption>
+        </figure>
+      </div>
+      <p class="notice">AI로 합성한 이미지예요. 실제 착용 모습과 다를 수 있어요.</p>
+    </div>
+  </section>
+
+  <section class="hall" id="hall" aria-labelledby="hall-title">
+    <div class="hall-copy wrap">
+      <p class="label">웨딩홀 시뮬레이션</p>
+      <h2 class="h2" id="hall-title">버진로드를<br>미리 걸어 보세요</h2>
+      <p class="body">입장부터 버진로드까지, 방문 전에 분위기와 동선을 먼저 걸어 봐요.</p>
+    </div>
+    <div class="hall-frame">
+      <button class="play-btn" type="button" aria-label="웨딩홀 시뮬레이션 영상"><i class="ph ph-play" aria-hidden="true"></i></button>
+      <p class="slot-note"><span>웨딩홀 시뮬레이션 영상</span><span>입구에서 버진로드까지 걷는 1인칭 영상</span></p>
+    </div>
+    <div class="wrap hall-notice"><p class="cap">AI가 만든 시뮬레이션이에요. 실제 웨딩홀과 다를 수 있어요.</p></div>
+  </section>
+
+  <section class="faq" id="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <h2 class="h2" id="faq-title">자주 묻는 질문</h2>
+      <div class="faq-list">
+        <details open>
+          <summary><span>스딩은 무엇인가요?</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="answer">스딩은 웨딩 가격을 정찰제로 투명하게 만들고, AI로 플래닝·드레스·웨딩홀을 미리 경험하게 하는 웨딩 플랫폼이에요.</p>
+        </details>
+        <details>
+          <summary><span>웨딩 가격 정찰제는 무엇인가요?</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="answer">웨딩 가격 정찰제는 상담을 받기 전에 가격을 공개하고, 같은 기준으로 보여 주는 방식이에요.</p>
+        </details>
+        <details>
+          <summary><span>AI 웨딩 플래너는 무엇을 해 주나요?</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="answer">AI 웨딩 플래너는 결혼식 날짜와 예산에 맞춰 준비 순서와 일정을 짜 주는 기능이에요.</p>
+        </details>
+        <details>
+          <summary><span>AI 드레스 합성은 어떻게 쓰나요?</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="answer">내 사진에 드레스를 합성해 어울리는 스타일을 미리 보는 기능이에요. 결과는 AI 합성 이미지라 실제 착용 모습과 다를 수 있어요.</p>
+        </details>
+        <details>
+          <summary><span>웨딩홀 시뮬레이션은 실제 웨딩홀과 같나요?</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="answer">실제 웨딩홀과 같지 않아요. AI가 만든 시뮬레이션이라 실제와 다를 수 있어요. 방문 전에 분위기와 동선을 확인하는 용도로 써 주세요.</p>
+        </details>
+        <details>
+          <summary><span>언제부터 쓸 수 있나요?</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="answer">스딩은 2026년 12월 25일 정식 오픈 예정이에요. 출시 알림을 신청하면 오픈하는 날 문자로 알려 드려요.</p>
+        </details>
+        <details>
+          <summary><span>출시 알림에 남긴 번호는 어떻게 쓰이나요?</span><i class="ph ph-plus" aria-hidden="true"></i></summary>
+          <p class="answer">출시 알림에 남긴 번호는 정식 오픈 안내 문자를 1회 보내는 데만 써요. 안내 문자를 보낸 뒤 5일 안에, 오픈이 늦어져도 2027년 6월 30일까지 파기해요.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="signup" id="signup" aria-labelledby="signup-title">
+    <div class="wrap signup-grid">
+      <div class="signup-intro">
+        <h2 id="signup-title"><span class="date">12월 25일</span>,<br>스딩이 문을<br class="br-d"> 열 예정이에요</h2>
+        <div class="signup-lead">
+          <p>전화번호를 남기면 오픈하는 날 문자로 알려 드려요.</p>
+          <p>로그인은 필요 없어요.</p>
+        </div>
+      </div>
+      <div class="signup-form">
+        <!-- Reading order is the legal order: the disclosure comes before the consent it covers. -->
+        <form class="form-block" action="/api/waitlist" method="post">
+          <div class="f-field">
+            <label class="field-label" for="phone">휴대폰 번호</label>
+            <input class="field-input" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="010-0000-0000">
+          </div>
+          <dl class="terms">
+            <dt>수집 항목</dt><dd>휴대폰 번호</dd>
+            <dt>이용 목적</dt><dd><strong>정식 오픈 안내 문자 1회 발송</strong></dd>
+            <dt>보유 기간</dt><dd><strong>안내 문자를 보낸 뒤 5일 안에, 오픈이&nbsp;늦어져도 2027년 6월 30일까지 파기</strong></dd>
+          </dl>
+          <p class="fine">동의를 거부할 수 있어요.<br class="br-m"> 거부하면 출시 알림을 받을&nbsp;수&nbsp;없어요.<br>만 14세 미만은 신청할 수 없어요.</p>
+          <div class="f-consent">
+            <label class="consent">
+              <span class="box"><input type="checkbox" name="agree" required><i class="ph ph-check" aria-hidden="true"></i></span>
+              <span>개인정보 수집·이용에 동의해요 (필수)</span>
+            </label>
+            <p class="doc-links"><a href="/privacy">개인정보 처리방침 보기</a><a href="/terms">이용약관 보기</a></p>
+          </div>
+          <button class="btn" type="submit">출시 알림 받기</button>
+        </form>
+        <div class="form-after">
+          <p>이미 신청했나요?<a href="#signup">신청 취소하기</a></p>
+          <p>웨딩 업체이신가요?<a href="mailto:namu@sding.kr">제휴 문의</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-top">
+      <div>
+        <a class="foot-brand" href="#top"><img src="/assets/logo-orange.svg" width="62" height="26" alt="스딩"></a>
+        <p class="foot-name">주식회사 스딩</p>
+        <ul class="foot-info">
+          <li>대표 정원창</li>
+          <li>사업자등록번호 590-86-03810</li>
+          <li>통신판매업신고번호</li>
+          <li>서울특별시 강남구 압구정로46길 5-10, 3층 302호 (신사동, 압구정로데오스타)</li>
+          <li>전화 010-9897-7678</li>
+          <li>이메일 namu@sding.kr</li>
+          <li>개인정보보호책임자 정원창</li>
+        </ul>
+      </div>
+      <ul class="foot-links">
+        <li><a class="privacy" href="/privacy">개인정보 처리방침</a></li>
+        <li><a href="/terms">이용약관</a></li>
+        <li><a href="mailto:namu@sding.kr">제휴 문의</a></li>
+      </ul>
+    </div>
+    <div class="foot-bottom">
+      <p>스딩 앱의 AI 기능은 생성형 AI를 활용할 예정이에요. 결과는 실제와 다를 수 있어요.</p>
+      <p>© 2026 주식회사 스딩. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Brand film layer. Opened declaratively by '소개 영상 보기' (command="show-modal"), closed by the button, Esc or a click outside.
+     TODO(소개 영상): add the owner's 16:9 film as <source>. No autoplay; it starts muted and the viewer turns sound on from the controls. -->
+<dialog class="film" id="film" aria-label="소개 영상" closedby="any">
+  <video controls muted playsinline preload="none" poster="/assets/hero.jpg" width="1920" height="1080"></video>
+  <button class="film-close" type="button" commandfor="film" command="close" aria-label="닫기"><i class="ph ph-x" aria-hidden="true"></i></button>
+</dialog>
+</body>
+</html>

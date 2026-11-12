@@ -1,21 +1,21 @@
 import type { CtaMode } from './launch';
+import type { FeatureId } from '@/content/features';
+import type { MediaId } from '@/content/media';
 
-// GA4 이벤트 8개(PLAN '분석 이벤트'). 매개변수는 아래의 정해진 값만 받는다. 번호와 입력값은 어떤 매개변수에도 넣지 않는다.
+// GA4 이벤트 7개(PLAN '분석 이벤트'). 매개변수는 아래의 정해진 값만 받는다. 번호와 입력값은 어떤 매개변수에도 넣지 않는다.
 // 이름은 GA의 예약 이벤트(form_submit, video_progress 등)를 피한다.
 // ID가 없거나 gtag가 없으면 아무것도 보내지 않는다. 함수는 브라우저에서만 부른다
 export const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? '';
 
-type MediaId = 'hero' | 'zone1' | 'zone2' | 'zone3' | 'zone4';
 export type FormResult = 'success' | 'phone' | 'consent' | 'challenge' | 'invalid' | 'server';
 export type CtaLocation = 'header' | 'hero' | 'final' | 'dialog';
 
 type Events = {
   cta_click: { location: CtaLocation; mode: CtaMode };
-  sound_toggle: { state: 'on' | 'off' };
   video_play: { media_id: MediaId };
   video_milestone: { media_id: MediaId; mark: '3s' | '25%' | '50%' | '75%' | '100%' };
   video_fallback: { reason: 'reduced_motion' | 'save_data' | 'low_power' | 'rejected' };
-  zone_view: { zone_id: string };
+  feature_view: { feature_id: FeatureId };
   faq_open: { faq_id: string };
   waitlist_submit: { result: FormResult };
 };

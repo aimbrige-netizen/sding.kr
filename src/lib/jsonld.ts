@@ -2,26 +2,15 @@ import { ctaMode } from './launch';
 import { prune } from './prune';
 import { COMPANY } from '@/content/company';
 import { faqFor } from '@/content/faq';
-import { MEDIA, type MediaSpec } from '@/content/media';
+import { FEATURES } from '@/content/features';
 import { COPY, SITE } from '@/content/site';
-import { ZONES } from '@/content/zones';
 
 const home = `${SITE.url}/`;
 const org = `${SITE.url}/#org`;
 const site = `${SITE.url}/#website`;
 const terms = `${SITE.url}/#terms`;
-const absolute = (url = '') => (url ? new URL(url, SITE.url).href : '');
 
-// 업로드일과 썸네일이 채워진 뒤에만 영상 노드를 낸다(PLAN '구조화 데이터')
-function film() {
-  const spec: MediaSpec = MEDIA.hero;
-  if (spec.kind !== 'video' || !spec.uploadDate || !spec.poster) return null;
-  return {
-    '@type': 'VideoObject', '@id': `${SITE.url}/#film`, name: COPY.film.title, description: spec.description,
-    thumbnailUrl: [absolute(spec.poster)], uploadDate: spec.uploadDate, duration: spec.duration,
-    contentUrl: absolute(spec.src), embedUrl: spec.youtube, inLanguage: 'ko-KR',
-  };
-}
+// 소개 영상(MEDIA.film)이 오면 present()로 파일을 확인해 VideoObject 노드를 더한다(PLAN '구조화 데이터')
 
 // ctaMode()는 스토어 주소가 있어야 'live'가 되므로 이 노드는 앱이 나온 뒤에만 나간다(PLAN 'CTA 전환')
 function app() {
@@ -50,9 +39,8 @@ export const graph = () => {
         isPartOf: { '@id': site }, about: { '@id': org }, inLanguage: 'ko-KR',
         primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE.url}/opengraph-image` } },
       { '@type': 'DefinedTermSet', '@id': terms, name: COPY.terms, inLanguage: 'ko-KR',
-        hasDefinedTerm: ZONES.map((zone) => ({ '@type': 'DefinedTerm', name: zone.feature, description: zone.definition,
+        hasDefinedTerm: FEATURES.map((f) => ({ '@type': 'DefinedTerm', name: f.feature, description: f.definition,
           inDefinedTermSet: { '@id': terms } })) },
-      film(),
       mode === 'live' ? app() : null,
       { '@type': 'FAQPage', '@id': `${SITE.url}/#faq`,
         mainEntity: faqFor(mode).map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })) },

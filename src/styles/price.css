@@ -1,0 +1,13 @@
+/* 웨딩 가격 정찰제(PLAN '웨딩 가격 정찰제', 시안 M170–175, M322–324).
+   글 블록 아래에 화면 폭 가득 16:9(폰 4:3) 프레임이 오고, 프레임 위에는 아무것도 얹지 않는다. 캡션은 그 아래 컨테이너 선이다 */
+@layer components {
+  /* 앵커로 오면 위 여백을 건너뛰어 라벨이 헤더 아래 --sp-6 자리에 온다 */
+  .price { padding-top: var(--section); scroll-margin-top: calc(var(--sp-6) - var(--section)); }
+  .price-media { margin-top: var(--gap-media); }
+  .price-frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--r-bleed); }
+  .price-cap { padding-top: var(--gap-cap); }
+
+  @media (max-width: 899px) {
+    .price-frame { aspect-ratio: 4 / 3; }
+  }
+}

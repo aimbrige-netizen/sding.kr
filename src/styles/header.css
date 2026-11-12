@@ -1,0 +1,52 @@
+/* 머리글(시안 M113–134, M290–300, M370–372). 늘 흰색 86%와 블러를 깔고, 스크롤 위치를 보지 않는다.
+   음수 아래 여백으로 히어로 위에 겹친다. 법적 페이지와 404는 위 여백에 --header-h를 더해 제목이 가려지지 않는다 */
+@layer components {
+  .site-header {
+    position: sticky; top: 0; z-index: 20;
+    height: var(--header-h); margin-bottom: calc(-1 * var(--header-h));
+    background: var(--header-bg);
+    -webkit-backdrop-filter: blur(var(--header-blur)); backdrop-filter: blur(var(--header-blur));
+  }
+  /* 블러가 없는 브라우저는 흰 바탕이다. 흐리지 않은 86% 흰색으로는 뒤의 사진이 비쳐 보인다 */
+  @supports not ((backdrop-filter: blur(var(--header-blur))) or (-webkit-backdrop-filter: blur(var(--header-blur)))) {
+    .site-header { background: var(--white); }
+  }
+  .site-header-in { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+
+  /* 기능 바로가기와 CTA. CTA는 nav 밖에 둔다. 링크의 누르는 영역은 높이와 폭 모두 --tap 이상이다.
+     세 글자 이름('정찰제' 등, 약 2.6em)은 --tap보다 좁아 좌우 여백을 더하고, 같은 만큼 음수 여백으로 돌려 글자 자리는 그대로 둔다.
+     이웃한 링크의 누르는 영역은 --sp-9에서 양쪽 여백을 뺀 만큼 떨어져 겹치지 않는다 */
+  .site-actions { display: flex; align-items: center; gap: var(--sp-11); }
+  .site-nav ul { display: flex; gap: var(--sp-9); margin: 0; padding: 0; list-style: none; }
+  .site-nav a {
+    display: inline-flex; align-items: center; min-height: var(--tap);
+    padding-inline: var(--sp-1_5); margin-inline: calc(-1 * var(--sp-1_5));
+    font-size: var(--fs-ui); line-height: 1; letter-spacing: var(--track-tight);
+    color: var(--ink); text-decoration: none; white-space: nowrap;
+  }
+  @media (hover: hover) {
+    .site-nav a:hover { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: var(--sp-1_5); }
+  }
+
+  /* 머리글 CTA. 모양과 색은 .btn이고 높이, 좌우 여백, 글자 크기만 줄인다 */
+  .btn-compact { min-height: var(--btn-compact-h); padding: 0 var(--btn-compact-pad); font-size: var(--fs-btn-compact); }
+
+  /* 폰: 바로가기를 숨기고 흰 바탕에 --orange-ink 글자와 안쪽 테두리. Chrome은 1.5px 테두리를 1px로 내리므로 안쪽 그림자로 그린다 */
+  @media (max-width: 899px) {
+    .site-nav { display: none; }
+    .btn.btn-compact { background: var(--white); color: var(--orange-ink); box-shadow: inset 0 0 0 1.5px var(--orange-ink); }
+  }
+  /* hover할 수 있는 기기에서만. 회색 면 위에서는 글자와 테두리를 --orange-ink-band로 내린다(띠 위 5.05) */
+  @media (max-width: 899px) and (hover: hover) {
+    .btn.btn-compact:hover { background: var(--gray-100); color: var(--orange-ink-band); box-shadow: inset 0 0 0 1.5px var(--orange-ink-band); }
+  }
+  /* 강제 색 모드는 그림자와 면을 지운다. 진짜 테두리로 버튼 모양을 남긴다 */
+  @media (forced-colors: active) {
+    .btn.btn-compact { border: 1.5px solid var(--edge-forced); }
+  }
+
+  @media print {
+    .site-header { position: static; margin-bottom: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .site-actions { display: none; }
+  }
+}

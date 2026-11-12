@@ -1,0 +1,54 @@
+/* 푸터(PLAN '푸터', 시안 M268–277, M363–366). 흰 바탕, 위쪽 가는 선, --gray-500 작은 글자. --gray-500은 흰 바탕에만 쓴다.
+   상호와 개인정보 처리방침 링크만 --ink이고 굵다. 링크는 누르는 영역이 --tap 이상이고 서로 겹치지 않는다 */
+@layer components {
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding: var(--sp-18) 0 calc(var(--sp-22) + env(safe-area-inset-bottom));
+    font-size: var(--fs-small); line-height: 1.75; letter-spacing: 0; color: var(--gray-500);
+  }
+
+  .foot-top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--sp-10); }
+  .foot-logo .logo-mark { height: var(--logo-foot-h); }
+  /* 로고 링크는 --tap 높이 상자 가운데에 워드마크가 있다. 링크 줄을 그만큼 내려 글자가 워드마크와 같은 높이에 온다(시안 M269) */
+  .foot-nav { margin-top: calc((var(--tap) - var(--logo-foot-h)) / 2); }
+
+  /* 회사 정보 */
+  .foot-address { font-style: normal; }
+  /* 로고 상자(--tap)에서 워드마크 아래로 남는 만큼 빼서, 워드마크 아래 --sp-5_5에 상호가 온다(시안 M271). 글자 크기는 폰에서도 같다 */
+  .foot-name {
+    margin-top: calc(var(--sp-5_5) - (var(--tap) - var(--logo-foot-h)) / 2);
+    font-size: var(--fs-name); font-weight: var(--w-strong); color: var(--ink);
+  }
+  .foot-info {
+    display: flex; flex-wrap: wrap; gap: var(--sp-0_5) var(--sp-6);
+    max-width: var(--foot-info-w); margin: var(--sp-2) 0 0; padding: 0; list-style: none;
+  }
+
+  /* 링크. li 안의 줄 글자라 min-height만으로는 커지지 않는다. inline-flex로 --tap 높이 상자를 만들고, 음수 여백으로 글자는 제자리에 둔다 */
+  .foot-links {
+    display: flex; gap: var(--sp-7); margin: 0; padding: 0; list-style: none;
+    font-size: var(--fs-meta); white-space: nowrap;
+  }
+  .foot-links a {
+    display: inline-flex; align-items: center; min-height: var(--tap); margin-block: calc((1.75em - var(--tap)) / 2);
+    color: var(--gray-700); text-decoration: none;
+  }
+  @media (hover: hover) {
+    .foot-links a:hover { text-decoration: underline; text-underline-offset: var(--sp-1); }
+  }
+  .foot-links .privacy { font-weight: var(--w-strong); color: var(--ink); }
+
+  .foot-bottom {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sp-2) var(--sp-6);
+    margin-top: var(--sp-12); padding-top: var(--sp-7); border-top: 1px solid var(--line);
+  }
+
+  /* 폰. 링크가 줄을 나누면 두 줄의 누르는 상자가 겹치지 않게 줄 사이를 --sp-6으로 둔다(시안보다 넓다) */
+  @media (max-width: 899px) {
+    .site-footer { padding: var(--sp-14) 0 calc(var(--sp-16) + env(safe-area-inset-bottom)); }
+    .foot-top { flex-direction: column; gap: var(--sp-7); }
+    .foot-nav { margin-top: 0; }
+    .foot-links { flex-wrap: wrap; gap: var(--sp-6); }
+    .foot-bottom { flex-direction: column; margin-top: var(--sp-8); }
+  }
+}

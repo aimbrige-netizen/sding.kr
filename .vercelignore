@@ -1,0 +1,3 @@
+# git 밖의 파일을 vercel deploy의 소스 업로드에서 뺀다. vercel build와 --prebuilt는 이 PC의 public/을 그대로 담으므로 막지 못한다(CLAUDE.md)
+public/media/preview
+docs/private

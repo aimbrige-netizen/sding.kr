@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // git 밖(.gitignore)의 개인 작업 파일. 사이트 코드가 아니다
+    "docs/private/**",
   ]),
 ]);
 
