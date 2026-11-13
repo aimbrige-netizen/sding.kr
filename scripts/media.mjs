@@ -1,5 +1,6 @@
 // 사진 원본을 사이트용 AVIF(q60)와 WebP(q82)로 미리 줄인다(PLAN '미디어 슬롯 사양'). 손으로 실행하고 빌드에는 들어가지 않는다.
-//   node scripts/media.mjs <원본 폴더> [--preview | --licensed]   원본 폴더의 사진을 아래 JOBS대로 자르고 줄인다. 기본은 --preview다
+//   node scripts/media.mjs <원본 폴더> [--preview | --licensed]   원본 폴더의 사진을 아래 JOBS대로 자르고 줄인다. 기본은 --preview다.
+//                                                                 2026-11-13부터 preview 작업이 없어 보통은 --licensed로 실행한다
 //   node scripts/media.mjs --verify                              src/content/media.ts가 가리키는 파일과 git 상태를 확인한다
 // 원본(마스터)은 git 밖의 docs/private/media-masters/에 바이트 그대로 둔다. 다시 인코딩하면 C2PA 서명이 빠지기 때문이다.
 // 무료 요금제 사진은 상업적으로 쓸 수 없어 public/media/preview/(git 제외)에만 쓴다. 로컬 커밋도 하지 않는다.
@@ -15,22 +16,38 @@ const PREVIEW_DIR = join(ROOT, 'public', 'media', 'preview');
 const LICENSED_DIR = join(ROOT, 'public', 'media');
 const KB = 1000;
 
-// 인코딩 작업. extract는 2560x1440 원본에서 자르는 자리(left, top, width, height)다.
-// preview: 무료 요금제 사진. --preview로만 만든다. budget은 파일 하나의 상한(바이트)이다
+// 인코딩 작업. extract는 원본에서 자르는 자리(left, top, width, height, 원본 픽셀)다.
+// preview: 무료 요금제 사진. --preview로만 만든다. budget은 파일 하나의 상한(바이트)이다.
+// 품질은 AVIF q60, WebP q82다. 이 품질로 상한을 넘는 폭만 byWidth에서 품질을 낮춘다(PLAN '미디어 슬롯 사양').
+// WebP는 AVIF를 못 읽는 옛 브라우저의 대체 파일이다. 큰 폭의 WebP가 q72에서도 상한을 넘으면 그 폭의 WebP 상한만 올린다
+// 원본 PNG에 힉스필드의 hf-job-id 글 조각이 있으면 사이트 파일의 XMP dc:source로 옮긴다. 출처 표시를 지우지 않는다(힉스필드 이용약관 5.5)
 const JOBS = [
-  { out: 'hero-d.v1', src: 'hero.jpg', widths: [1280, 1920, 2560], preview: true, budget: { avif: 50 * KB, webp: 64 * KB } },   // LCP
-  { out: 'hero-m.v1', src: 'hero.jpg', extract: [1126, 0, 1152, 1440], widths: [640, 960, 1152], preview: true, budget: { avif: 40 * KB, webp: 50 * KB } },
-  { out: 'price-d.v1', src: 'price.jpg', widths: [1280, 1920, 2560], preview: true, budget: { avif: 120 * KB, webp: 120 * KB } },
-  { out: 'price-m.v1', src: 'price.jpg', extract: [320, 0, 1920, 1440], widths: [640, 960, 1280], preview: true, budget: { avif: 120 * KB, webp: 120 * KB } },
-  { out: 'planner-d.v1', src: 'planner.jpg', extract: [404, 0, 1296, 1440], widths: [960, 1296], preview: true, budget: { avif: 120 * KB, webp: 120 * KB } },
-  { out: 'planner-m.v1', src: 'planner.jpg', extract: [422, 0, 1152, 1440], widths: [640, 960, 1152], preview: true, budget: { avif: 120 * KB, webp: 120 * KB } },
+  // 무료 요금제(Fish Audio) 미리보기 작업(hero/price/planner v1)은 2026-11-13에 힉스필드 사진으로 바꾸며 지웠다.
+  // 힉스필드 Ultra 요금제 원본 2752x1536, 1792x2400(2026-11-12). git 밖의 docs/private/media-masters/higgsfield/manifest.json에 job id와 해시가 있다.
+  // 낮춘 품질은 100% 확대 비교에서 얼굴 차이가 없었고, 웨딩홀 2560의 꽃잎 결만 조금 부드러워졌다(2026-11-13)
+  { out: 'hero-d.v2', src: '01-hero-b.png', extract: [21, 0, 2731, 1536], widths: [1280, 1920, 2560],
+    byWidth: { 2560: { quality: { avif: 52, webp: 76 } } }, budget: { avif: 50 * KB, webp: 64 * KB } },   // LCP
+  { out: 'hero-m.v2', src: '01-hero-b.png', extract: [1310, 0, 1229, 1536], widths: [640, 960, 1152],
+    byWidth: { 960: { quality: { avif: 55, webp: 78 } }, 1152: { quality: { avif: 50, webp: 72 } } }, budget: { avif: 40 * KB, webp: 50 * KB } },   // 폰 LCP
+  { out: 'price-d.v2', src: '02-price-b.png', extract: [21, 0, 2731, 1536], widths: [1280, 1920, 2560], budget: { avif: 120 * KB, webp: 120 * KB } },
+  { out: 'price-m.v2', src: '02-price-b.png', extract: [606, 0, 2048, 1536], widths: [640, 960, 1280], budget: { avif: 120 * KB, webp: 120 * KB } },
+  { out: 'planner-d.v2', src: '03-planner-c.png', extract: [494, 0, 1382, 1536], widths: [960, 1296],
+    byWidth: { 1296: { quality: { avif: 55, webp: 72 }, budget: { webp: 140 * KB } } }, budget: { avif: 120 * KB, webp: 120 * KB } },
+  { out: 'planner-m.v2', src: '03-planner-c.png', extract: [660, 0, 1229, 1536], widths: [640, 960, 1152],
+    byWidth: { 960: { quality: { webp: 80 } }, 1152: { quality: { webp: 74 } } }, budget: { avif: 120 * KB, webp: 120 * KB } },
+  { out: 'dress-before.v1', src: '04-dress-before-a.png', extract: [0, 11, 1792, 2389], widths: [480, 720, 960, 1224], budget: { avif: 200 * KB, webp: 200 * KB } },
+  { out: 'dress-after.v1', src: '05-dress-after-a.png', extract: [0, 11, 1792, 2389], widths: [480, 720, 960, 1224], budget: { avif: 200 * KB, webp: 200 * KB } },
+  { out: 'hall.v1', src: '06-hall-a.png', extract: [13, 0, 2731, 1536], widths: [960, 1280, 1920, 2560],
+    byWidth: { 1920: { quality: { avif: 55, webp: 72 }, budget: { webp: 160 * KB } }, 2560: { quality: { avif: 43, webp: 72 }, budget: { webp: 250 * KB } } },
+    budget: { avif: 120 * KB, webp: 120 * KB } },
 ];
 
-// AI로 만든 이미지라는 표시(IPTC DigitalSourceType). 원본의 C2PA 서명을 대신하지는 않는다
-const XMP = '<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>'
+// AI로 만든 이미지라는 표시(IPTC DigitalSourceType)와 원본의 출처(dc:source). 원본의 C2PA 서명을 대신하지는 않는다
+const xmp = (source) => '<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>'
   + '<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
-  + '<rdf:Description rdf:about="" xmlns:Iptc4xmpExt="http://iptc.org/std/Iptc4xmpExt/2008-02-29/">'
+  + '<rdf:Description rdf:about="" xmlns:Iptc4xmpExt="http://iptc.org/std/Iptc4xmpExt/2008-02-29/" xmlns:dc="http://purl.org/dc/elements/1.1/">'
   + '<Iptc4xmpExt:DigitalSourceType>http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia</Iptc4xmpExt:DigitalSourceType>'
+  + (source ? `<dc:source>${source}</dc:source>` : '')
   + '</rdf:Description></rdf:RDF></x:xmpmeta><?xpacket end="r"?>';
 
 const fail = (message) => {
@@ -76,19 +93,27 @@ async function encode() {
   const over = [];
   let count = 0;
   for (const job of jobs) {
+    // 힉스필드 원본의 job id(PNG 글 조각). 16진수와 -만 받아 XMP에 그대로 넣어도 안전하게 한다
+    const { comments = [] } = await sharp(join(masters, job.src)).metadata();
+    const hf = comments.find((c) => c.keyword === 'hf-job-id')?.text;
+    const source = hf && /^[0-9a-f-]{8,64}$/i.test(hf) ? `higgsfield:job:${hf}` : '';
+    if (licensed && !source) console.warn(`경고: ${job.src}에 hf-job-id가 없거나 형식이 달라 출처(dc:source) 없이 쓴다`);
     for (const w of job.widths) {
+      const o = job.byWidth?.[w] ?? {};
       for (const ext of ['avif', 'webp']) {
         let img = sharp(join(masters, job.src));
         if (job.extract) {
           const [left, top, width, height] = job.extract;
           img = img.extract({ left, top, width, height });
         }
-        img = img.resize(w, null, { kernel: 'lanczos3' });
-        img = ext === 'avif' ? img.avif({ quality: 60, effort: 4 }) : img.webp({ quality: 82, effort: 4 });
+        // 힉스필드 PNG는 RGBA다. 다 불투명한 알파를 빼야 AVIF에 쓸모없는 알파 면이 들어가지 않는다
+        img = img.resize(w, null, { kernel: 'lanczos3' }).removeAlpha();
+        const q = { avif: 60, webp: 82, ...o.quality };
+        img = ext === 'avif' ? img.avif({ quality: q.avif, effort: 4 }) : img.webp({ quality: q.webp, effort: 4 });
         const file = join(outDir, `${job.out}-${w}.${ext}`);
-        const info = await img.withXmp(XMP).toFile(file);
+        const info = await img.withXmp(xmp(source)).toFile(file);
         const bytes = statSync(file).size;
-        const limit = job.budget[ext];
+        const limit = { ...job.budget, ...o.budget }[ext];
         const flag = bytes > limit ? `  상한 ${limit} 초과` : '';
         if (flag) over.push(file);
         count += 1;

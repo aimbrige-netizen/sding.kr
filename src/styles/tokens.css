@@ -90,7 +90,7 @@
   --container: 1240px;
   --gutter: var(--sp-10);
   --edge: max(var(--gutter), calc((100% - var(--container)) / 2));   /* 꽉 찬 블록 안의 컨테이너 왼쪽 선. 100%는 쓰는 자리의 폭이다 */
-  --header-h: 72px;                 /* 띠가 신랑 머리 위에서 끝난다(1440x900에서 머리 y82) */
+  --header-h: 72px;                 /* 띠가 신랑 머리 위에서 끝난다(1440x900에서 머리 y148) */
   --hero-min: 640px;
   --hero-pad: var(--sp-24);
   --gap-media: var(--sp-18);        /* 글 블록에서 그 아래 미디어까지 */
