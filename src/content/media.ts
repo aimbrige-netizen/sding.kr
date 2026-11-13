@@ -25,9 +25,10 @@ export const MEDIA = {
   // AI 예시 사진. 힉스필드 Ultra 요금제로 2026-11-12(UTC)에 만들었다. 약관은 상업적 이용을 제한하지 않고 보이는 워터마크가 없다.
   // 남은 질문 둘은 TODO(ai-image-rights)에 있다. 원본, job id, 해시는 git 밖의 docs/private/media-masters/higgsfield/manifest.json에 있고,
   // 사이트 파일은 media.mjs --licensed로 만든다. alt 여섯 개는 승인 전 초안이다. TODO(hero-copy)
-  // 히어로 상자가 16:9보다 좁으면(가로세로 비 16:9 이하 창) 사진은 높이에 맞춰 화면 폭보다 넓게 그려지므로 sizes가 그 폭을 따른다
+  // 히어로 상자가 16:9보다 좁으면 사진은 상자 높이에 맞춰 화면 폭보다 넓게 그려지므로 sizes가 그 폭을 따른다.
+  // 상자 높이는 화면 높이이고, 가로세로 비가 50/39(약 1.28)보다 좁은 창에서는 폭의 78%다(hero.css). 0.78 × 16/9 = 138.67vw
   hero: { kind: 'image', ai: true, alt: '흰 스튜디오에서 함께 웃는 신랑과 주황색 꽃다발을 든 신부',
-    desktop: { file: 'hero-d.v2', widths: [1280, 1920, 2560], ratio: '16/9', sizes: '(max-aspect-ratio: 16/9) calc(100vh * 16 / 9), 100vw' },
+    desktop: { file: 'hero-d.v2', widths: [1280, 1920, 2560], ratio: '16/9', sizes: '(max-aspect-ratio: 50/39) 138.67vw, (max-aspect-ratio: 16/9) calc(100vh * 16 / 9), 100vw' },
     phone: { file: 'hero-m.v2', widths: [640, 960, 1152], ratio: '4/5', sizes: '100vw' } },
   price: { kind: 'image', ai: true, alt: '드레스와 턱시도, 부케에 주황 끈으로 빈 가격표를 단 흰 쇼룸',
     desktop: { file: 'price-d.v2', widths: [1280, 1920, 2560], ratio: '16/9', sizes: '100vw' },

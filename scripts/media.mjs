@@ -23,7 +23,7 @@ const KB = 1000;
 // 원본 PNG에 힉스필드의 hf-job-id 글 조각이 있으면 사이트 파일의 XMP dc:source로 옮긴다. 출처 표시를 지우지 않는다(힉스필드 이용약관 5.5)
 const JOBS = [
   // 무료 요금제(Fish Audio) 미리보기 작업(hero/price/planner v1)은 2026-11-13에 힉스필드 사진으로 바꾸며 지웠다.
-  // 힉스필드 Ultra 요금제 원본 2752x1536, 1792x2400(2026-11-12). git 밖의 docs/private/media-masters/higgsfield/manifest.json에 job id와 해시가 있다.
+  // 힉스필드 Ultra 요금제 원본 2752x1536, 1792x2400(2026-11-12 UTC). git 밖의 docs/private/media-masters/higgsfield/manifest.json에 job id와 해시가 있다.
   // 낮춘 품질은 100% 확대 비교에서 얼굴 차이가 없었고, 웨딩홀 2560의 꽃잎 결만 조금 부드러워졌다(2026-11-13)
   { out: 'hero-d.v2', src: '01-hero-b.png', extract: [21, 0, 2731, 1536], widths: [1280, 1920, 2560],
     byWidth: { 2560: { quality: { avif: 52, webp: 76 } } }, budget: { avif: 50 * KB, webp: 64 * KB } },   // LCP
