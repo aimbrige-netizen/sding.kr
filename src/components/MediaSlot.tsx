@@ -1,29 +1,36 @@
 import { PosterCard } from './PosterCard';
 import { VideoPlayer } from './VideoPlayer';
 import { FEATURES } from '@/content/features';
-import { MEDIA, mediaUrl, previewUrl, type Art, type ImageSpec, type MediaId, type MediaSpec } from '@/content/media';
+import { DETAILS, MEDIA, mediaUrl, previewUrl, type Art, type DetailRow, type ImageSpec, type MediaId, type MediaSpec } from '@/content/media';
 import { COPY } from '@/content/site';
 import { present } from '@/lib/media-files';
 
-type Props = { id: MediaId; part?: 'before' | 'after'; priority?: boolean };
+// 미디어 자리 하나(id) 또는 디테일 컷 한 장(detail, index)
+type Props =
+  | { id: MediaId; part?: 'before' | 'after'; priority?: boolean; detail?: never; index?: never }
+  | { detail: DetailRow; index: number; id?: never; part?: never; priority?: never };
 
-// 빌드할 때 멈춘다. 파일만 넣고 대체 텍스트를 빠뜨리거나, 폰 크롭을 반만 채우는 실수를 배포 전에 잡는다
-function check(spec: MediaSpec, id: MediaId) {
+// 빌드할 때 멈춘다. 파일만 넣고 대체 텍스트를 빠뜨리거나, 폰 크롭을 반만 채우는 실수를 배포 전에 잡는다.
+// 디테일 컷 가운데 장면 목차의 사진(이름이 있는 링크 안)만 alt를 비울 수 있다
+function check(spec: MediaSpec, name: string, emptyAlt = false) {
   if (spec.kind === 'pair') {
-    check(spec.before, id);
-    check(spec.after, id);
+    check(spec.before, name);
+    check(spec.after, name);
     return;
   }
   if (spec.kind === 'video') {
     // 포스터 이미지가 없으면 재생 전 영상 자리에 보일 그림이 없다
-    if (spec.src && !spec.poster) throw new Error(`MEDIA.${id}: 영상 주소가 있으면 poster도 있어야 한다`);
+    if (spec.src && !spec.poster) throw new Error(`${name}: 영상 주소가 있으면 poster도 있어야 한다`);
+    if (spec.src && !spec.alt.trim()) throw new Error(`${name}: 영상에는 장면 설명(alt)을 써야 한다`);
     return;
   }
-  if (spec.desktop.file && !spec.alt.trim()) throw new Error(`MEDIA.${id}: 이미지 파일이 있으면 alt를 써야 한다`);
-  if (spec.desktop.file && spec.phone && !spec.phone.file) throw new Error(`MEDIA.${id}: phone 크롭의 file이 비어 있다`);
+  if (spec.desktop.file && !emptyAlt && !spec.alt.trim()) throw new Error(`${name}: 이미지 파일이 있으면 alt를 써야 한다`);
+  if (spec.desktop.file && spec.phone && !spec.phone.file) throw new Error(`${name}: phone 크롭의 file이 비어 있다`);
+  if (!/^\d+\/\d+$/.test(spec.desktop.ratio)) throw new Error(`${name}: ratio는 '정수/정수'로 쓴다`);
 }
 
-// 파일 이름은 `${file}-${너비}.${avif|webp}`(scripts/media.mjs). 무료 요금제 사진은 /media/preview/에서 읽는다
+// 파일 이름은 `${file}-${너비}.${avif|webp}`(scripts/media.mjs). 무료 요금제 사진은 /media/preview/에서 읽는다.
+// width와 height는 가장 큰 파일의 크기라 그리기 전에도 비율이 정해진다(CLS 없음)
 function Picture({ spec, priority = false }: { spec: ImageSpec; priority?: boolean }) {
   const url = (art: Art, w: number, ext: 'avif' | 'webp') => {
     const name = `${art.file}-${w}.${ext}`;
@@ -61,10 +68,17 @@ function Picture({ spec, priority = false }: { spec: ImageSpec; priority?: boole
 
 // 영상과 이미지는 이 컴포넌트로만 넣는다(CLAUDE.md). 그릴 파일이 없으면 브랜드 포스터 카드를 그린다.
 // 파일이 있는지는 present()만 정한다. file 문자열이 비었는지로 정하지 않는다(무료 요금제 사진은 이 PC에만 있다).
-// 비율은 부모 프레임이 정하고, 슬롯은 프레임을 가득 채운다
-export function MediaSlot({ id, part, priority = false }: Props) {
-  const spec = MEDIA[id] as MediaSpec;   // satisfies가 좁힌 유니온을 넓힌다. 지금 없는 종류(video)도 다룬다
-  check(spec, id);
+// 비율은 부모 프레임이 정하고, 슬롯은 프레임을 가득 채운다.
+// 디테일 컷은 포스터 카드를 그리지 않는다. 줄을 그릴지는 부모가 rowPresent()로 정하고, 여기서는 한 장이 없으면 아무것도 그리지 않는다
+export function MediaSlot(props: Props) {
+  if (props.detail) {
+    const spec: ImageSpec = DETAILS[props.detail][props.index];
+    check(spec, `DETAILS.${props.detail}[${props.index}]`, props.detail === 'index');
+    return present(spec) ? <Picture spec={spec} /> : null;
+  }
+  const { id, part, priority = false } = props;
+  const spec = MEDIA[id] as MediaSpec;   // satisfies가 좁힌 유니온을 넓힌다
+  check(spec, `MEDIA.${id}`);
 
   switch (spec.kind) {
     case 'pair':
@@ -84,6 +98,7 @@ export function MediaSlot({ id, part, priority = false }: Props) {
           src={spec.src}
           srcMobile={spec.srcMobile || undefined}
           poster={spec.poster}
+          posterSize={spec.posterSize}
           alt={spec.alt}
           captions={spec.captions || undefined}
           captionsLabel={COPY.film.captions}

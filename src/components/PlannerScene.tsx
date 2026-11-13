@@ -1,24 +1,46 @@
-import { FeatureHead } from './FeatureHead';
+import { Band } from './Band';
 import { MediaSlot } from './MediaSlot';
+import { Phrase } from './Phrase';
+import { Shot, StripLift } from './Shot';
 import { featureById } from '@/content/features';
-import { MEDIA } from '@/content/media';
-import { noteFor, present } from '@/lib/media-files';
+import { noteFor, rowNote, rowPresent } from '@/lib/media-files';
 
-// AI 웨딩 플래너(#planner, PLAN 'AI 웨딩 플래너'). 900px 이상은 왼쪽 5/12에 글, 오른쪽 7/12에 화면 오른쪽 끝까지 닿는 9:10 사진이다.
-// 폰은 글 다음에 4:5 사진이 온다. 캡션은 사진 바로 아래 사진의 왼쪽 끝에 둔다.
-// figure와 figcaption은 실제 파일이 있을 때만 쓴다. 포스터 카드는 div이고 캡션이 없다(noteFor가 빈 값)
+// AI 웨딩 플래너(#planner, PLAN 'AI 웨딩 플래너', 시안 A 장면 2).
+// 데스크톱: 소파의 커플 사진이 고정되고 제목은 오른쪽 위 창가(9칸부터)에 놓인다. 흰 막에는 굵은 한 줄, 단계 네 개, 노트와 튤립 컷.
+// 폰: 4:5 사진, 제목, 굵은 한 줄, 2x2 단계, 화면 폭 노트 컷(22:9). 600px부터는 노트와 튤립 컷이 한 줄이다(튤립은 600px 이상에서만)
 export function PlannerScene() {
+  const f = featureById('planner');
   const note = noteFor('planner');
-  const photo = present(MEDIA.planner);
-  const Box = photo ? 'figure' : 'div';
-  const Cap = photo ? 'figcaption' : 'p';
+  const crops = rowPresent('planner');
   return (
-    <section id="planner" aria-labelledby="planner-title" data-feature="planner" className="planner">
-      <div className="planner-copy"><FeatureHead feature={featureById('planner')} /></div>
-      <Box className="planner-media">
-        <div className="planner-frame"><MediaSlot id="planner" /></div>
-        {note && <Cap className="cap planner-cap">{note}</Cap>}
-      </Box>
+    <section id="planner" aria-labelledby="planner-title" data-feature="planner" className="feature">
+      <Band feature={f} />
+      <div className="scene scene-planner">
+        <Shot id="planner" note={note} />
+        <div className="reel">
+          <div className="reel-text">
+            <h2 id="planner-title" tabIndex={-1} className="h2"><Phrase parts={f.headline} /></h2>
+          </div>
+          <div className="strip">
+            <StripLift note={note} />
+            <div className="strip-text">
+              <p className="callout">{f.body[1]}</p>
+            </div>
+            <ol className="steps">
+              {(f.steps ?? []).map((step) => <li key={step}>{step}</li>)}
+            </ol>
+            {crops ? (
+              <>
+                <div className="crops crops-planner">
+                  <div className="crop crop-note"><MediaSlot detail="planner" index={0} /></div>
+                  <div className="crop crop-tulips"><MediaSlot detail="planner" index={1} /></div>
+                </div>
+                <p className="note strip-note">{rowNote('planner')}</p>
+              </>
+            ) : null}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

@@ -1,38 +1,52 @@
-/* 마지막 CTA(#waitlist), 신청 폼과 신청 취소, 신청 창, 스토어 선택(PLAN '마지막 CTA', '전역 요소', 시안 M229–265, M347–361).
-   왼쪽 5/12에 제목과 설명을 흰 바탕에 두고, 오른쪽 7/12의 --gray-100 블록에 폼을 둔다. 블록 위 작은 글자는 --gray-700 이상이고 --gray-500 글자는 없다.
-   눈은 번호, 고지, 체크, 버튼 순서로 내려간다. 누른 뒤에 생기는 것은 모두 버튼 아래에 나온다. 블록은 아래로만 자라 위의 내용이 움직이지 않는다.
-   신청 창에서는 회색 블록 없이 흰 카드에 바로 폼을 둔다(카드 안의 카드를 두지 않는다) */
+/* 마지막 CTA(#waitlist), 신청 폼과 신청 취소, 신청 창, 스토어 선택(PLAN '마지막 CTA', '전역 요소', 시안 A 마지막 장면).
+   섹션: 사진 무대(데스크톱 최대 700px, 폰 6:5) 위 왼쪽에 제목과 설명, 그 아래 흰 바탕에 폼. 폼은 흰 바탕 위라 회색 블록이 없다.
+   1280px 이상은 사진이 무대 전체이고 왼쪽 흰 막(--veil-final) 위에 제목이 놓인다. 900~1279px는 막이 신랑을 덮으므로
+   사진을 무대 오른쪽 절반에 두고 제목은 왼쪽 흰 바탕에 둔다(막 없음).
+   데스크톱 폼은 두 칸이다. 왼쪽 1~5칸에 번호 라벨과 입력칸, 오른쪽 7~12칸에 동의 고지, 거부 권리와 나이 줄, 동의 체크, 문서 링크, 버튼, 아래 줄.
+   고지가 체크 바로 위에 있어 체크하기 전에 보인다(PLAN '동의 고지'). 화면의 순서가 DOM 순서, 읽는 순서와 같다.
+   폼 마크업(WaitlistForm)은 그대로 두고 블록과 폼을 display: contents로 풀어 .wl의 격자에 놓는다.
+   눈은 번호, 고지, 체크, 버튼 순서로 내려간다. 누른 뒤에 생기는 것(상태 줄, Turnstile)은 모두 버튼 아래에 나온다.
+   신청 창에서는 같은 폼이 흰 카드에 한 칸으로 놓인다(카드 안의 카드를 두지 않는다) */
 @layer components {
-  /* 섹션. 앵커로 오면 위 여백을 건너뛰어 제목이 헤더 아래 --sp-6 자리에 온다 */
-  .signup { padding: var(--section) 0 var(--signup-end); scroll-margin-top: calc(var(--sp-6) - var(--section)); }
-  .signup-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; column-gap: var(--sp-16); }
-  .signup-title { font-size: var(--fs-close); line-height: var(--lh-close); letter-spacing: var(--track-close); }
+  /* ---------- 섹션 ---------- */
+  .signup { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "media" "note" "head" "form"; }
+  .signup-media { grid-area: media; position: relative; overflow: hidden; aspect-ratio: 6 / 5; }
+  .signup-media img { object-position: 50% 12%; }
+  .signup-veil { display: none; }
+  .signup-note { grid-area: note; padding-top: var(--sp-2_5); }
+  .signup-head { grid-area: head; padding-top: var(--sp-10); }
+  .signup-title { font-size: var(--fs-scene); line-height: var(--lh-scene); letter-spacing: var(--track-scene); }
   .signup-title .date { color: var(--orange); }   /* 표시 크기에서만 쓴다. 흰 바탕 3.17:1이라 큰 글자 기준만 맞는다 */
-  .signup-lead { margin-top: var(--sp-8); }
+  .signup-lead { margin-top: var(--sp-4); }
   .signup-lead p { font-size: var(--fs-lead); line-height: 1.7; color: var(--gray-700); }
+  .signup-form { grid-area: form; padding: var(--sp-7) 0 var(--sp-14); }
+  /* 앵커로 오면 사진 무대의 위 끝이 머리글 바로 아래에 온다(html의 scroll-padding-top). 폰은 사진, 제목, 설명이 한 화면에 든다.
+     포스터 상태(사진 파일이 없을 때): 폰은 무대를 숨긴다 */
+  .signup[data-media="poster"] .signup-media { display: none; }
 
-  /* 폼의 뿌리. 줄은 블록과 그 아래 한 줄이다. 마지막 CTA에서 성공하면 뿌리의 높이를 고정하므로(WaitlistForm) 블록이 늘어나 그 높이를 지킨다 */
+  /* ---------- 폼의 뿌리 ----------
+     줄은 블록과 그 아래 한 줄이다. 마지막 CTA에서 성공하면 뿌리의 높이를 고정하므로(WaitlistForm) 블록이 늘어나 그 높이를 지킨다 */
   .wl { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
-  .wl-block { display: grid; align-content: center; }
-  .signup .wl-block { --wl-pad: var(--sp-14); padding: var(--wl-pad); border-radius: var(--r-frame); background: var(--gray-100); }
-  .wl-dialog .wl-block { padding: 0; background: none; border-radius: 0; }
+  .wl-block { display: grid; align-content: start; }
+  .signup .wl-block { --wl-pad: var(--gutter); }   /* Turnstile 자리가 넓혀 쓸 수 있는 여백. 신청 창은 카드의 여백(.wl-card)이다 */
 
-  /* 입력칸. 글자는 --fs-input(폰 18)이라 iOS가 확대하지 않는다(16 이상). 테두리는 띠 위에서도 3:1을 넘는다 */
+  /* 입력칸. 글자는 --fs-input(19)이라 iOS가 확대하지 않는다(16 이상). 테두리는 흰 위 4.83:1(그래픽 3:1 이상) */
   .wl-label {
     display: block;
     font-family: var(--ff-display); font-weight: var(--w-strong); font-size: var(--fs-ui); line-height: 1.4; letter-spacing: var(--track-tight);
     scroll-margin-top: var(--sp-2);   /* 신청 창에서 키보드가 뜨면 라벨이 여기에 와서 고지와 체크가 키보드 위에 남는다 */
   }
   .wl-input {
-    display: block; width: 100%; min-height: var(--input-h); margin-top: var(--sp-3); padding: 0 var(--sp-5);
-    border: 1px solid var(--field-edge); border-radius: var(--r-control); background: var(--white); color: var(--ink);
+    display: block; width: 100%; min-height: var(--input-h); margin-top: var(--sp-2_5); padding: 0 var(--sp-4_5);
+    border: 1.5px solid var(--field-edge); border-radius: var(--r-control); background: var(--white); color: var(--ink);
     font-size: var(--fs-input); letter-spacing: var(--track-input); font-variant-numeric: tabular-nums;
   }
+  .wl-input::placeholder { color: var(--gray-500); }
   .wl-input:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; border-color: var(--ink); }
   /* 테두리가 굵어져도 글자가 움직이지 않게 여백을 같이 줄인다 */
-  .wl-input[aria-invalid="true"] { padding-inline: calc(var(--sp-5) - 1px); border: 2px solid var(--danger); }
+  .wl-input[aria-invalid="true"] { padding-inline: calc(var(--sp-4_5) - 0.5px); border: 2px solid var(--danger); }
 
-  /* 오류와 상태. 뜻은 문구가 전하고 색은 따라갈 뿐이다. --danger는 띠 위 5.05:1, 흰 바탕 5.55:1이다. 비어 있는 줄은 자리를 차지하지 않는다 */
+  /* 오류와 상태. 뜻은 문구가 전하고 색은 따라갈 뿐이다. --danger는 흰 바탕 5.55:1이다. 비어 있는 줄은 자리를 차지하지 않는다 */
   .wl-error, .wl-status, .wl-nojs { font-size: var(--fs-small); font-weight: var(--w-strong); line-height: 1.4; }
   .wl-error { color: var(--danger); }
   .wl-error:not(:empty) { margin-top: var(--sp-1); }
@@ -42,31 +56,31 @@
 
   /* 동의 고지. 상자도 선도 없이 잉크와 굵기로만 나눈다. 이용 목적과 보유 기간은 굵게 보인다(시행령 제17조제3항, 고시 제4조) */
   .wl-notice {
-    display: grid; row-gap: var(--sp-3); margin-top: var(--sp-10);
+    display: grid; row-gap: var(--sp-2_5); margin-top: var(--sp-5_5);
     font-size: var(--fs-terms); line-height: 1.6; letter-spacing: var(--track-terms);
   }
-  .wl-notice > div { display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: var(--sp-7); }
-  .wl-notice dt { color: var(--gray-700); font-size: var(--fs-terms-dt); }
-  .wl-notice dd { color: var(--ink); }
-  .wl-notice-strong dd { font-weight: var(--w-strong); }
+  .wl-notice > div { display: grid; grid-template-columns: 5.2em minmax(0, 1fr); column-gap: var(--sp-3); align-items: baseline; }
+  .wl-notice dt { color: var(--gray-500); font-size: var(--fs-terms-dt); }
+  .wl-notice dd { color: var(--gray-700); }
+  .wl-notice-strong dd { color: var(--ink); font-weight: var(--w-strong); }
   .wl-terms {
-    display: grid; margin-top: var(--sp-5);
-    font-size: var(--fs-fine); line-height: 1.65; letter-spacing: 0; color: var(--gray-700);
+    display: grid; margin-top: var(--sp-4);
+    font-size: var(--fs-fine); line-height: 1.6; letter-spacing: 0; color: var(--gray-700);
   }
 
-  /* 동의. 줄 전체가 체크다. 한 줄이면 --tap 높이로 눌리지만 자리는 시안의 한 줄(1.5em)만 차지한다. 줄을 나누면 그 높이를 다 쓴다.
-     누르는 영역은 줄 위로만 넓힌다. 위는 .wl-consent의 여백으로 비어 있고, 아래로 넓히면 .wl-docs 링크의 누르는 상자와 겹친다.
-     링크는 라벨 밖, 아래 .wl-docs에 둔다 */
-  .wl-consent { margin-top: var(--sp-9); }
+  /* 동의. 줄 전체가 체크다. 한 줄이면 --tap 높이로 눌리지만 자리는 한 줄(줄 높이 --sp-6)만 차지한다. 줄을 나누면 그 높이를 다 쓴다.
+     줄 높이를 정수(24px)로 두어 누르는 높이가 정확히 --tap이 된다. 누르는 영역은 줄 위로만 넓힌다.
+     위는 .wl-consent의 여백으로 비어 있고, 아래로 넓히면 .wl-docs 링크의 누르는 상자와 겹친다. 링크는 라벨 밖, 아래 .wl-docs에 둔다 */
+  .wl-consent { margin-top: var(--sp-6_5); }
   .wl-check {
     display: flex; align-items: flex-start; gap: var(--sp-3);
-    padding-top: calc(var(--tap) - 1.5em); margin-top: calc(1.5em - var(--tap));
-    font-size: var(--fs-ui); line-height: 1.5; cursor: pointer;
+    padding-top: calc(var(--tap) - var(--sp-6)); margin-top: calc(var(--sp-6) - var(--tap));
+    font-size: var(--fs-ui); font-weight: var(--w-strong); line-height: var(--sp-6); color: var(--ink); cursor: pointer;
   }
   .wl-check input {
     --wl-tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 10.5l3.5 3.5L15 7'/%3E%3C/svg%3E");
     display: block; flex: none; width: var(--check); height: var(--check); margin: 0;
-    border: 1.5px solid var(--field-edge); border-radius: var(--r-frame);
+    border: 1.5px solid var(--field-edge); border-radius: var(--r-s);
     background: var(--white); color: var(--white);   /* 꺼져 있으면 체크가 바탕과 같은 색이라 보이지 않는다 */
     appearance: none; cursor: pointer;
   }
@@ -75,20 +89,18 @@
     background: currentColor;
     mask: var(--wl-tick) center / contain no-repeat;   /* 마스크는 알파만 읽는다. stroke 색은 화면에 나오지 않는다 */
   }
-  /* 띠 위 --orange는 2.88:1이라 테두리는 --orange-ink(4.28:1)로 둔다 */
   .wl-check input:checked { border-color: var(--orange-ink); background: var(--orange); color: var(--on-accent); }
   .wl-check input[aria-invalid="true"] { border-color: var(--danger); }
 
   /* 처리방침과 약관 링크. 새 탭으로 연다. 폭이 모자라면 약관 링크가 다음 줄로 넘어간다.
-     줄 글자는 제자리에 두고 누르는 영역만 --tap으로 키운다 */
+     줄 글자는 제자리에 두고 누르는 영역만 --tap으로 키운다. 체크 상자 오른쪽 글자 선에 맞춘다 */
   .wl-docs {
-    display: flex; flex-wrap: wrap; gap: var(--sp-1_5) var(--sp-5); margin-top: var(--sp-3); padding-left: var(--sp-9);
+    display: flex; flex-wrap: wrap; gap: var(--sp-1_5) var(--sp-4_5); margin-top: var(--sp-3); padding-left: var(--sp-9);
     font-size: var(--fs-meta); line-height: 1.5;
   }
   .wl-docs a {
     display: inline-flex; align-items: center; min-height: var(--tap); margin-block: calc((1.5em - var(--tap)) / 2);
-    color: var(--gray-700); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: var(--sp-1);
-    transition: color 200ms var(--ease);
+    color: var(--gray-700); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em;
   }
   @media (hover: hover) {
     .wl-docs a:hover { color: var(--ink); }
@@ -96,14 +108,14 @@
 
   /* 주 버튼은 .btn이다. 폭과 간격만 정한다. 200% 확대로 폭이 모자라면 줄을 바꾼다 */
   .wl-submit, .store-link { width: 100%; white-space: normal; line-height: 1.2; }
-  .wl-submit { margin-top: var(--sp-9); }
+  .wl-submit { min-height: var(--submit-h); margin-top: var(--sp-6); }
   /* JS 끔. 하이드레이션 전에도 disabled라서 html:not(.js)로만 건다. 그래야 첫 화면에서 깜빡이지 않는다 */
   html:not(.js) .wl-submit { background: var(--white); color: var(--gray-700); border-color: var(--field-edge); cursor: not-allowed; }
   .wl-nojs { display: none; margin-top: var(--sp-2); }
   html:not(.js) .wl-nojs { display: block; }
 
   /* Turnstile. 블록의 맨 끝이라 나타나도 위의 내용이 움직이지 않고, 드문 일에 빈자리를 두지 않는다.
-     getToken이 clientWidth로 크기를 고르므로 display: none을 쓰지 않는다. 내용 폭이 --ts-w보다 좁으면 그만큼만 블록이나 카드의 여백(--wl-pad)으로 넓힌다.
+     getToken이 clientWidth로 크기를 고르므로 display: none을 쓰지 않는다. 내용 폭이 --ts-w보다 좁으면 그만큼만 여백(--wl-pad)으로 넓힌다.
      그래도 모자라면 compact(150 x 140)가 가운데에 온다 */
   .wl-slot {
     display: grid; justify-items: center;
@@ -111,16 +123,16 @@
   }
   .wl-slot[data-open] { margin-top: var(--sp-3); }
 
-  /* 블록 아래 한 줄: 신청 취소(글자 버튼)와 제휴 문의. 바뀌어도 블록 안의 내용은 움직이지 않는다.
-     글자는 제자리에 두고 누르는 영역만 --tap으로 키운다. 줄을 나누면 두 줄의 누르는 상자가 겹치지 않게 줄 사이를 --sp-6으로 둔다 */
+  /* 블록 아래 줄: 신청 취소(글자 버튼)와 제휴 문의를 한 줄씩. 바뀌어도 블록 안의 내용은 움직이지 않는다.
+     글자는 제자리에 두고 누르는 영역만 --tap으로 키운다. 두 줄의 누르는 상자가 겹치지 않게 줄 사이를 둔다 */
   .wl-after {
-    display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sp-6);
-    margin-top: var(--sp-6); font-size: var(--fs-meta); line-height: 1.6; color: var(--gray-700);
+    display: grid; justify-items: start; row-gap: var(--sp-5);   /* 두 줄의 누르는 상자(--tap)가 겹치지 않는 간격. 시안은 8px */
+    margin-top: var(--sp-5_5); font-size: var(--fs-after); line-height: 1.6; color: var(--gray-700);
   }
   .wl-switch button, .wl-partner a {
     display: inline-flex; align-items: center; min-height: var(--tap); margin-block: calc((1.6em - var(--tap)) / 2); margin-left: var(--sp-1);
     color: var(--ink); font-weight: var(--w-strong);
-    text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: var(--sp-1);
+    text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em;
   }
   .wl-switch button { cursor: pointer; }
   html:not(.js) .wl-switch { display: none; }   /* JS가 있어야 열 수 있다. 그때는 처리방침의 메일과 전화로 받는다 */
@@ -131,25 +143,58 @@
   /* 신청 취소의 설명. 신청 창의 설명(--gray-700) 아래에 와도 이 폼의 일로 읽힌다 */
   .wl-lead { margin-bottom: var(--sp-4); color: var(--ink); font-weight: var(--w-strong); }
 
-  /* 폰. 한 줄로 쌓고 블록이 화면 폭 가득 찬다 */
-  @media (max-width: 899px) {
-    .signup-grid { grid-template-columns: minmax(0, 1fr); }
-    .signup-lead { margin-top: var(--sp-5); }
-    .signup-form { margin-top: var(--sp-8); }
-    .signup .wl-block {
-      --wl-pad: var(--gutter);
-      margin: 0 calc(var(--gutter) * -1); padding: var(--sp-9) var(--gutter) var(--sp-8); border-radius: 0;
+  /* ---------- 데스크톱: 사진 무대 위 제목, 그 아래 두 칸 폼 ---------- */
+  @media (min-width: 900px) {
+    .signup { grid-template-areas: "stage" "note" "form"; }
+    .signup-media { grid-area: stage; aspect-ratio: auto; height: max(var(--final-min), min(var(--final-max), calc(100svh - var(--header-h) - var(--sp-20)))); }
+    .signup-media img { object-position: 60% 0%; }
+    .signup-veil { display: block; position: absolute; inset: 0; pointer-events: none; background: var(--veil-final); }
+    .signup-head { grid-area: stage; align-self: center; z-index: 1; padding: 0; }
+    .signup-lead { margin-top: var(--sp-7); }
+    .signup-form { padding: var(--sp-16) 0 var(--sp-42); }
+    .signup[data-media="poster"] .signup-media { display: block; justify-self: end; width: 50%; }
+
+    /* 두 칸 폼. 블록과 폼을 풀어 .wl의 12칸 격자에 놓는다. 왼쪽은 번호만, 오른쪽은 고지에서 아래 줄까지 한 줄로 흐른다.
+       r1~3 라벨, 번호, 오류 | 고지   r4 - | 거부 권리와 나이   r5 - | 동의   r6 - | 오류   r7 - | 문서 링크   r8 - | 버튼
+       r9~12 - | JS 끔 줄, 상태, Turnstile, 아래 줄 */
+    .signup .wl {
+      grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap);
+      grid-template-rows: repeat(12, auto); align-content: start; padding-top: var(--sp-6);
     }
-    /* 라벨 칸을 좁혀 보유 기간이 두 줄에 들어간다. dt/dd 격자는 줄마다 있으므로 간격과 기준선도 줄에 준다(시안 M355) */
-    .wl-notice { row-gap: var(--sp-2_5); margin-top: var(--sp-7); }
-    .wl-notice > div { column-gap: var(--sp-3); align-items: baseline; }
-    .wl-terms { line-height: 1.6; }
-    .wl-docs { row-gap: var(--sp-6); }   /* 줄을 나눈 두 링크의 누르는 상자가 겹치지 않는다 */
-    .wl-consent, .wl-submit { margin-top: var(--sp-7); }
-    .wl-after { flex-direction: column; margin-top: var(--sp-5); }
+    .signup .wl-block, .signup .wl-form { display: contents; }
+    .signup .wl-form > *, .signup .wl-block > *, .signup .wl-after { grid-column: 7 / -1; }
+    .signup .wl-label { grid-column: 1 / span 5; grid-row: 1; }
+    .signup .wl-input { grid-column: 1 / span 5; grid-row: 2; }
+    .signup .wl-form > .wl-error:first-of-type { grid-column: 1 / span 5; grid-row: 3; }
+    .signup .wl-notice { grid-row: 1 / span 3; align-self: start; margin-top: 0; }
+    .signup .wl-terms { grid-row: 4; align-self: start; }
+    .signup .wl-consent { grid-row: 5; }
+    .signup .wl-consent + .wl-error { grid-row: 6; }
+    .signup .wl-docs { grid-row: 7; align-self: start; }
+    .signup .wl-submit { grid-row: 8; align-self: start; margin-top: var(--sp-7); }
+    .signup .wl-nojs { grid-row: 9; }
+    .signup .wl-status { grid-row: 10; }
+    .signup .wl-slot { grid-row: 11; }
+    .signup .wl-after { grid-row: 12; align-self: start; font-size: var(--fs-after); }
+    .signup .wl-done { grid-column: 1 / -1; grid-row: 1 / span 5; }
+    /* 신청 취소: 폼을 풀지 않고 왼쪽 6칸에 한 칸으로 둔다 */
+    .signup .wl:has([data-withdraw]) .wl-block { display: grid; grid-column: 1 / span 6; grid-row: 1; }
+    .signup .wl:has([data-withdraw]) .wl-form { display: block; }
+    .signup .wl:has([data-withdraw]) .wl-form > *, .signup .wl:has([data-withdraw]) .wl-block > * { grid-column: auto; grid-row: auto; }
+    .signup .wl:has([data-withdraw]) .wl-after { grid-column: 1 / span 6; grid-row: 2; }
+  }
+  /* 900~1279px: 흰 막(글 폭까지 94%)이 사진 속 신랑을 덮는다. 막을 쓰지 않고 사진을 무대 오른쪽 절반에 두며(포스터 상태와 같은 자리),
+     두 사람이 그 안에 들도록 오른쪽 기준으로 자른다. 제목과 설명은 왼쪽 흰 바탕에 놓인다 */
+  @media (min-width: 900px) and (max-width: 1279px) {
+    .signup-media { justify-self: end; width: 50%; }
+    .signup-media img { object-position: 80% 0%; }
+    .signup-veil { display: none; }
+    .signup-head { width: auto; margin-inline: var(--gutter) calc(50% + var(--gap)); }
+    .signup-note { width: auto; margin-inline: 50% var(--gutter); }   /* 고지는 사진 바로 아래 */
   }
 
-  /* 신청 창. 창 자체는 화면 전체의 투명한 층이고 패딩이 키보드를 비킨다. 카드는 높이를 정하지 않고 스스로 스크롤한다.
+  /* ---------- 신청 창 ----------
+     창 자체는 화면 전체의 투명한 층이고 패딩이 키보드를 비킨다. 카드는 높이를 정하지 않고 스스로 스크롤한다.
      투명도만 움직인다. WebKit에서 transform이 걸린 dialog는 포커스된 입력칸과 어긋난다 */
   /* 스크롤 막대가 있던 자리는 페이지가 움직이지 않게 비워 둔다. 그 자리에는 ::backdrop이 닿지 않고 html의 배경색만 칠해진다.
      scrollbar-gutter는 Safari 18.2부터라 그 아래 Mac에서 막대가 보이는 설정이면 막대 폭만큼 움직인다(OPEN_ITEMS) */
@@ -195,6 +240,7 @@
   .wl-title:focus { outline: none; }   /* 조작하는 곳이 아니라 읽기가 시작되는 자리다. iOS는 스크립트로 옮긴 포커스에도 링을 그린다 */
   .wl-desc { margin-block: var(--sp-1) var(--sp-6); color: var(--gray-700); line-height: 1.6; text-wrap: balance; }
   .wl-desc > span { display: block; }   /* 문장마다 한 줄 */
+  .wl-dialog .wl-after { margin-top: var(--sp-4); }
   @media (max-width: 899px) {
     .wl-card { --wl-pad: var(--sp-4); }
     .wl-desc { margin-bottom: var(--sp-4); }
@@ -235,11 +281,13 @@
   @media (forced-colors: active) and (hover: hover) {
     .wl-check:hover input:not(:checked) { border-color: Highlight; }
   }
+  @media (prefers-reduced-motion: no-preference) {
+    .wl-docs a { transition: color 200ms var(--ease); }
+  }
 
   @media print {
     html:has(.wl-dialog[open]) { overflow: visible; background-color: transparent; }
-    .signup { padding-block: var(--sp-6); }
-    .signup .wl-block { padding: 0; background: none; }
+    .signup-media, .signup-veil { display: none; }
     .wl-submit, .wl-status, .wl-slot, .wl-switch, html:not(.js) .wl-nojs, .wl-dialog[open] { display: none; }
     .store-link { min-height: 0; padding: 0; background: none; color: var(--ink); }
   }

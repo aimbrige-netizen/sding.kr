@@ -238,7 +238,7 @@ function createController(setSoundOn: (on: boolean) => void, setMedia: (media: M
       e.userPaused = true;
       e.video.pause();
     },
-    // 화면 폭이 767px를 넘나들면 모바일·데스크톱 컷을 바꾼다. 재생 중이었으면 같은 시점에서 잇는다
+    // 화면 폭이 899/900px를 넘나들면 모바일·데스크톱 컷을 바꾼다(VideoPlayer의 matchMedia). 재생 중이었으면 같은 시점에서 잇는다
     swap: (video, src) => {
       const e = entries.get(video);
       if (!e) return;

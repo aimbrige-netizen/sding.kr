@@ -1,4 +1,5 @@
 import { COMPANY } from './company';
+import type { Seg } from './features';
 
 export const SITE = {
   url: 'https://sding.kr',
@@ -22,14 +23,19 @@ export const COPY = {
     kicker: '정식 오픈',                                  // 오픈 뒤 날짜 줄. 앞에 launchDotted()
     kickerSoon: '정식 오픈 예정',                         // 오픈 전 날짜 줄. 아직 오지 않은 날을 확정처럼 쓰지 않는다
     h1: ['스스로', '준비하는 웨딩'],                      // 대표가 정한 제목(2026-11-13). 어느 폭에서나 두 줄이고, 긴 둘째 줄이 신부에게 닿지 않는다
-    sub: ['스딩은 웨딩 가격을 정찰제로 공개하고,', 'AI로 플래닝과 드레스, 웨딩홀을 미리 경험하게 해요.'],   // TODO(hero-copy) TODO(price-rule). 첫 줄 뒤에서 늘 줄을 바꾼다
+    // TODO(hero-copy) TODO(price-rule). 첫 줄 뒤에서 늘, '드레스,' 뒤에서는 폰에서만 줄을 바꾼다(시안 A). 글자는 v2.1과 같다
+    sub: [{ t: '스딩은 웨딩 가격을 정찰제로 공개하고,' }, { t: 'AI로 플래닝과 드레스,', br: 'all' }, { t: '웨딩홀을 미리 경험하게 해요.', br: 'phone' }] as readonly Seg[],
   },
-  media: { aiCaption: 'AI로 만든 예시 이미지예요.' },      // AI로 만든 사진 바로 아래 한 줄(PLAN 'AI 서비스 고지')
+  media: {
+    aiCaption: 'AI로 만든 예시 이미지예요.',              // AI로 만든 사진 바로 아래 한 줄(PLAN 'AI 서비스 고지')
+    details: '디테일 사진',                               // 폰에서 가로로 넘기는 디테일 컷 줄의 이름. 앞에 기능 이름을 붙인다. TODO(hero-copy): v2.2 새 초안
+  },
   film: { title: '스딩 소개 영상', play: '영상 재생', pause: '영상 일시정지', transcript: '영상 내용 글로 보기', captions: '한국어' },   // 영상 슬롯 버튼 이름, VideoObject 이름, M2 영상 창
-  compare: { label: '원본과 AI 합성 비교', before: '원본', after: 'AI 합성' },   // 드레스 비교 묶음 이름과 캡션
+  // 드레스 비교 묶음 이름과 캡션. detail은 흰 막의 목둘레·밑단 비교 묶음 이름이다(스크린리더가 두 묶음을 구별한다). TODO(hero-copy): detail은 v2.2 새 초안
+  compare: { label: '원본과 AI 합성 비교', detail: '원본과 AI 합성의 목둘레와 밑단 비교', before: '원본', after: 'AI 합성' },
   faq: { title: '자주 묻는 질문' },
   final: {
-    title: [',', '스딩이 문을', '열 예정이에요'],          // 첫 칸 앞에 launchLabel(). 날짜 줄 뒤에서 늘, 둘째 칸 뒤에서는 900px 이상에서만 줄을 바꾼다
+    title: [',', '스딩이', '문을 열 예정이에요'],          // 첫 칸 앞에 launchLabel(). 칸마다 늘 줄을 바꾼다(시안 A, 세 줄). 글자는 v2.1과 같다
     titleLive: '지금 스딩을 시작해 보세요',
     lead: ['전화번호를 남기면 오픈하는 날 문자로 알려 드려요.', '로그인은 필요 없어요.'],   // 문장마다 나눈다. 넓은 화면은 문장마다 한 줄이다
     partner: ['웨딩 업체이신가요?', '제휴 문의'],

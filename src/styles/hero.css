@@ -1,56 +1,98 @@
-/* 히어로(시안 M137–156, M302–314). 두 상태는 빌드할 때 Hero.tsx의 data-media가 정하고, 문구의 상자는 두 상태에서 같다.
-   사진 상태: 데스크톱은 사진이 화면 폭 가득 문구 뒤에 깔리고 왼쪽에 흰 베일, 폰은 문구 다음 4:5 사진과 캡션이다.
-   포스터 상태: 데스크톱은 오른쪽 절반 가운데에 주황 워드마크만 있고 문구는 흰 바탕 위다. 폰은 미디어 자리를 숨긴다.
-   등장 효과는 없다. H1과 사진은 처음부터 보인다(LCP) */
+/* 히어로(시안 A 첫 장면). 두 상태는 빌드할 때 Hero.tsx의 data-media가 정한다.
+   폰(기본): 사진이 먼저 오고, 사진 아래쪽(옷 부분)이 흰 바탕으로 녹아든 자리에 날짜와 제목이 앉는다. 얼굴과 꽃다발은 위쪽 4분의 3 안에 있다.
+            그 아래 AI 캡션, 보조 문장, CTA. 창이 낮으면 사진이 낮아져(위를 기준으로 자른다) CTA가 첫 화면에 남는다.
+            가로로 든 폰(가로세로 비 4/3 이상)은 사진을 오른쪽에 세우고 문구를 그 왼쪽에 둔다.
+   데스크톱(900px 이상): 사진 무대(화면 높이에서 머리글과 --hero-rest를 뺀 높이, 폭의 78%까지) 위 왼쪽 흰 벽에 문구, 무대 아래 장면 목차와 캡션.
+   포스터 상태: 데스크톱은 무대 오른쪽 절반에 포스터 카드, 폰은 미디어 자리를 숨긴다.
+   제목과 사진에는 등장 효과가 없다(LCP). 보조 문장, CTA, 목차만 움직임을 줄이지 않은 방문자에게 아래에서 올라온다 */
 @layer components {
-  /* 높이는 화면 높이지만 폭의 78%를 넘지 않는다. 세로 창이나 정사각형에 가까운 창(1024x1366, 900x1200, 1024x900, 900x800)에서
-     화면 높이를 다 쓰면 16:9 사진의 양옆이 잘려 신랑이 잘린다. 가로세로 비가 1.28 이상이면 두 사람과 문구 자리가 남는다 */
   .hero {
-    position: relative; display: flex; align-items: flex-end;
-    min-height: max(var(--hero-min), min(100svh, 78vw)); overflow: hidden; isolation: isolate;
+    display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "media" "note" "body";
+    padding-top: var(--header-h);   /* 머리글이 음수 여백으로 겹친다 */
   }
-  .hero-copy { padding-bottom: var(--hero-pad); }
+  /* 낮은 창에서는 사진이 낮아져(아래가 잘린다) CTA가 첫 화면에 남는다. 다만 제목이 얼굴에 닿는 높이(--hero-face-safe)보다는 낮아지지 않는다.
+     width를 정해 두어야 max-height가 비율을 거쳐 폭까지 줄이지 않는다 */
+  .hero-media {
+    grid-area: media; position: relative; overflow: hidden;
+    width: 100%; aspect-ratio: 2 / 3; max-height: max(var(--hero-face-safe), calc(100svh - var(--header-h) - var(--hero-rest-m)));
+  }
+  .hero-media img { object-position: 50% 0; }
+  .hero-veil { position: absolute; inset: 0; pointer-events: none; background: var(--veil-hero-m); }
 
+  .hero-copy { display: contents; }
+  .hero-head { grid-area: media; align-self: end; z-index: 1; width: var(--wrap); margin-inline: auto; padding-bottom: var(--sp-0_5); }
   .hero-date {
-    font-family: var(--ff-display); font-weight: var(--w-strong); font-size: var(--fs-label);
-    line-height: 1.4; letter-spacing: 0;
+    font-family: var(--ff-display); font-weight: var(--w-strong); font-size: var(--fs-date);
+    line-height: 1.4; letter-spacing: 0; color: var(--orange-ink);
   }
-  .hero-title { margin-top: var(--sp-5_5); font-size: var(--fs-h1); line-height: var(--lh-h1); letter-spacing: var(--track-h1); }
-  .hero-sub { margin-top: var(--sp-7_5); font-size: var(--fs-lead); line-height: 1.65; color: var(--gray-700); }
-  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-8); margin-top: var(--sp-11); }
+  .hero-title { margin-top: var(--sp-2); font-size: var(--fs-h1); line-height: var(--lh-h1); letter-spacing: var(--track-h1); }
+  .hero-note { grid-area: note; padding-top: var(--sp-2); }
+  .hero-body { grid-area: body; width: var(--wrap); margin-inline: auto; }
+  .hero-sub { margin-top: var(--sp-2_5); font-size: var(--fs-lead); line-height: 1.6; color: var(--gray-700); text-wrap: pretty; }
+  .hero-actions { margin-top: var(--sp-4); }
+  .hero-cta { width: 100%; max-width: 26rem; }   /* 폰은 화면 폭 가득, 넓은 태블릿에서는 26rem까지 */
+  .hero-index { display: none; }
 
-  /* 사진은 문구 뒤에 깐다. 위를 기준으로 잘라 16:9보다 넓은 창에서는 바닥이 잘리고 머리는 잘리지 않는다 */
-  .hero-media { position: absolute; inset: 0; z-index: -1; }
-  .hero-frame { position: absolute; inset: 0; }
-  .hero-frame img { object-position: 56% 0; }   /* hero-d.v2: 두 사람이 가로 54~86%. 50~58%여야 900x700에서 신랑 소매가 남고 문구가 신부 팔꿈치에 닿지 않는다 */
-  /* 흰 베일: 문구가 놓이는 왼쪽 벽을 밝힌다. 대비가 모자라면 tokens.css의 --veil-strong, --veil-soft를 올린다 */
-  .hero-frame::after {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(90deg, var(--veil-strong) 0%, var(--veil-soft) 26%, var(--veil-clear) 50%);
-  }
-  /* AI 캡션: 첫 화면 안, 사진 왼쪽 아래 컨테이너 선. 베일이 깔린 밝은 벽 위라 --gray-700이다(시안 M417과 다르다) */
-  .hero-cap { position: absolute; left: var(--edge); bottom: var(--sp-6); color: var(--gray-700); }
-
-  /* 사진 파일이 없는 상태. 카드는 MediaSlot이 그리고, 히어로는 자리와 크기만 정한다 */
+  /* 포스터 상태(폰): 미디어 자리를 숨기고 문구만 둔다 */
+  .hero[data-media="poster"] .hero-media { display: none; }
+  .hero[data-media="poster"] .hero-head { padding-top: var(--sp-12); }
   .hero .poster { border: 0; }
   .hero .poster-mark { height: clamp(var(--sp-16), 12cqi, var(--sp-28)); }
-  .hero[data-media="poster"] .hero-media { inset: 0 0 0 50%; }               /* 오른쪽 절반. 폰에서는 아래 규칙이 숨긴다 */
-  .hero[data-media="poster"] .hero-frame::after { content: none; }          /* 흰 바탕에는 베일이 없다 */
 
-  /* 폰: 문구 다음에 4:5 사진, 그 아래 캡션 */
-  @media (max-width: 899px) {
-    .hero { display: block; min-height: 0; overflow: visible; }
-    .hero-copy { padding: var(--hero-pad) 0 0; }
-    .hero-title { margin-top: var(--sp-3_5); }
-    .hero-sub { margin-top: var(--sp-4_5); }
-    .hero-actions { gap: var(--sp-5_5); margin-top: var(--sp-7); }
-    .hero-media { position: relative; inset: auto; z-index: auto; margin-top: var(--gap-media); }
-    .hero-frame { position: relative; aspect-ratio: 4 / 5; }
-    .hero-frame img { object-position: 50% 50%; }   /* 폰 크롭(hero-m)은 파일에서 이미 잘라 두었다 */
-    .hero-frame::after { display: none; }
-    .hero-cap { position: static; padding: var(--gap-cap) var(--gutter) 0; color: var(--gray-500); }
-
-    .hero[data-media="poster"] .hero-media { display: none; }
-    .hero[data-media="poster"] .hero-copy { padding-bottom: var(--gap-media); }
+  /* 가로로 든 폰과 낮고 넓은 좁은 창(가로세로 비 4/3 이상): 2:3 사진이 화면 폭을 다 쓰면 첫 화면에 창과 머리만 보인다.
+     사진은 머리글 아래 화면 높이로 오른쪽에 세우고, 날짜와 제목, 보조 문장, CTA는 그 왼쪽 흰 바탕에 둔다(얼굴과 겹치지 않는다).
+     캡션은 사진 아래. 제목 크기는 tokens.css가 화면 높이에 맞춘다 */
+  @media (max-width: 899px) and (min-aspect-ratio: 4/3) {
+    .hero { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "head media" "body media" ". note"; column-gap: var(--gap); }
+    .hero-media { width: auto; height: calc(100svh - var(--header-h)); max-height: none; }
+    .hero-veil { display: none; }
+    .hero-head { grid-area: head; align-self: end; width: auto; margin: 0 0 0 var(--gutter); padding: 0; }
+    .hero-body { grid-area: body; width: auto; margin: 0 0 0 var(--gutter); }
+    .hero-note { width: auto; margin: 0; }
+    .hero[data-media="poster"] .hero-head { padding-top: var(--sp-6); }   /* 포스터 상태(사진 없음)에서도 CTA가 첫 화면에 든다 */
   }
+
+  @media (min-width: 900px) {
+    .hero { grid-template-areas: "stage" "index" "note"; }
+    .hero-media {
+      grid-area: stage; aspect-ratio: auto; max-height: none;
+      height: clamp(var(--hero-min), calc(100svh - var(--header-h) - var(--hero-rest)), 78vw);
+    }
+    .hero-cta { max-width: none; }
+    /* 두 사람은 사진 가로 54~86%. 세로로 긴 창에서 양옆이 잘려도 신랑이 남고, 문구는 왼쪽 흰 벽 위에 남는다 */
+    .hero-media img { object-position: 56% 36%; }
+    .hero-veil { background: var(--veil-hero); }
+    .hero-copy { display: block; grid-area: stage; align-self: center; z-index: 1; width: var(--wrap); margin-inline: auto; padding-bottom: var(--sp-2); }
+    .hero-head, .hero-body { width: auto; margin: 0; padding: 0; }
+    .hero-title { margin-top: var(--sp-5); }
+    .hero-sub { margin-top: var(--sp-7); line-height: 1.7; }
+    .hero-actions { margin-top: var(--sp-9); }
+    .hero-cta { width: auto; }
+
+    /* 장면 목차: 네 장면의 한 컷과 기능 이름 */
+    .hero-index {
+      display: grid; grid-area: index; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--gap);
+      margin-block: 0; padding: var(--sp-4_5) 0 0; list-style: none;
+    }
+    .idx { display: flex; align-items: center; gap: var(--sp-4); border-radius: var(--r-frame); color: var(--ink); text-decoration: none; }
+    .idx-img { position: relative; flex: none; width: var(--idx-w); height: var(--idx-h); overflow: hidden; border-radius: var(--r-frame); }
+    .idx-name { font-size: var(--fs-label); font-weight: var(--w-strong); line-height: 1.35; letter-spacing: var(--track-callout); }
+    .hero-note { padding-top: var(--sp-2_5); }
+
+    /* 포스터 상태(데스크톱): 무대 오른쪽 절반에 포스터 카드, 문구는 흰 바탕 위 */
+    .hero[data-media="poster"] .hero-media { display: block; justify-self: end; width: 50%; }
+    .hero[data-media="poster"] .hero-head { padding-top: 0; }
+  }
+
+  @media (hover: hover) {
+    .idx:hover .idx-name { color: var(--orange-ink); }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-body, .hero-index { animation: hero-rise 900ms var(--ease-out) both; }
+    .hero-body { animation-delay: 100ms; }
+    .hero-index { animation-delay: 200ms; }
+    .idx-name { transition: color 200ms var(--ease); }
+  }
+  @keyframes hero-rise { from { opacity: 0; transform: translateY(var(--sp-5_5)); } to { opacity: 1; transform: none; } }
 }
