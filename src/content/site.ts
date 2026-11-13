@@ -21,7 +21,7 @@ export const COPY = {
   hero: {
     kicker: '정식 오픈',                                  // 오픈 뒤 날짜 줄. 앞에 launchDotted()
     kickerSoon: '정식 오픈 예정',                         // 오픈 전 날짜 줄. 아직 오지 않은 날을 확정처럼 쓰지 않는다
-    h1: ['가격이 보이는', '결혼 준비'],                   // TODO(hero-copy) TODO(price-rule). 어느 폭에서나 두 줄
+    h1: ['스스로', '준비하는 웨딩'],                      // 대표가 정한 제목(2026-11-13). 어느 폭에서나 두 줄이고, 긴 둘째 줄이 신부에게 닿지 않는다
     sub: ['스딩은 웨딩 가격을 정찰제로 공개하고,', 'AI로 플래닝과 드레스, 웨딩홀을 미리 경험하게 해요.'],   // TODO(hero-copy) TODO(price-rule). 첫 줄 뒤에서 늘 줄을 바꾼다
   },
   media: { aiCaption: 'AI로 만든 예시 이미지예요.' },      // AI로 만든 사진 바로 아래 한 줄(PLAN 'AI 서비스 고지')
