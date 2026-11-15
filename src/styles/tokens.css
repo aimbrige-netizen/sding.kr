@@ -1,76 +1,222 @@
 /* src/styles/tokens.css
-   색, 간격, 글자 크기의 유일한 출처다. 값은 docs/PLAN.md '디자인 토큰'과 같다. */
+   색, 간격, 글자 크기, 모양의 유일한 출처다. 값은 docs/PLAN.md '디자인 토큰'(v2.2, 시안 A '장면형 시네마')과 같다.
+   컴포넌트 CSS는 이 이름만 쓰고 헥스, rgb(), px 값을 직접 쓰지 않는다(CLAUDE.md). 선 두께(1px, 1.5px, 2px, 3px)는 예외다.
+   원색은 '--이름: #RRGGBB;' 꼴로 한 줄에 하나씩 쓴다. src/app/opengraph-image.tsx와 scripts/icons.mjs가 정규식으로 읽는다.
+   이름은 Tailwind 테마 이름공간(--color-*, --font-*, --text-*, --radius-*, --tracking-*, --leading-*, --ease-*, --container-*)과
+   겹치지 않게 짓는다. globals.css의 @theme inline이 같은 이름을 선언하면 자기 자신을 가리켜 값이 사라진다.
+   폭 기준점은 900px 하나다. 폰 값(899px 이하)은 390px의 시안 값에서 768px의 태블릿 값까지 화면 폭을 따라 자란다(clamp). */
 :root {
   color-scheme: light;
-  --brand: #FF5416;      --brand-deep: #D63A00;
-  --ink-900: #2A1A14;    --ink-600: #6B5A52;
-  --cream: #FFFAF6;      --peach: #FFF1E8;
-  --line: #F1E1D8;       --white: #FFFFFF;
 
-  --r-sm: 12px;  --r-md: 24px;  --r-lg: 32px;  --r-pill: 999px;
-  --shadow-soft: 0 12px 32px -12px rgb(255 84 22 / .28);
-  --shadow-lift: 0 24px 60px -20px rgb(255 84 22 / .38);
-  --shadow-seal: 14px 4px 16px -12px rgb(255 84 22 / .32);    /* D-day 실링. 오른쪽으로만 져 'Soon'의 'n' 옆 크림을 물들이지 않는다 */
-  --glow-hero: radial-gradient(60% 50% at 50% 0%, #FFE2D0, rgb(255 250 246 / 0));
+  /* 원색: 오렌지 하나와 무채색. 대비는 WCAG 2 공식으로 잰 값이다(흰 = #FFFFFF, 띠 = #F4F4F5) */
+  --orange: #FF5719;          /* 워드마크, 주 버튼 면, 체크된 상자, 표시 크기 강조. 흰 위 3.17(큰 글자와 그래픽만) */
+  --orange-ink: #D63A00;      /* 흰 바탕 위 작은 주황 글자, 주 버튼 hover 면(흰 글자 4.70). 띠 위 4.28이라 띠 위 글자에는 쓰지 않는다 */
+  --orange-ink-band: #C23400; /* 띠 위 작은 주황 글자와 오류 글자. 띠 5.05, 흰 5.55 */
+  --ink: #111113;             /* 글자. 흰 18.86, 띠 17.16, 오렌지 위 5.95 */
+  --gray-700: #3F3F46;        /* 본문, 고지. 흰 10.44, 띠 9.50 */
+  --gray-500: #71717A;        /* 흰 바탕 위 캡션과 고지, 입력칸 테두리. 흰 4.83(띠 위 글자는 4.40이라 쓰지 않는다) */
+  --gray-200: #E4E4E7;        /* 가는 선. 장식 전용 1.27 */
+  --gray-100: #F4F4F5;        /* 푸터 바탕 */
+  --white: #FFFFFF;
 
-  /* 'Coming Soon' 후킹 전용. 390px 96px, 1440px 184px.
-     낮은 화면에서는 높이에 맞춰 줄여 영상 노출을 지킨다(844px 높이 96px, 667px 높이 66px). 가로로 눕힌 폰은 56px에서 멈춘다 */
-  --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), max(3.5rem, 16.95svh - 47px));
-  --fs-h1: clamp(2.5rem, 1.796rem + 3.005vw, 4.5rem);
-  --fs-h2: clamp(1.875rem, 1.479rem + 1.690vw, 3rem);
-  --fs-h3: clamp(1.375rem, 1.243rem + 0.563vw, 1.75rem);
-  --fs-lead: clamp(1.125rem, 1.037rem + 0.376vw, 1.375rem);
-  --fs-body: clamp(1rem, 0.956rem + 0.188vw, 1.125rem);
-  --fs-cap: clamp(0.8125rem, 0.790rem + 0.094vw, 0.875rem);
-  --fs-seal-label: max(12px, 9.6cqw);   /* D-day 실링 안 글자. cqw는 실링 폭 기준이다 */
-  --fs-seal-num: 26cqw;
-  --seal-min: 68px;   /* D-day 실링 최소 폭. 낮은 화면에서도 12px 라벨이 점선 고리 안에 든다 */
+  /* 역할 */
+  --on-accent: var(--white);           /* 오렌지 면 위 글자. 20px·700 이상만 */
+  --line: var(--gray-200);
+  --field-edge: var(--gray-500);       /* 입력칸과 체크 상자 테두리(그래픽 3:1 이상) */
+  --danger: var(--orange-ink-band);    /* 오류와 실패 상태 글자. 흰 5.55, 띠 5.05 */
+  --focus-ring: var(--ink);
+  --focus-ring-on-dark: var(--white);
+  --edge-forced: ButtonText;           /* 강제 색 모드에서만 쓰는 테두리 */
+  --header-bg: var(--white);           /* 머리글은 흰 바탕과 아래 가는 선(시안 A). 사진 위에 겹치지 않는다 */
+  --scrim-flat: color-mix(in srgb, var(--ink) 56%, var(--white));   /* 신청 창이 열린 동안 스크롤 막대 자리 */
 
-  /* 간격 단계: --sp-N = N x 4px = Tailwind 간격 N */
-  --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;  --sp-6: 24px;
-  --sp-8: 32px;  --sp-10: 40px; --sp-12: 48px; --sp-14: 56px; --sp-16: 64px;
+  /* 사진 위 흰 막(시안 A). 사진 위 글자의 대비를 지키는 값이라, 대비가 모자라면 이 값들만 올린다(PLAN '색상 토큰').
+     마스크는 알파만 읽으므로 색은 뜻이 없다 */
+  --veil-hero: linear-gradient(90deg, rgb(255 255 255 / .55) 0%, rgb(255 255 255 / .38) 34%, rgb(255 255 255 / 0) 52%);   /* 데스크톱 첫 화면 왼쪽 */
+  /* 폰 첫 화면 사진의 아래: 날짜와 제목 자리(--hero-text-m)는 흰색이고, 그 위 96px 동안 사진이 흰색으로 녹아든다. 390x844에서 시안의 56~75%와 같다 */
+  --veil-hero-m: linear-gradient(180deg, rgb(255 255 255 / 0) calc(100% - var(--hero-text-m) - 96px), rgb(255 255 255 / .42) calc(100% - var(--hero-text-m) - 56px),
+    rgb(255 255 255 / .84) calc(100% - var(--hero-text-m) - 21px), rgb(255 255 255) calc(100% - var(--hero-text-m)));
+  --veil-price: linear-gradient(180deg, rgb(255 255 255 / .86) 0, rgb(255 255 255 / 0) 44%);
+  --mask-price: linear-gradient(90deg, rgb(0 0 0) 0 50%, rgb(0 0 0 / 0) 62%);
+  --veil-planner: linear-gradient(180deg, rgb(255 255 255 / .82) 0, rgb(255 255 255 / .55) 24%, rgb(255 255 255 / 0) 44%);
+  --mask-planner: linear-gradient(270deg, rgb(0 0 0) 0 30%, rgb(0 0 0 / 0) 40%);
+  --veil-hall: linear-gradient(90deg, rgb(255 255 255 / .86) 0, rgb(255 255 255 / .72) 42%, rgb(255 255 255 / .3) 68%, rgb(255 255 255 / 0) 100%);   /* 웨딩홀 제목에 붙어 함께 지나가는 띠 */
+  --mask-hall: linear-gradient(180deg, rgb(0 0 0 / 0) 0, rgb(0 0 0) 32% 68%, rgb(0 0 0 / 0) 100%);
+  --veil-pair: linear-gradient(180deg, rgb(255 255 255 / .72), rgb(255 255 255 / 0));   /* 드레스 비교 캡션 자리(위 20%) */
+  /* 신청 장면 왼쪽(1280px 이상): 제목과 설명이 놓이는 폭(컨테이너 선 + 33rem)까지 흰색 94%, 그 뒤 15vw 동안 걷힌다. 1440에서 시안의 40/50/60%와 거의 같다.
+     1279px 이하에서는 이 막이 신랑을 덮어 쓰지 않고, 사진을 무대 오른쪽 절반에 따로 둔다(cta.css) */
+  --veil-final: linear-gradient(90deg, rgb(255 255 255 / .94) 0 calc(max(var(--gutter), (100vw - var(--container)) / 2) + 33rem),
+    rgb(255 255 255 / .6) calc(max(var(--gutter), (100vw - var(--container)) / 2) + 33rem + 7vw),
+    rgb(255 255 255 / 0) calc(max(var(--gutter), (100vw - var(--container)) / 2) + 33rem + 15vw));
+  --veil-ctrl: rgb(255 255 255 / .94);   /* 영상 위 재생 버튼의 흰 면 */
 
-  --section-y: clamp(72px, 10vw, 140px);
-  --gutter: clamp(16px, 4vw, 40px);
-  --container: 1200px;
-  --header-h: 60px;
-  --header-blur: 12px;
-  --peek: clamp(170px, 25vh, 250px);   /* 첫 화면 아래에 보이는 영상 프레임 높이 */
-  --hero-gap: clamp(8px, 5.6svh - 24px, 24px);   /* 히어로의 세로 간격. 900px 높이 24px, 667px 높이 13px */
-  --glow-h: clamp(220px, 30svh, 300px);   /* --glow-hero를 그리는 높이. 'Soon' 위에서 끝나 대비 3:1을 지킨다 */
-  --film-max: 1080px;                     /* 소개 영상 최대 폭 */
-  /* 소개 영상 폭. 첫 화면 노출(--peek)만으로 영상이 36% 넘게 보이도록 낮은 화면에서는 폭을 줄인다. 모바일은 4:5 */
-  --film-w: min(var(--film-max), calc((var(--peek) - var(--sp-3)) / .45));
-  --tap: 44px;                         /* 최소 터치 영역 */
-  --btn-h: 60px;                       /* 주 버튼 높이 */
-  --btn-fs: 1.25rem;                   /* 주 버튼 글자 20px. 오렌지 위 흰 글자 기준 */
-  --buddy: 56px;                       /* 사운드 버디 */
-  --ctrl: 44px;                        /* 영상 재생·일시정지 버튼 */
-  --ts-w: 300px;                       /* Turnstile flexible 위젯의 최소 폭 */
-  --qr: 165px;                         /* QR 한 변. 33칸 x 5px이라 칸이 화소에 맞는다 */
-  --scrim-flat: color-mix(in srgb, var(--ink-900) 56%, var(--cream));   /* --scrim을 크림 위에 겹친 색 */
+  /* 글꼴. 제목 글꼴을 바꿀 때는 --ff-display 한 줄과 @font-face만 고친다. 굵기는 500, 700, 900 세 가지다 */
+  --ff-body: "Pretendard Variable", "Pretendard Fallback", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --ff-display: var(--ff-body);
+  --w-body: 500;
+  --w-strong: 700;      /* 라벨, 큰 문장, 단계, 굵은 한 줄, 버튼, FAQ 질문 */
+  --w-display: 900;     /* 제목, 비교 캡션 */
+
+  /* 글자 크기. 이 블록은 900px 이상 값이고, 폰 값은 아래 미디어 쿼리에 있다. 1440px에서 시안과 같은 값이 된다 */
+  --fs-h1: clamp(72px, 8vw, 124px);          /* 첫 화면 제목. 1440에서 115.2. 어느 폭에서나 두 줄 */
+  --fs-scene: clamp(48px, 4.9vw, 72px);      /* 장면 제목(h2), FAQ 제목, 신청 제목 */
+  --fs-statement: clamp(34px, 3.35vw, 48px); /* 흰 띠의 큰 문장 */
+  --fs-figure: clamp(28px, 2.5vw, 36px);     /* 비교 캡션 '원본', 'AI 합성' */
+  --fs-step: clamp(26px, 2.5vw, 36px);       /* 플래너 단계 */
+  --fs-callout: clamp(21px, 1.8vw, 26px);    /* 굵은 한 줄과 정찰제 정의 문장 */
+  --fs-body: clamp(18px, 1.39vw, 20px);      /* 본문, FAQ 답 */
+  --fs-lead: 21px;          /* 첫 화면 보조 문장, 신청 설명 */
+  --fs-label: 19px;         /* 기능 라벨, 장면 목차 이름 */
+  --fs-date: 19px;          /* 첫 화면 날짜 줄 */
+  --fs-q: clamp(20px, 1.6vw, 23px);          /* FAQ 질문 */
+  --fs-h2: 60px;            /* 법적 페이지와 404의 제목 */
+  --fs-h3: 28px;            /* 신청 창 제목, 완료 문구, 법적 페이지 절 제목 */
+  --fs-btn: 20px;
+  --fs-btn-compact: 20px;   /* 머리글 CTA */
+  --fs-input: 19px;
+  --fs-ui: 17px;            /* 머리글 바로가기, 입력 라벨, 동의 줄 */
+  --fs-terms: 16px;         /* 동의 고지 */
+  --fs-terms-dt: 16px;
+  --fs-fine: 16px;          /* 거부 권리, 나이 줄 */
+  --fs-meta: 15px;          /* 문서 링크, 푸터 링크 */
+  --fs-after: 15px;         /* 신청 아래 줄 */
+  --fs-name: 15px;          /* 푸터 상호 */
+  --fs-small: 14px;         /* AI 고지, 푸터, 오류와 상태 줄 */
+
+  /* 폭에 따라 바뀌는 줄 높이와 자간 */
+  --lh-h1: 1.04;
+  --lh-scene: 1.14;
+  --lh-statement: 1.3;
+  --lh-h2: 1.15;
+  --lh-body: 1.72;
+  --track-h1: -0.045em;
+  --track-scene: -0.04em;
+  --track-statement: -0.035em;
+  --track-h2: -0.035em;
+  --track-callout: -0.02em;
+  --track-step: -0.03em;
+  --track-q: -0.02em;
+  --track-tight: -0.01em;
+  --track-label: -0.005em;
+  --track-btn: -0.015em;
+  --track-input: 0.01em;
+  --track-terms: -0.005em;
+
+  /* 간격 단계: --sp-N = N x 4px = Tailwind 간격 N. 반 단계는 _5로 쓴다(--sp-4_5 = 18px) */
+  --sp-0_5: 2px;  --sp-1: 4px;    --sp-1_5: 6px;  --sp-2: 8px;    --sp-2_5: 10px;
+  --sp-3: 12px;   --sp-3_5: 14px; --sp-4: 16px;   --sp-4_5: 18px; --sp-5: 20px;
+  --sp-5_5: 22px; --sp-6: 24px;   --sp-6_5: 26px; --sp-7: 28px;   --sp-7_5: 30px;
+  --sp-8: 32px;   --sp-8_5: 34px; --sp-9: 36px;   --sp-9_5: 38px; --sp-10: 40px;
+  --sp-11: 44px;  --sp-12: 48px;  --sp-14: 56px;  --sp-15: 60px;  --sp-16: 64px;
+  --sp-18: 72px;  --sp-19: 76px;  --sp-20: 80px;  --sp-21: 84px;  --sp-22: 88px;
+  --sp-24: 96px;  --sp-26: 104px; --sp-28: 112px; --sp-36: 144px; --sp-37_5: 150px;
+  --sp-38: 152px; --sp-40: 160px; --sp-42: 168px; --sp-44: 176px; --sp-50: 200px;
+
+  /* 배치. 12칸 격자이고 칸 사이는 --gap이다 */
+  --container: 1280px;
+  --gutter: clamp(var(--sp-12), calc(12.5vw - 100px), var(--sp-20));   /* 1184px까지 48, 1440px부터 80(시안 1280px 이상 값) */
+  --gap: var(--sp-6);
+  --wrap: min(var(--container), 100% - var(--gutter) * 2);   /* 100%는 쓰는 자리의 폭이다 */
+  --header-h: 72px;
+  --hero-rest: var(--sp-37_5);     /* 첫 화면 사진 무대 아래에 장면 목차와 고지가 들어갈 높이 */
+  --hero-min: 540px;
+  --hero-rest-m: 208px;            /* 폰 첫 화면 사진 아래에 캡션, 보조 문장, CTA가 들어갈 높이. 낮은 창에서는 사진이 이만큼 낮아진다 */
+  --hero-text-m: calc(2.16 * var(--fs-h1) + 38px);   /* 폰 첫 화면 사진 아래쪽에 앉는 날짜와 두 줄 제목의 높이 */
+  /* 폰 첫 화면 사진이 낮아질 수 있는 하한: 얼굴(사진 높이의 39%, 폭의 58.5vw)보다 넉넉히 아래(66vw)에서 녹아들기 시작해 제목이 얼굴에 닿지 않는다 */
+  --hero-face-safe: calc(66vw + 96px + var(--hero-text-m));
+  --final-min: 560px;              /* 마지막 장면 사진 무대의 높이(데스크톱) */
+  --final-max: 700px;
+  --lift: var(--sp-10);            /* 장면의 흰 막이 사진 아래로 남기는 줄(AI 고지 자리) */
+  --section: var(--sp-50);         /* 법적 페이지 아래. 흰 띠, 장면, FAQ, 신청의 여백은 scene.css, faq.css, cta.css가 이 간격 단계로 정한다 */
+  --measure: 34em;
+  --foot-info-w: 980px;            /* 푸터 회사 정보 줄의 최대 폭 */
+  --idx-w: clamp(var(--sp-16), calc(12.5vw - 68px), var(--sp-28));   /* 장면 목차 사진. 1440px부터 112 x 84, 좁은 데스크톱은 64까지 줄어 이름이 한 칸에 든다 */
+  --idx-h: calc(var(--idx-w) * 3 / 4);
+  --crop-cap: 14rem;               /* 600~899px에서 정사각 디테일 컷(드레스 목둘레·밑단, 웨딩홀) 한 칸의 최대 폭. 컷이 거의 원본 크기라 늘려 그리지 않는다 */
+
+  /* 모양: 풀블리드 사진과 흰 막은 0, 컷·영상 창·버튼·입력·신청 창은 --r-frame(--r-control), 작은 요소는 --r-s. 장식 그림자는 쓰지 않는다 */
+  --r-bleed: 0;
+  --r-s: 6px;
+  --r-frame: 12px;
+  --r-control: 12px;
+
+  /* 조작 요소 */
+  --tap: 44px;               /* 최소 터치 영역 */
+  --btn-h: 64px;             /* 첫 화면 CTA */
+  --btn-pad: var(--sp-9);
+  --btn-compact-h: 48px;
+  --btn-compact-pad: var(--sp-5_5);
+  --submit-h: 66px;          /* 신청 버튼 */
+  --input-h: 58px;
+  --check: 24px;             /* 동의 체크 상자 */
+  --ctrl: 48px;              /* 영상 재생·일시정지 */
+  --frame-inset: var(--sp-5);
+  --play-big: 72px;
+  --icon-play: 28px;
+  --icon-q: 18px;            /* FAQ 더하기 표시 */
+  --icon-ui: 24px;
+  --logo-h: 30px;
+  --logo-foot-h: 26px;
+  --ts-w: 300px;             /* Turnstile flexible 위젯의 최소 폭 */
+  --qr: 165px;               /* QR 한 변. 33칸 x 5px */
 }
-/* 신청 창 뒤를 어둡게 하는 값과 그 페이드가 읽는 값. Safari 17.4 미만의 ::backdrop은 :root를 상속하지 않아 함께 선언한다 */
+/* 신청 창 뒤를 어둡게 하는 값과 페이드가 읽는 값. Safari 17.4 미만의 ::backdrop은 :root를 상속하지 않아 함께 선언한다 */
 :root, ::backdrop {
-  --scrim: rgb(42 26 20 / .56);
+  --scrim: rgb(17 17 19 / .56);
   --ease: cubic-bezier(.22, 1, .36, 1);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);   /* 시안 A의 움직임 */
 }
-@supports (height: 100svh) { :root { --peek: clamp(170px, 25svh, 250px); } }
-@media (min-width: 768px) {
+/* 900px 이상이면서 860px보다 낮은 창(1280x720, 1366x768, 1440x789, 1536x730): 머리글을 60px로 낮춰 고정 장면 사진을 넓힌다 */
+@media (min-width: 900px) and (max-height: 859px) {
+  :root { --header-h: 60px; --btn-compact-h: 44px; }
+}
+/* 폰과 좁은 태블릿. 폭 기준점은 이것 하나다. 값은 390px에서 시안의 폰 값이고, 768px의 시안 태블릿 값까지 폭을 따라 자란다 */
+@media (max-width: 899px) {
   :root {
-    --header-h: 72px; --btn-h: 64px; --buddy: 64px; --ctrl: 48px;
-    --film-w: min(var(--film-max), calc((var(--peek) - var(--sp-3)) / .36 * 16 / 9));   /* 16:9 */
+    --gutter: clamp(var(--sp-5), calc(5.3vw - 0.67px), var(--sp-10));
+    --gap: clamp(var(--sp-3), calc(2.12vw + 3.75px), var(--sp-5));
+    --header-h: 60px;
+    --fs-h1: clamp(44px, min(11.8vw, calc(25.36px + 5.291vw)), 66px);
+    --fs-scene: clamp(32px, min(9.23vw, calc(21.56px + 3.704vw)), 50px);
+    --fs-statement: clamp(22px, min(6.15vw, calc(15.75px + 2.116vw)), 32px);
+    --fs-figure: clamp(26px, calc(21.87px + 1.058vw), 30px);
+    --fs-step: clamp(20px, min(5.64vw, calc(17.87px + 1.058vw)), 26px);
+    --fs-callout: clamp(18px, min(5.13vw, calc(16.9px + 0.794vw)), 23px);
+    --fs-body: clamp(17px, calc(15.97px + 0.265vw), 18px);
+    --fs-lead: var(--fs-body);
+    --fs-label: clamp(15px, calc(14.97px + 0.265vw), 17px);
+    --fs-date: 15px;
+    --fs-q: clamp(18px, calc(15.94px + 0.529vw), 20px);
+    --fs-h2: clamp(32px, 8.2vw, 48px);
+    --fs-h3: 22px;
+    --fs-btn-compact: 16px;
+    --fs-after: 16px;
+    --lh-h1: 1.08;
+    --lh-statement: 1.42;
+    --lh-h2: 1.25;
+    --track-statement: -0.03em;
+    --track-h2: -0.03em;
+    --btn-h: 56px;
+    --btn-pad: var(--sp-7);
+    --btn-compact-h: 44px;          /* 시안은 42px. 터치 영역 44px을 지킨다 */
+    --btn-compact-pad: var(--sp-3_5);
+    --submit-h: 62px;
+    --ctrl: 44px;
+    --frame-inset: var(--sp-3);
+    --play-big: 56px;
+    --icon-play: 22px;
+    --logo-h: 26px;
   }
 }
-/* 1024px부터 후킹은 한 줄이다. 실링까지 여백 안에 들어오도록 폭으로도 줄인다.
-   마지막 값은 브라우저 글자 크기를 키워도 한 줄이 --container 안에 들게 한다(기본 글자 크기에서는 쓰이지 않는다) */
-@media (min-width: 1024px) {
-  :root { --fs-display: min(clamp(5.5rem, 3.956rem + 8.38vw, 11.5rem), calc((100vw - 2 * var(--gutter)) / 6.9), 20.6svh, calc(var(--container) / 6.1)); }
+/* 가로로 든 폰과 낮고 넓은 좁은 창(899px 이하, 가로세로 비 4/3 이상): 첫 화면은 사진 옆에 날짜와 제목을 둔다(hero.css).
+   제목 크기를 화면 높이에 맞춰 날짜, 제목, 보조 문장, CTA가 첫 화면에 든다 */
+@media (max-width: 899px) and (min-aspect-ratio: 4/3) {
+  :root { --fs-h1: clamp(40px, 11svh, 66px); }
 }
 
 html { scroll-padding-top: var(--header-h); }
 html.js { scroll-behavior: smooth; }   /* JS가 꺼지면 해시 주소에서 부드러운 스크롤을 끄는 스크립트도 없으므로 처음부터 쓰지 않는다 */
-body { background: var(--cream); color: var(--ink-900); word-break: keep-all; overflow-wrap: break-word; }
+body { background: var(--white); color: var(--ink); word-break: keep-all; overflow-wrap: anywhere; }
 /* 이동과 확대를 끈다. 반복 횟수를 1로 두어 무한 반복이 아주 짧은 주기로 깜빡이지 않게 한다 */
 @media (prefers-reduced-motion: reduce) {
   html.js { scroll-behavior: auto; }

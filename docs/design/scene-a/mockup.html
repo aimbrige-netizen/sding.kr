@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>스딩 Sding | 스스로 준비하는 웨딩</title>
+<meta name="description" content="스딩은 웨딩 가격을 정찰제로 투명하게 만들고, AI로 플래닝·드레스·웨딩홀을 미리 경험하게 하는 웨딩 플랫폼이에요.">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" href="/fonts.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<!--
+  시안 A "장면형 시네마"
+  페이지는 영화처럼 장면이 이어진다. 기능 하나가 한 장면이고, 장면 사이 흰 띠에는 라벨과 큰 문장 하나가 숨을 고른다.
+  첫 화면: hero-b 풀블리드 위 큰 제목, 그 아래 네 장면을 고르는 장면 목차(작은 사진 + 기능 이름).
+  장면 구조(데스크톱 1024px 이상)
+    .shot-wrap : 풀블리드 사진. position: sticky로 장면이 끝날 때까지 화면에 고정된다. 사진 위에는 제목(H2)만 얹는다.
+    .reel      : 고정된 사진 위를 지나가는 층. 1행은 사진 높이만큼의 제목 자리, 2행은 흰 막(.reel__strip)이다.
+                 흰 막은 화면 폭 전체를 덮으며 아래에서 올라와 사진을 닦아 내고(장면 전환), 그 위에 글과 디테일 컷이 실려 온다.
+                 흰 막의 맨 윗줄에는 AI 안내 문구가 있어서, 사진이 얼마나 남아 있든 문구는 늘 사진 바로 아래에 붙어 있다.
+    정지 화면(전체 페이지 캡처)에서는 sticky가 제자리(장면 맨 위)에 있으므로 "사진과 제목, 그 아래 흰 막의 글과 컷" 순서로 읽힌다.
+  휴대폰(767px 이하): 장면마다 쌓아서 보여 주되, 기능마다 짜임을 바꾼다.
+    정찰제는 4:5 사진 + 가로로 넘기는 디테일 컷, 플래너는 2x2 단계 + 넓은 컷, 드레스는 무릎 길이 비교 두 장 + 밑단 비교,
+    웨딩홀은 16:9 영상이 먼저 오고 정사각 컷 두 장.
+  움직임은 모두 prefers-reduced-motion: no-preference 안에만 있다(맨 아래 블록). 움직임을 끄면 모든 요소가 처음부터 제자리에 보인다.
+-->
+<style>
+:root{
+  --orange:#FF5719; --orange-ink:#D63A00;
+  --ink:#111113; --ink-2:#3F3F46; --ink-3:#71717A; --zinc:#A1A1AA; --line:#E4E4E7; --mist:#F4F4F5; --white:#FFFFFF;
+  /* 모서리: 풀블리드 사진과 흰 막은 0, 컷, 영상 창, 버튼, 입력은 --r-m, 작은 요소는 --r-s */
+  --r-s:6px; --r-m:12px;
+  --hh:60px; --side:20px; --gap:12px;
+  --wrap:min(1280px, calc(100% - var(--side) * 2));
+  /* 글자 크기 단계. 굵기는 500(본문) 700(라벨, 문장, 단계, 버튼) 900(제목, 비교 캡션) 세 가지만 */
+  --t-h1:46px; --t-h2:36px; --t-st:24px; --t-cap:26px; --t-step:22px; --t-lead:20px; --t-body:17px; --t-label:16px; --t-q:18px; --t-small:14px;
+  font-family:'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+}
+@media (min-width:768px){
+  :root{ --side:40px; --gap:20px; --t-h1:66px; --t-h2:50px; --t-st:32px; --t-cap:30px; --t-step:26px; --t-lead:23px; --t-body:18px; --t-label:17px; --t-q:20px; }
+}
+@media (min-width:1024px){
+  :root{ --hh:72px; --side:48px; --gap:24px;
+    --t-h1:clamp(80px, 8vw, 124px); --t-h2:clamp(48px, 4.9vw, 72px); --t-st:clamp(34px, 3.35vw, 48px);
+    --t-cap:clamp(28px, 2.5vw, 36px); --t-step:clamp(26px, 2.5vw, 36px); --t-lead:clamp(21px, 1.8vw, 26px);
+    --t-body:clamp(18px, 1.39vw, 20px); --t-label:19px; --t-q:clamp(20px, 1.6vw, 23px); }
+}
+@media (min-width:1280px){ :root{ --side:80px; } }
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{margin:0; background:var(--white); color:var(--ink); font-size:var(--t-body); font-weight:500; line-height:1.72; letter-spacing:-0.01em;
+  word-break:keep-all; overflow-wrap:anywhere; -webkit-font-smoothing:antialiased}
+img,video{display:block; max-width:100%}
+h1,h2,p,figure,dl,dd,ul,ol{margin:0}
+ul,ol{padding:0; list-style:none}
+a{color:inherit}
+h1,h2,.statement{text-wrap:balance}
+.wrap{width:var(--wrap); margin-inline:auto}
+br.d{display:none}
+@media (min-width:768px){ br.m{display:none} }
+:focus-visible{outline:3px solid var(--ink); outline-offset:3px; border-radius:var(--r-s)}
+.skip{position:absolute; left:12px; top:-64px; z-index:60; padding:10px 16px; border-radius:var(--r-m); background:var(--ink); color:#fff; font-weight:700; text-decoration:none}
+.skip:focus{top:12px}
+.note{font-size:var(--t-small); line-height:1.55; color:var(--ink-3); font-weight:500; letter-spacing:0}
+.label{font-size:var(--t-label); font-weight:700; line-height:1.4; letter-spacing:-0.005em; color:var(--orange-ink)}
+.h2{font-size:var(--t-h2); font-weight:900; line-height:1.14; letter-spacing:-0.04em}
+.lead{font-size:var(--t-lead); font-weight:700; line-height:1.5; letter-spacing:-0.02em; color:var(--ink)}
+.def{font-size:var(--t-body); font-weight:500; line-height:1.72; color:var(--ink-2)}
+section[id]{scroll-margin-top:var(--hh)}
+
+/* 버튼: 주황 바탕 흰 글자는 20px 굵게만 */
+.btn{display:inline-flex; align-items:center; justify-content:center; height:56px; padding:0 28px; border:0; border-radius:var(--r-m);
+  background:var(--orange); color:#fff; font:inherit; font-size:20px; font-weight:700; letter-spacing:-0.015em; line-height:1; text-decoration:none; white-space:nowrap; cursor:pointer}
+.btn:hover{background:var(--orange-ink)}
+/* 1023px 이하 머리글 버튼은 조용하게(테두리만). 첫 화면의 큰 버튼과 겹쳐 외치지 않게 */
+.btn--hd{height:42px; padding:0 14px; background:transparent; color:var(--orange-ink); box-shadow:inset 0 0 0 1.5px var(--orange-ink); font-size:16px}
+.btn--hd:hover{background:var(--orange-ink); color:#fff}
+
+/* ---------- 머리글 ---------- */
+.hd{position:sticky; top:0; z-index:40; height:var(--hh); background:var(--white); border-bottom:1px solid var(--line)}
+.hd__in{height:100%; display:flex; align-items:center; gap:28px}
+.hd__logo{display:block; margin-right:auto; border-radius:var(--r-s)}
+.hd__logo img{height:26px; width:auto}
+.hd__nav{display:none}
+
+/* ---------- 첫 장면(휴대폰 기본) ----------
+   사진이 먼저 오고, 사진 아래쪽(치마와 바지 부분)이 흰 바탕으로 녹아든 자리에 날짜와 제목이 앉는다.
+   얼굴과 부케는 위쪽 4분의 3 안에 있어 글과 겹치지 않는다. 설명과 버튼은 사진 아래 */
+.hero{display:grid; grid-template-columns:minmax(0, 1fr); grid-template-areas:"media" "note" "body"}
+.hero__media{grid-area:media; position:relative; aspect-ratio:780 / 1152; overflow:hidden; background:var(--mist)}
+.hero__media picture{display:contents}
+.hero__media img{width:100%; height:100%; object-fit:cover}
+.hero__scrim{position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(180deg, rgb(255 255 255 / 0) 56%, rgb(255 255 255 / .42) 63%, rgb(255 255 255 / .84) 69.5%, #fff 75%)}
+.hero__copy{display:contents}
+.hero__head{grid-area:media; align-self:end; z-index:1; width:var(--wrap); margin-inline:auto; padding-bottom:2px}
+.hero__date{font-size:15px; font-weight:700; line-height:1.4; letter-spacing:0; color:var(--orange-ink)}
+.hero__title{margin-top:8px; font-size:var(--t-h1); font-weight:900; line-height:1.08; letter-spacing:-0.045em}
+.hero__title span{display:block}
+.hero__note{grid-area:note; padding-top:8px}
+.hero__body{grid-area:body; width:var(--wrap); margin-inline:auto}
+.hero__sub{margin-top:10px; color:var(--ink-2); line-height:1.6; text-wrap:pretty}
+.hero__cta{margin-top:16px; width:100%}
+.hero__index{display:none}
+
+/* ---------- 장면 사이 흰 띠: 라벨 + 큰 문장 하나 ---------- */
+.band{padding:76px 0 34px}
+.band .label{margin-bottom:10px}
+.statement{font-size:var(--t-st); font-weight:700; line-height:1.42; letter-spacing:-0.03em; color:var(--ink)}
+.statement em{font-style:normal; color:var(--orange)}
+
+/* ---------- 장면(휴대폰 기본: 쌓기) ---------- */
+.scene{position:relative}
+.shot{position:relative; overflow:hidden; aspect-ratio:4 / 5; background:var(--mist)}
+.shot picture{display:contents}
+.shot img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.shot__scrim{display:none}
+.shot__note{width:var(--wrap); margin-inline:auto; padding-top:10px}
+.reel__text{width:var(--wrap); margin-inline:auto; padding-top:24px}
+.reel__text .lead{margin-top:12px}
+.strip__lift,.frame-mark{display:none}
+/* 렌더 도구용 표시(출시 전에 뺀다): 장면 사진이 머리글 바로 아래에 붙는 순간을 한 화면 찍게 한다 */
+.frame-mark--start{display:block; position:absolute; left:0; top:calc(var(--hh) * -1); width:1px; height:1px; pointer-events:none}
+.strip__text{width:var(--wrap); margin:14px auto 0}
+.strip__text .lead{margin-top:10px}
+.strip__note{width:var(--wrap); margin-inline:auto; padding-top:10px}
+.crop{margin:0; min-width:0}
+/* height:auto는 꼭 둔다. 없으면 img의 height 속성값이 그대로 CSS 높이가 되어 비율이 깨진다 */
+.crop img{width:100%; height:auto; object-fit:cover; border-radius:var(--r-m); background:var(--mist)}
+
+/* 정찰제: 가격표가 달린 네 가지를 가로로 넘긴다. 다음 컷이 보이게 */
+.scene--price .strip__crops{display:flex; gap:10px; overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory; scroll-padding-inline:var(--side);
+  margin-top:22px; padding:0 var(--side) 4px; scrollbar-width:none}
+.scene--price .strip__crops::-webkit-scrollbar{display:none}
+.scene--price .crop{flex:0 0 66%; scroll-snap-align:start}
+.scene--price .crop img{aspect-ratio:4 / 5}
+
+/* 플래너: 단계 네 개를 2x2로, 그 아래 넓은 컷 하나 */
+.steps{width:var(--wrap); margin:24px auto 0; display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:20px var(--gap)}
+.steps li{border-top:2px solid var(--ink); padding-top:12px; font-size:var(--t-step); font-weight:700; line-height:1.3; letter-spacing:-0.03em}
+.scene--planner .strip__crops{margin-top:28px}
+.scene--planner .c-note img{aspect-ratio:3 / 2; border-radius:0}
+.c-tulips{display:none}
+
+/* 드레스: 무릎 길이 비교 두 장을 화면 폭 가득, 캡션은 사진 아래 */
+.shot--pair{aspect-ratio:auto; overflow:visible; display:grid; grid-template-columns:1fr 1fr; gap:3px; background:var(--white)}
+.pair__item{position:relative; margin:0; min-width:0}
+.pair__img{position:relative; overflow:hidden; aspect-ratio:3 / 5; background:var(--mist)}
+.pair__img picture{display:contents}
+.pair__img img{object-position:50% 26%}
+.pair__cap{display:block; padding:10px 0 0 var(--side); font-size:var(--t-cap); font-weight:900; line-height:1.1; letter-spacing:-0.04em; color:var(--ink)}
+.pair__cap--ai{padding-left:12px; color:var(--orange-ink)}
+/* 밑단 비교: 휴대폰은 같은 자리를 정사각으로 잘라 나란히 */
+.hem{width:var(--wrap); margin:24px auto 0; display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px}
+/* 열마다 캡션 하나(원본 / AI 합성), 그 아래 같은 자리를 자른 목둘레와 밑단 */
+.hem__item{margin:0; min-width:0; display:grid; gap:8px; align-content:start}
+.hem__item img{width:100%; height:auto; aspect-ratio:1; object-fit:cover; border-radius:var(--r-m); background:var(--mist)}
+.hem__item figcaption{font-size:var(--t-lead); font-weight:700; line-height:1.3; letter-spacing:-0.02em}
+.hem__item--ai figcaption{color:var(--orange-ink)}
+
+/* 웨딩홀: 휴대폰에서는 영상이 장면의 첫 화면. 고정 사진은 쓰지 않는다 */
+.scene--hall .shot-wrap{display:none}
+.scene--hall .reel{display:flex; flex-direction:column}
+.scene--hall .reel__strip,.hall-media{display:contents}
+.hall-video{order:1; position:relative; margin:0; aspect-ratio:16 / 9; overflow:hidden; background:var(--mist)}
+.hall-video video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.hall-video__note{order:2; width:var(--wrap); margin-inline:auto; padding-top:10px}
+.scene--hall .reel__text{order:3}
+.hall-crops{order:4; width:var(--wrap); margin:22px auto 0; display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px}
+.hall-crops .crop img{aspect-ratio:1}
+.c-aisle img{object-position:22% 50%}
+.scene--hall .strip__note{order:5}
+
+/* 영상 재생 버튼(영상 위에 허용되는 유일한 요소) */
+.play{position:absolute; z-index:2; top:12px; right:12px; display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 14px 0 12px;
+  border:0; border-radius:var(--r-m); background:rgb(255 255 255 / .94); color:var(--ink); font:inherit; font-size:15px; font-weight:700; letter-spacing:-0.01em; cursor:pointer}
+.play i{font-size:20px; line-height:1}
+.play .ph-pause{display:none}
+.play.is-playing .ph-play{display:none}
+.play.is-playing .ph-pause{display:inline-block}
+
+/* ---------- 자주 묻는 질문 ---------- */
+.faq{padding:60px 0 44px}
+.faq__title{font-size:var(--t-h2); font-weight:900; line-height:1.14; letter-spacing:-0.04em}
+.faq__list{margin-top:26px}
+.faq details + details{border-top:1px solid var(--line)}
+.faq summary{display:flex; justify-content:space-between; align-items:flex-start; gap:20px; padding:19px 0; list-style:none; cursor:pointer;
+  font-size:var(--t-q); font-weight:700; line-height:1.45; letter-spacing:-0.02em; color:var(--ink); border-radius:var(--r-s)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:""; flex:none; width:18px; height:18px; margin-top:.28em;
+  background:linear-gradient(var(--ink), var(--ink)) center / 100% 2px no-repeat, linear-gradient(var(--ink), var(--ink)) center / 2px 100% no-repeat}
+.faq details[open] summary::after{background:linear-gradient(var(--orange-ink), var(--orange-ink)) center / 100% 2px no-repeat}
+.faq details p{padding:0 0 26px; color:var(--ink-2); max-width:34em}
+
+/* ---------- 출시 알림 ---------- */
+.final{display:grid; grid-template-areas:"media" "note" "head" "body"}
+.final__media{grid-area:media; position:relative; overflow:hidden; aspect-ratio:6 / 5; background:var(--mist)}
+.final__media picture{display:contents}
+.final__media img{width:100%; height:100%; object-fit:cover; object-position:50% 12%}
+.final__scrim{display:none}
+.final__note{grid-area:note; padding-top:10px}
+.final__head{grid-area:head; padding-top:40px}
+.final__title{font-size:var(--t-h2); font-weight:900; line-height:1.14; letter-spacing:-0.04em}
+.final__title em{font-style:normal; color:var(--orange)}
+.final__lead{margin-top:16px; color:var(--ink-2)}
+.final__lead span{display:block}
+.final__body{grid-area:body; padding:28px 0 56px}
+.form{display:grid; gap:0}
+.form__col{min-width:0}
+.field__label{display:block; font-size:17px; font-weight:700; color:var(--ink)}
+.field__input{display:block; width:100%; height:58px; margin-top:10px; padding:0 18px; border:1.5px solid var(--ink-3); border-radius:var(--r-m); background:#fff;
+  font:inherit; font-size:19px; font-weight:500; color:var(--ink); letter-spacing:.01em}
+.field__input::placeholder{color:var(--ink-3)}
+.field__input:focus-visible{outline:3px solid var(--ink); outline-offset:2px; border-color:var(--ink)}
+.rows{margin-top:22px; display:grid; gap:10px; font-size:16px; line-height:1.6}
+.rows div{display:grid; grid-template-columns:5.2em 1fr; gap:12px}
+.rows dt{color:var(--ink-3); font-weight:500}
+.rows dd{color:var(--ink-2); font-weight:500}
+.rows dd.is-strong{color:var(--ink); font-weight:700}
+.fine{margin-top:16px; font-size:16px; line-height:1.6; color:var(--ink-2)}
+.fine span{display:block}
+.consent{display:flex; align-items:flex-start; gap:12px; margin-top:26px; font-size:17px; font-weight:700; line-height:1.45; color:var(--ink); cursor:pointer}
+.consent input{flex:none; width:24px; height:24px; margin:0; accent-color:var(--orange); cursor:pointer}
+.consent span{padding-top:1px}
+.links{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:12px; padding-left:36px; font-size:15px}
+.links a{color:var(--ink-2); text-underline-offset:3px}
+.form .btn{width:100%; height:62px; margin-top:24px}
+.after{margin-top:22px; display:grid; gap:8px; font-size:16px; color:var(--ink-2)}
+.after button,.after a{padding:0; border:0; background:none; font:inherit; font-weight:700; color:var(--ink); text-decoration:underline; text-underline-offset:3px; cursor:pointer}
+
+/* ---------- 바닥글 ---------- */
+.ft{background:var(--mist); padding:48px 0 36px; font-size:14px; line-height:1.7; color:var(--ink-2)}
+.ft__top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:20px}
+.ft__logo img{height:26px; width:auto}
+.ft__links{display:flex; flex-wrap:wrap; gap:8px 22px; font-size:15px}
+.ft__links a{text-decoration:none; color:var(--ink-2)}
+.ft__links a:hover{text-decoration:underline; text-underline-offset:3px}
+.ft__links .ft__privacy{color:var(--ink); font-weight:700}
+.ft__name{margin-top:28px; font-size:15px; font-weight:700; color:var(--ink)}
+.ft__info{margin-top:8px; display:flex; flex-wrap:wrap; gap:2px 22px}
+.ft__ai{margin-top:20px; color:var(--ink-3)}
+.ft__copy{margin-top:6px; color:var(--ink-3)}
+
+/* ======================================================================
+   태블릿(768 ~ 1023): 휴대폰 짜임을 넓게
+   ====================================================================== */
+@media (min-width:768px) and (max-width:1023px){
+  .hero__media{aspect-ratio:4 / 3}
+  .hero__media img{object-position:76% 30%}
+  .hero__cta{width:auto}
+  .shot{aspect-ratio:4 / 3}
+  .scene--price .crop{flex-basis:40%}
+  .pair__img{aspect-ratio:4 / 5}
+  .hem{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:repeat(4, minmax(0, 1fr))}
+}
+
+/* ======================================================================
+   데스크톱(1024 이상): 사진을 고정하고 흰 막이 그 위로 지나가게 한다
+   ====================================================================== */
+@media (min-width:1024px){
+  br.d{display:inline}
+  .hd__logo img{height:30px}
+  .hd__nav{display:flex; gap:34px; margin-right:10px}
+  .hd__nav a{padding:8px 0; font-size:17px; font-weight:700; color:var(--ink-2); text-decoration:none}
+  .hd__nav a:hover{color:var(--ink)}
+  .btn--hd{height:48px; padding:0 22px; background:var(--orange); color:#fff; box-shadow:none; font-size:20px}
+  .btn--hd:hover{background:var(--orange-ink)}
+
+  /* 첫 화면: 사진 무대(흰 벽 위 큰 제목) + 장면 목차 + 안내 문구가 한 화면에 */
+  .hero{grid-template-areas:"stage" "index" "note"}
+  .hero__media{grid-area:stage; aspect-ratio:auto; height:calc(100svh - var(--hh) - 150px); min-height:540px}
+  .hero__media img{object-position:50% 36%}
+  .hero__scrim{background:linear-gradient(90deg, rgb(255 255 255 / .55) 0%, rgb(255 255 255 / .38) 34%, rgb(255 255 255 / 0) 52%)}
+  .hero__copy{display:block; grid-area:stage; align-self:center; z-index:1; width:var(--wrap); margin-inline:auto; padding-bottom:8px}
+  .hero__head,.hero__body{width:auto; margin:0; padding:0}
+  .hero__date{font-size:19px}
+  .hero__title{margin-top:20px; line-height:1.04}
+  .hero__sub{margin-top:28px; font-size:21px; line-height:1.7}
+  .hero__cta{margin-top:36px; width:auto; height:64px; padding:0 36px}
+  .hero__index{display:grid; grid-area:index; grid-template-columns:repeat(4, minmax(0, 1fr)); column-gap:var(--gap); padding-top:18px}
+  .idx{display:flex; align-items:center; gap:16px; text-decoration:none; color:var(--ink); border-radius:var(--r-m)}
+  .idx img{flex:none; width:112px; height:84px; object-fit:cover; border-radius:var(--r-m); background:var(--mist)}
+  .idx span{font-size:19px; font-weight:700; line-height:1.35; letter-spacing:-0.02em}
+  .idx:hover span{color:var(--orange-ink)}
+  .hero__note{padding-top:10px}
+
+  /* 흰 띠: 라벨과 문장이 제목과 같은 왼쪽 선(x=80)에서 시작한다 */
+  .band{padding:96px 0 104px}
+  .band--tight{padding:64px 0}
+  .band .wrap{display:grid; grid-template-columns:repeat(12, minmax(0, 1fr)); column-gap:var(--gap)}
+  .band .label,.band .statement{grid-column:1 / span 10}
+  .band .label{margin-bottom:18px}
+  .statement{line-height:1.3; letter-spacing:-0.035em}
+
+  /* 장면 */
+  .scene{--shot-h:calc(100svh - var(--hh)); --lift:40px; overflow-x:clip}
+  .shot-wrap{position:sticky; top:var(--hh); z-index:0; height:calc(var(--shot-h) - var(--lift))}
+  .shot{height:100%; aspect-ratio:auto}
+  .shot__note{display:none}
+  .shot__scrim{display:block; position:absolute; inset:0; pointer-events:none}
+  .reel{position:relative; z-index:1; width:var(--wrap); margin:calc((var(--shot-h) - var(--lift)) * -1) auto 0; padding-bottom:48px;
+    display:grid; grid-template-columns:repeat(12, minmax(0, 1fr)); column-gap:var(--gap); grid-template-rows:calc(var(--shot-h) - var(--lift)) auto; pointer-events:none}
+  .reel > *{pointer-events:auto}
+  .reel__text{grid-row:1; width:auto; margin:0; padding:0}
+  /* 흰 막: 화면 폭 전체를 덮는다. 컷이 제 원본 사진 위에 올라앉는 일이 없다 */
+  .reel__strip{grid-row:2; grid-column:1 / -1; position:relative; z-index:0; display:grid; grid-template-columns:subgrid; align-items:start; align-content:start}
+  .reel__strip::before{content:""; position:absolute; z-index:-1; top:0; bottom:-48px; left:calc(50% - 50vw); right:calc(50% - 50vw); background:var(--white)}
+  .strip__lift{display:block; grid-column:1 / -1; height:var(--lift); padding-top:10px}
+  .strip__text{grid-column:1 / span 8; width:auto; margin:0}
+  .strip__note{grid-column:1 / -1; width:auto; margin:0; padding-top:12px}
+  .crop img{height:100%}
+  /* 렌더 도구가 장면 중간(흰 막이 사진 위로 반쯤 올라온 순간)을 한 화면 찍도록 두는 표시. 출시 전에 뺀다 */
+  /* 값은 제목이 머리글 밑에 잘리지 않는 지점(제목이 이미 위로 빠져나간 뒤)으로 장면마다 맞췄다 */
+  .frame-mark{display:block; position:absolute; left:0; top:var(--mark, 360px); width:1px; height:1px; pointer-events:none}
+  .frame-mark--start{top:calc(var(--hh) * -1)}
+  .scene--price,.scene--planner{--mark:358px}
+  .scene--dress{--mark:488px}
+  .scene--hall{--mark:408px}
+
+  /* 장면 1: 정찰제. 제목은 소품 위 빈 벽(왼쪽 위). 흰 막에는 정의와 같은 기준으로 놓인 네 가지 */
+  .scene--price .shot img{object-position:50% 50%}
+  .scene--price .shot__scrim{background:linear-gradient(180deg, rgb(255 255 255 / .86) 0, rgb(255 255 255 / 0) 44%);
+    -webkit-mask-image:linear-gradient(90deg, #000 0 50%, transparent 62%); mask-image:linear-gradient(90deg, #000 0 50%, transparent 62%)}
+  .scene--price .reel__text{grid-column:1 / span 8; align-self:start; padding-top:40px}
+  .scene--price .strip__text{padding:44px 0 40px}
+  .scene--price .def{font-size:var(--t-lead); line-height:1.62; letter-spacing:-0.02em}
+  .scene--price .strip__text .lead{margin-top:6px}
+  .scene--price .strip__crops{grid-column:1 / -1; display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:var(--gap); margin:0; padding:0; overflow:visible}
+  .scene--price .crop img{aspect-ratio:4 / 5; height:auto}
+  .c-lace{--drift:18px} .c-bouq{--drift:46px} .c-ring{--drift:28px} .c-cards{--drift:58px}
+
+  /* 장면 2: 플래너. 제목은 오른쪽 위 창가(남자 머리에서 120px 넘게 떨어진 9열부터). 흰 막에는 한 줄, 단계 네 개, 컷 두 장 */
+  .scene--planner .shot img{object-position:50% 50%}
+  .scene--planner .shot__scrim{background:linear-gradient(180deg, rgb(255 255 255 / .82) 0, rgb(255 255 255 / .55) 24%, rgb(255 255 255 / 0) 44%);
+    -webkit-mask-image:linear-gradient(270deg, #000 0 30%, transparent 40%); mask-image:linear-gradient(270deg, #000 0 30%, transparent 40%)}
+  .scene--planner .reel__text{grid-column:9 / -1; align-self:start; padding-top:40px}
+  .scene--planner .h2{white-space:nowrap}
+  .scene--planner .strip__text{padding-top:44px}
+  .steps{grid-column:1 / -1; width:auto; margin:36px 0 0; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:var(--gap)}
+  .steps li{padding-top:18px}
+  .scene--planner .strip__crops{grid-column:1 / -1; display:grid; grid-template-columns:subgrid; align-items:stretch; margin-top:44px}
+  .c-note{grid-column:1 / span 8}
+  .scene--planner .c-note img{aspect-ratio:880 / 360; height:auto; border-radius:var(--r-m)}
+  .c-tulips{display:block; grid-column:9 / -1}
+  .c-note{--drift:22px} .c-tulips{--drift:52px}
+
+  /* 장면 3: 드레스. 비교 두 장이 6열부터 오른쪽 끝까지 꽉 찬 높이로 고정되고, 왼쪽 흰 면에 제목과 한 줄 */
+  .scene--dress .shot{display:grid; grid-template-columns:1fr 1fr; gap:4px; height:100%; width:auto; background:var(--white);
+    margin-left:calc((100% - var(--wrap)) / 2 + (var(--wrap) - 11 * var(--gap)) * 5 / 12 + 5 * var(--gap))}
+  .pair__item{height:100%}
+  .pair__img{height:100%; aspect-ratio:auto}
+  .pair__img img{object-position:50% 40%}
+  .pair__img::after{content:""; position:absolute; left:0; right:0; top:0; height:20%; pointer-events:none;
+    background:linear-gradient(to bottom, rgb(255 255 255 / .72), rgb(255 255 255 / 0))}
+  .pair__cap{position:absolute; z-index:1; top:20px; left:24px; padding:0}
+  .pair__cap--ai{left:auto; right:24px}
+  .scene--dress .reel__text{grid-column:1 / span 5; align-self:center; padding-bottom:24px}
+  .scene--dress .reel__text .lead{margin-top:28px}
+  .scene--dress .strip__lift{grid-column:6 / -1}
+  .hem{grid-column:1 / -1; width:auto; margin:0; padding-top:44px; grid-template-columns:subgrid; gap:0 normal}
+  .hem__item{grid-column:span 6; gap:14px}
+  .hem__item img{aspect-ratio:1200 / 470}
+  .hem__item figcaption{font-size:var(--t-cap); font-weight:900; letter-spacing:-0.04em}
+  .hem__item:first-child{--drift:24px} .hem__item--ai{--drift:48px}
+
+  /* 장면 4: 웨딩홀. 선명한 hall-c 사진(둥근 샹들리에 홀)이 고정되고, 흰 막에 다른 홀(hall-a)을 걷는 영상과 그 홀의 디테일 두 장 */
+  .scene--hall .shot-wrap{display:block}
+  .scene--hall .reel{display:grid}
+  .scene--hall .reel__strip{display:grid}
+  .scene--hall .shot img{object-position:50% 50%}
+  /* 웨딩홀 제목의 흰 막은 사진이 아니라 제목에 붙어 함께 지나간다. 제목이 빠져나가면 고정된 사진은 다시 맑아진다.
+     막은 제목 높이의 띠에만 있어 아래쪽 꽃은 바래지 않는다 */
+  .scene--hall .shot__scrim{display:none}
+  .scene--hall .reel__text{grid-column:1 / span 6; align-self:center; padding-bottom:24px; position:relative; z-index:0}
+  .scene--hall .reel__text::before{content:""; position:absolute; z-index:-1; pointer-events:none; top:-150px; bottom:-150px;
+    left:calc(-1 * max(var(--side), (100vw - 1280px) / 2)); width:62vw;
+    background:linear-gradient(90deg, rgb(255 255 255 / .86) 0, rgb(255 255 255 / .72) 42%, rgb(255 255 255 / .3) 68%, rgb(255 255 255 / 0) 100%);
+    -webkit-mask-image:linear-gradient(180deg, transparent 0, #000 32% 68%, transparent 100%); mask-image:linear-gradient(180deg, transparent 0, #000 32% 68%, transparent 100%)}
+  /* 영상이 두 행을 차지하고 그 높이가 행을 정한다. 컷 두 장은 그 두 행을 꽉 채운다(위아래 선이 영상과 맞는다) */
+  .hall-media{display:grid; grid-column:1 / -1; grid-template-columns:subgrid; grid-template-rows:auto auto; row-gap:var(--gap); align-items:stretch; padding-top:44px}
+  .hall-video{grid-column:1 / span 8; grid-row:1 / span 2; align-self:start; border-radius:var(--r-m)}
+  .hall-video__note{display:none}
+  .hall-crops{display:contents}
+  .hall-crops .crop{grid-column:9 / -1; position:relative; min-height:0}
+  .c-chand{grid-row:1} .c-aisle{grid-row:2}
+  .hall-crops .crop img{position:absolute; inset:0; height:100%; aspect-ratio:auto}
+  .c-chand{--drift:26px} .c-aisle{--drift:54px}
+  .play{top:20px; right:20px; height:48px; padding:0 18px 0 14px; font-size:16px}
+
+  /* 자주 묻는 질문: 제목은 왼쪽에 머물고 목록이 오른쪽으로 흐른다 */
+  .faq{padding:168px 0 152px}
+  .faq__grid{display:grid; grid-template-columns:repeat(12, minmax(0, 1fr)); column-gap:var(--gap); align-items:start}
+  .faq__title{grid-column:1 / span 5; position:sticky; top:calc(var(--hh) + 56px)}
+  .faq__list{grid-column:6 / -1; margin-top:0}
+  .faq summary{padding:30px 0}
+  .faq details p{padding-bottom:34px}
+
+  /* 출시 알림: 마지막 장면 위에 제목, 아래에 신청 패널 */
+  .final{grid-template-areas:"stage" "note" "body"; grid-template-rows:auto auto auto}
+  .final__media{grid-area:stage; aspect-ratio:auto; height:min(700px, calc(100svh - var(--hh) - 80px)); min-height:560px}
+  .final__media img{object-position:60% 0%}
+  .final__scrim{display:block; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(90deg, rgb(255 255 255 / .94) 0 40%, rgb(255 255 255 / .6) 50%, rgb(255 255 255 / 0) 60%)}
+  .final__head{grid-area:stage; align-self:center; z-index:1; padding:0}
+  .final__lead{margin-top:28px; font-size:21px}
+  .final__body{padding:64px 0 168px}
+  .form{grid-template-columns:repeat(12, minmax(0, 1fr)); column-gap:var(--gap); padding:24px 0 0}
+  .form__col--a{grid-column:1 / span 6}
+  .form__col--b{grid-column:8 / -1; display:flex; flex-direction:column; justify-content:flex-end}
+  .rows{margin-top:30px}
+  .consent{margin-top:0}
+  .form .btn{height:66px; margin-top:28px}
+  .after{font-size:15px}
+
+  .ft{padding:72px 0 48px}
+  .ft__info{margin-top:10px; max-width:980px}
+}
+
+/* ======================================================================
+   움직임: 움직임을 줄이지 않은 방문자에게만
+   - 첫 화면 사진은 살짝 확대된 상태에서 제자리로 가라앉고, 글과 장면 목차가 아래에서 차례로 올라온다
+   - 각 장면 사진은 화면에 들어오는 동안 1.08배에서 1배로 줄며 자리를 잡는다(스크롤 연동)
+   - 데스크톱에서 흰 막 위 디테일 컷은 스크롤에 맞춰 서로 다른 속도로 떠오른다(패럴랙스).
+     움직임을 끈 정지 화면에서는 모두 한 줄에 맞춰 서 있다
+   - 흰 띠의 문장은 화면에 들어오며 진해진다
+   ====================================================================== */
+@media (prefers-reduced-motion: no-preference){
+  html{scroll-behavior:smooth}
+  .btn{transition:background-color .2s ease, color .2s ease, transform .25s cubic-bezier(.16, 1, .3, 1)}
+  .btn:active{transform:translateY(1px) scale(.985)}
+  .hd__nav a,.idx span{transition:color .2s ease}
+  .hero__media img{animation:settle 1.8s cubic-bezier(.16, 1, .3, 1) both}
+  .hero__head,.hero__body,.hero__index{animation:rise .9s cubic-bezier(.16, 1, .3, 1) both}
+  .hero__body{animation-delay:.1s}
+  .hero__index{animation-delay:.2s}
+  @keyframes settle{from{transform:scale(1.06)} to{transform:none}}
+  @keyframes rise{from{opacity:0; transform:translateY(22px)} to{opacity:1; transform:none}}
+  @supports (animation-timeline: view()){
+    .scene{view-timeline:--scene block}
+    .shot img{animation:scene-in linear both; animation-timeline:--scene; animation-range:entry 0% entry 100%}
+    @keyframes scene-in{from{transform:scale(1.08)} to{transform:none}}
+    .statement{animation:statement-in linear both; animation-timeline:view(); animation-range:entry 10% cover 40%}
+    @keyframes statement-in{from{opacity:.15; transform:translateY(36px)} to{opacity:1; transform:none}}
+    @media (min-width:1024px){
+      .reel__strip .crop,.hem__item{animation:drift linear both; animation-timeline:view(); animation-range:cover}
+      @keyframes drift{from{transform:translateY(var(--drift, 30px))} to{transform:translateY(calc(var(--drift, 30px) * -1))}}
+    }
+  }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+
+<header class="hd">
+  <div class="wrap hd__in">
+    <a class="hd__logo" href="#top" aria-label="스딩 Sding 홈"><img src="/assets/logo-orange.svg" alt="" width="71" height="30"></a>
+    <nav class="hd__nav" aria-label="기능">
+      <a href="#price">정찰제</a>
+      <a href="#planner">AI 플래너</a>
+      <a href="#dress">드레스</a>
+      <a href="#hall">웨딩홀</a>
+    </nav>
+    <a class="btn btn--hd" href="#waitlist">출시 알림 받기</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- 첫 장면 -->
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <div class="hero__media">
+      <picture>
+        <source media="(max-width: 767px)" srcset="img/hero-m2.jpg">
+        <img src="/assets/hero-b.jpg" alt="밝은 스튜디오에서 함께 웃는 신랑과 신부" width="2752" height="1536" fetchpriority="high">
+      </picture>
+      <span class="hero__scrim" aria-hidden="true"></span>
+    </div>
+    <div class="hero__copy">
+      <div class="hero__head">
+        <p class="hero__date">2026.12.25 정식 오픈 예정</p>
+        <h1 class="hero__title" id="hero-title"><span>스스로</span><span>준비하는 웨딩</span></h1>
+      </div>
+      <div class="hero__body">
+        <p class="hero__sub">스딩은 웨딩 가격을 정찰제로 공개하고,<br>AI로 플래닝과 드레스,<br class="m"> 웨딩홀을 미리 경험하게 해요.</p>
+        <a class="btn hero__cta" href="#waitlist">출시 알림 받기</a>
+      </div>
+    </div>
+    <!-- 장면 목차: 네 장면의 한 컷과 이름. 누르면 그 장면으로 간다 -->
+    <ul class="wrap hero__index">
+      <li><a class="idx" href="#price"><img src="img/i-price.jpg" alt="" width="400" height="300" loading="lazy"><span>웨딩 가격 정찰제</span></a></li>
+      <li><a class="idx" href="#planner"><img src="img/i-planner.jpg" alt="" width="400" height="300" loading="lazy"><span>AI 웨딩 플래너</span></a></li>
+      <li><a class="idx" href="#dress"><img src="img/i-dress.jpg" alt="" width="400" height="300" loading="lazy"><span>AI 드레스 합성</span></a></li>
+      <li><a class="idx" href="#hall"><img src="img/i-hall.jpg" alt="" width="400" height="300" loading="lazy"><span>웨딩홀 시뮬레이션</span></a></li>
+    </ul>
+    <p class="wrap note hero__note">AI로 만든 예시 이미지예요.</p>
+  </section>
+
+  <!-- 장면 1: 웨딩 가격 정찰제 -->
+  <section class="feature" id="price" aria-labelledby="price-title">
+    <div class="band">
+      <div class="wrap">
+        <p class="label">웨딩 가격 정찰제</p>
+        <p class="statement">상담을 받아야 알 수 있던<br>웨딩 가격을 <em>처음부터</em><br class="m"> 보여 드려요.</p>
+      </div>
+    </div>
+    <div class="scene scene--price">
+      <span class="frame-mark frame-mark--start" data-frame aria-hidden="true"></span>
+      <div class="shot-wrap">
+        <div class="shot">
+          <picture>
+            <source media="(max-width: 767px)" srcset="img/price-m.jpg">
+            <img src="/assets/price-b.jpg" alt="흰 쇼룸의 테이블 위 반지 상자와 부케, 행거의 드레스와 턱시도에 빈 가격표가 달려 있어요" width="2752" height="1536" loading="lazy">
+          </picture>
+          <span class="shot__scrim" aria-hidden="true"></span>
+        </div>
+        <p class="note shot__note">AI로 만든 예시 이미지예요.</p>
+      </div>
+      <div class="reel">
+        <div class="reel__text">
+          <h2 class="h2" id="price-title">웨딩 가격,<br>묻지 않아도 보여요</h2>
+        </div>
+        <div class="reel__strip">
+          <p class="note strip__lift">AI로 만든 예시 이미지예요.</p>
+          <div class="strip__text">
+            <p class="def">웨딩 가격 정찰제는 상담을 받기 전에 가격을 공개하고,<br class="d"> 같은 기준으로 보여 주는 방식이에요.</p>
+            <p class="lead">같은 기준으로 놓고 비교해 보세요.</p>
+          </div>
+          <div class="strip__crops">
+            <figure class="crop c-lace"><img src="img/price-lace.jpg" alt="빈 가격표가 달린 레이스 드레스" width="410" height="512" loading="lazy"></figure>
+            <figure class="crop c-bouq"><img src="img/price-bouq.jpg" alt="빈 가격표가 달린 부케" width="528" height="660" loading="lazy"></figure>
+            <figure class="crop c-ring"><img src="img/price-ring.jpg" alt="빈 가격표가 달린 반지 상자" width="380" height="475" loading="lazy"></figure>
+            <figure class="crop c-cards"><img src="img/price-cards.jpg" alt="끈으로 묶고 빈 가격표를 단 청첩장 묶음" width="480" height="600" loading="lazy"></figure>
+          </div>
+          <p class="note strip__note">AI로 만든 예시 이미지예요.</p>
+        </div>
+      </div>
+      <span class="frame-mark" data-frame aria-hidden="true"></span>
+    </div>
+  </section>
+
+  <!-- 장면 2: AI 웨딩 플래너 -->
+  <section class="feature" id="planner" aria-labelledby="planner-title">
+    <div class="band">
+      <div class="wrap">
+        <p class="label">AI 웨딩 플래너</p>
+        <p class="statement">결혼식 날짜와 예산에 맞춰<br>준비 순서와 일정을<br class="m"> AI가 짜 드려요.</p>
+      </div>
+    </div>
+    <div class="scene scene--planner">
+      <span class="frame-mark frame-mark--start" data-frame aria-hidden="true"></span>
+      <div class="shot-wrap">
+        <div class="shot">
+          <picture>
+            <source media="(max-width: 767px)" srcset="img/planner-m.jpg">
+            <img src="/assets/planner-c.jpg" alt="소파에 나란히 앉아 휴대폰 하나를 함께 보며 웃는 커플" width="2752" height="1536" loading="lazy">
+          </picture>
+          <span class="shot__scrim" aria-hidden="true"></span>
+        </div>
+        <p class="note shot__note">AI로 만든 예시 이미지예요.</p>
+      </div>
+      <div class="reel">
+        <div class="reel__text">
+          <h2 class="h2" id="planner-title">날짜와 예산만<br>알려 주세요</h2>
+        </div>
+        <div class="reel__strip">
+          <p class="note strip__lift">AI로 만든 예시 이미지예요.</p>
+          <div class="strip__text">
+            <p class="lead">투어와 피팅 일정도 한곳에서 챙길 수 있어요.</p>
+          </div>
+          <ol class="steps">
+            <li>날짜와 예산</li>
+            <li>준비 순서</li>
+            <li>일정</li>
+            <li>투어와 피팅</li>
+          </ol>
+          <div class="strip__crops">
+            <figure class="crop c-note"><img src="img/planner-note.jpg" alt="나무 탁자 위에 펼쳐 둔 빈 플래너 노트와 펜" width="880" height="360" loading="lazy"></figure>
+            <figure class="crop c-tulips"><img src="img/planner-tulips2.jpg" alt="" width="640" height="561" loading="lazy"></figure>
+          </div>
+          <p class="note strip__note">AI로 만든 예시 이미지예요.</p>
+        </div>
+      </div>
+      <span class="frame-mark" data-frame aria-hidden="true"></span>
+    </div>
+  </section>
+
+  <!-- 장면 3: AI 드레스 합성 -->
+  <section class="feature" id="dress" aria-labelledby="dress-title">
+    <div class="band band--tight">
+      <div class="wrap">
+        <p class="label">AI 드레스 합성</p>
+        <p class="statement">내 사진에 드레스를 입혀<br>어울리는 스타일을<br class="m"> 미리 확인해요.</p>
+      </div>
+    </div>
+    <div class="scene scene--dress">
+      <span class="frame-mark frame-mark--start" data-frame aria-hidden="true"></span>
+      <div class="shot-wrap">
+        <div class="shot shot--pair" role="group" aria-label="원본과 AI 합성 비교">
+          <figure class="pair__item">
+            <div class="pair__img">
+              <picture>
+                <source media="(max-width: 767px)" srcset="/assets/dress-before-b.jpg">
+                <img src="/assets/dress-before-a.jpg" alt="흰 티셔츠와 청바지를 입은 원본 사진" width="1792" height="2400" loading="lazy">
+              </picture>
+            </div>
+            <figcaption class="pair__cap">원본</figcaption>
+          </figure>
+          <figure class="pair__item">
+            <div class="pair__img">
+              <picture>
+                <source media="(max-width: 767px)" srcset="/assets/dress-after-b.jpg">
+                <img src="/assets/dress-after-a.jpg" alt="같은 사람에게 레이스 드레스를 합성한 사진" width="1792" height="2400" loading="lazy">
+              </picture>
+            </div>
+            <figcaption class="pair__cap pair__cap--ai">AI 합성</figcaption>
+          </figure>
+        </div>
+        <p class="note shot__note">AI로 만든 예시 이미지예요. 실제 착용 모습과 다를 수 있어요.</p>
+      </div>
+      <div class="reel">
+        <div class="reel__text">
+          <h2 class="h2" id="dress-title">내 사진으로<br>드레스를<br class="d"> 입어 보세요</h2>
+          <p class="lead">피팅 전에 후보를 좁힐 수 있어요.</p>
+        </div>
+        <div class="reel__strip">
+          <p class="note strip__lift">AI로 만든 예시 이미지예요. 실제 착용 모습과 다를 수 있어요.</p>
+          <div class="hem" role="group" aria-label="원본과 AI 합성 비교">
+            <figure class="hem__item">
+              <figcaption>원본</figcaption>
+              <img src="img/dress-top-o.jpg" alt="원본 사진의 흰 티셔츠 목둘레와 소매" width="1200" height="470" loading="lazy">
+              <img src="img/dress-hem-o.jpg" alt="원본 사진의 청바지와 흰 운동화" width="1200" height="470" loading="lazy">
+            </figure>
+            <figure class="hem__item hem__item--ai">
+              <figcaption>AI 합성</figcaption>
+              <img src="img/dress-top-ai.jpg" alt="AI 합성 사진의 레이스 드레스 목둘레와 레이스 소매" width="1200" height="470" loading="lazy">
+              <img src="img/dress-hem-ai.jpg" alt="AI 합성 사진의 레이스 드레스 밑단" width="1200" height="470" loading="lazy">
+            </figure>
+          </div>
+          <p class="note strip__note">AI로 만든 예시 이미지예요. 실제 착용 모습과 다를 수 있어요.</p>
+        </div>
+      </div>
+      <span class="frame-mark" data-frame aria-hidden="true"></span>
+    </div>
+  </section>
+
+  <!-- 장면 4: 웨딩홀 시뮬레이션 -->
+  <section class="feature" id="hall" aria-labelledby="hall-title">
+    <div class="band">
+      <div class="wrap">
+        <p class="label">웨딩홀 시뮬레이션</p>
+        <p class="statement">입장부터 버진로드까지,<br>방문 전에 분위기와 동선을<br class="m"> <em>먼저 걸어 봐요.</em></p>
+      </div>
+    </div>
+    <div class="scene scene--hall">
+      <span class="frame-mark frame-mark--start" data-frame aria-hidden="true"></span>
+      <div class="shot-wrap">
+        <div class="shot">
+          <img src="/assets/hall-c.jpg" alt="둥근 샹들리에 아래 흰 버진로드 양옆으로 꽃이 길게 이어진 웨딩홀" width="2752" height="1536" loading="lazy">
+          <span class="shot__scrim" aria-hidden="true"></span>
+        </div>
+        <p class="note shot__note">AI로 만든 예시 이미지예요. 실제 웨딩홀과 다를 수 있어요.</p>
+      </div>
+      <div class="reel">
+        <div class="reel__text">
+          <h2 class="h2" id="hall-title">버진로드를<br>미리 걸어 보세요</h2>
+        </div>
+        <div class="reel__strip">
+          <p class="note strip__lift">AI로 만든 예시 이미지예요. 실제 웨딩홀과 다를 수 있어요.</p>
+          <div class="hall-media">
+            <figure class="hall-video">
+              <video class="hall-video__v" muted loop playsinline preload="none" poster="/assets/hall-walk-poster.jpg" aria-label="웨딩홀 입구에서 버진로드를 따라 걸어 들어가는 시점의 영상" width="1280" height="720">
+                <source src="/assets/hall-walk.mp4" type="video/mp4">
+              </video>
+              <button class="play" type="button" aria-pressed="false"><i class="ph ph-play" aria-hidden="true"></i><i class="ph ph-pause" aria-hidden="true"></i><span class="play__t">영상 재생</span></button>
+            </figure>
+            <p class="note hall-video__note">AI로 만든 예시 이미지예요. 실제 웨딩홀과 다를 수 있어요.</p>
+            <div class="hall-crops">
+              <figure class="crop c-chand"><img src="img/hall-chand.jpg" alt="" width="580" height="317" loading="lazy"></figure>
+              <figure class="crop c-aisle"><img src="img/hall-aisle-a2.jpg" alt="" width="900" height="492" loading="lazy"></figure>
+            </div>
+          </div>
+          <p class="note strip__note">AI로 만든 예시 이미지예요. 실제 웨딩홀과 다를 수 있어요.</p>
+        </div>
+      </div>
+      <span class="frame-mark" data-frame aria-hidden="true"></span>
+    </div>
+  </section>
+
+  <!-- 자주 묻는 질문 -->
+  <section class="faq" id="faq" aria-labelledby="faq-title">
+    <div class="wrap faq__grid">
+      <h2 class="faq__title" id="faq-title">자주 묻는 질문</h2>
+      <div class="faq__list">
+        <details open>
+          <summary>스딩은 무엇인가요?</summary>
+          <p>스딩은 웨딩 가격을 정찰제로 투명하게 만들고, AI로 플래닝·드레스·웨딩홀을 미리 경험하게 하는 웨딩 플랫폼이에요.</p>
+        </details>
+        <details>
+          <summary>웨딩 가격 정찰제는 무엇인가요?</summary>
+          <p>웨딩 가격 정찰제는 상담을 받기 전에 가격을 공개하고, 같은 기준으로 보여 주는 방식이에요.</p>
+        </details>
+        <details>
+          <summary>AI 웨딩 플래너는 무엇을 해 주나요?</summary>
+          <p>AI 웨딩 플래너는 결혼식 날짜와 예산에 맞춰 준비 순서와 일정을 짜 주는 기능이에요.</p>
+        </details>
+        <details>
+          <summary>AI 드레스 합성은 어떻게 쓰나요?</summary>
+          <p>내 사진에 드레스를 합성해 어울리는 스타일을 미리 보는 기능이에요. 결과는 AI 합성 이미지라 실제 착용 모습과 다를 수 있어요.</p>
+        </details>
+        <details>
+          <summary>웨딩홀 시뮬레이션은 실제 웨딩홀과 같나요?</summary>
+          <p>실제 웨딩홀과 같지 않아요. AI가 만든 시뮬레이션이라 실제와 다를 수 있어요. 방문 전에 분위기와 동선을 확인하는 용도로 써 주세요.</p>
+        </details>
+        <details>
+          <summary>언제부터 쓸 수 있나요?</summary>
+          <p>스딩은 2026년 12월 25일 정식 오픈 예정이에요. 출시 알림을 신청하면 오픈하는 날 문자로 알려 드려요.</p>
+        </details>
+        <details>
+          <summary>출시 알림에 남긴 번호는 어떻게 쓰이나요?</summary>
+          <p>출시 알림에 남긴 번호는 정식 오픈 안내 문자를 1회 보내는 데만 써요. 안내 문자를 보낸 뒤 5일 안에, 오픈이 늦어져도 2027년 6월 30일까지 파기해요.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 마지막 장면: 출시 알림 -->
+  <section class="final" id="waitlist" aria-labelledby="final-title">
+    <div class="final__media">
+      <picture>
+        <source media="(max-width: 767px)" srcset="img/final-m.jpg">
+        <img src="/assets/hero-c.jpg" alt="창가의 흰 스튜디오에서 부케를 들고 웃는 신랑과 신부" width="2752" height="1536" loading="lazy">
+      </picture>
+      <span class="final__scrim" aria-hidden="true"></span>
+    </div>
+    <p class="wrap note final__note">AI로 만든 예시 이미지예요.</p>
+    <div class="wrap final__head">
+      <h2 class="final__title" id="final-title"><em>12월 25일,</em><br>스딩이<br>문을 열 예정이에요</h2>
+      <p class="final__lead"><span>전화번호를 남기면 오픈하는 날 문자로 알려 드려요.</span><span>로그인은 필요 없어요.</span></p>
+    </div>
+    <div class="wrap final__body">
+      <form class="form" action="/api/waitlist" method="post" novalidate>
+        <div class="form__col form__col--a">
+          <label class="field__label" for="phone">휴대폰 번호</label>
+          <input class="field__input" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="010-0000-0000" required>
+          <dl class="rows">
+            <div><dt>수집 항목</dt><dd>휴대폰 번호</dd></div>
+            <div><dt>이용 목적</dt><dd class="is-strong">정식 오픈 안내 문자 1회 발송</dd></div>
+            <div><dt>보유 기간</dt><dd class="is-strong">안내 문자를 보낸 뒤 5일 안에, 오픈이 늦어져도 2027년 6월 30일까지 파기</dd></div>
+          </dl>
+          <p class="fine"><span>동의를 거부할 수 있어요. 거부하면 출시 알림을 받을 수 없어요.</span><span>만 14세 미만은 신청할 수 없어요.</span></p>
+        </div>
+        <div class="form__col form__col--b">
+          <label class="consent"><input type="checkbox" name="consent" required><span>개인정보 수집·이용에 동의해요 (필수)</span></label>
+          <p class="links"><a href="/privacy">개인정보 처리방침 보기</a><a href="/terms">이용약관 보기</a></p>
+          <button class="btn" type="submit">출시 알림 받기</button>
+          <div class="after">
+            <p>이미 신청했나요? <button type="button">신청 취소하기</button></p>
+            <p>웨딩 업체이신가요? <a href="mailto:namu@sding.kr">제휴 문의</a></p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="ft">
+  <div class="wrap">
+    <div class="ft__top">
+      <a class="ft__logo" href="#top" aria-label="스딩 Sding 홈"><img src="/assets/logo-orange.svg" alt="" width="71" height="30"></a>
+      <nav class="ft__links" aria-label="사이트 정보">
+        <a class="ft__privacy" href="/privacy">개인정보 처리방침</a>
+        <a href="/terms">이용약관</a>
+        <a href="mailto:namu@sding.kr">제휴 문의</a>
+      </nav>
+    </div>
+    <p class="ft__name">주식회사 스딩</p>
+    <ul class="ft__info">
+      <li>대표 정원창</li>
+      <li>사업자등록번호 590-86-03810</li>
+      <li>통신판매업신고번호</li>
+      <li>서울특별시 강남구 압구정로46길 5-10, 3층 302호 (신사동, 압구정로데오스타)</li>
+      <li>전화 010-9897-7678</li>
+      <li>이메일 namu@sding.kr</li>
+      <li>개인정보보호책임자 정원창</li>
+    </ul>
+    <p class="ft__ai">스딩 앱의 AI 기능은 생성형 AI를 활용할 예정이에요. 결과는 실제와 다를 수 있어요.</p>
+    <p class="ft__copy">© 2026 주식회사 스딩. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+/* 꾸밈용: 웨딩홀 영상 재생 버튼. 움직임을 줄인 방문자는 버튼을 눌러야만 재생된다. 소리는 늘 꺼져 있다. 이 스크립트가 없어도 화면은 포스터로 완성돼 있다 */
+(() => {
+  const v = document.querySelector('.hall-video__v');
+  const b = document.querySelector('.play');
+  if (!v || !b) return;
+  const t = b.querySelector('.play__t');
+  let userPaused = false;
+  const sync = () => { const on = !v.paused; b.classList.toggle('is-playing', on); b.setAttribute('aria-pressed', String(on)); t.textContent = on ? '영상 일시정지' : '영상 재생'; };
+  v.addEventListener('play', sync); v.addEventListener('pause', sync);
+  b.addEventListener('click', () => { if (v.paused) { userPaused = false; v.play().catch(() => {}); } else { userPaused = true; v.pause(); } });
+  if (matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => { if (e.isIntersecting && !userPaused) v.play().catch(() => {}); else if (!e.isIntersecting) v.pause(); }, { threshold: .4 }).observe(v);
+  }
+})();
+</script>
+</body>
+</html>

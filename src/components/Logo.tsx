@@ -1,15 +1,14 @@
 import Link from 'next/link';
-import { COMPANY } from '@/content/company';
+import { Wordmark } from './Wordmark';
 
-type Props = { href?: string; label?: string; tone?: string };
+type Props = { href: string; label: string; className?: string };
 
-// TODO(logo): 로고 SVG 원본이 오면 public/brand/logo.svg로 바꾼다. 그 전까지 텍스트 로고를 쓴다
-export function Logo({ href, label, tone = 'text-brand' }: Props) {
-  const mark = <span className={`text-h3 font-extrabold ${tone}`}>{COMPANY.brandName}</span>;
-  if (!href) return mark;
+// 머리글과 푸터의 로고 링크. 누르는 영역은 44px 이상이고(base.css .logo), 워드마크 색은 --orange다.
+// TODO(logo): 지금은 따낸 워드마크다. 로고 원본 벡터가 오면 Wordmark.tsx의 d만 바꾼다
+export function Logo({ href, label, className }: Props) {
   return (
-    <Link href={href} aria-label={label} className="inline-flex min-h-(--tap) min-w-(--tap) items-center">
-      {mark}
+    <Link href={href} aria-label={label} className={['logo', className].filter(Boolean).join(' ')}>
+      <Wordmark className="logo-mark" />
     </Link>
   );
 }

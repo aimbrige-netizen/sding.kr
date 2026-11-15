@@ -10,6 +10,7 @@ type Props = {
   src: string;
   srcMobile?: string;
   poster?: string;
+  posterSize?: readonly [number, number];   // 포스터 파일의 크기. img의 width, height가 되어 그리기 전에도 비율이 정해진다
   alt: string;
   hasAudio?: boolean;
   captions?: string;
@@ -21,7 +22,7 @@ type Props = {
 };
 
 export function VideoPlayer({
-  mediaId, src, srcMobile, poster, alt, hasAudio = false, captions, captionsLabel, labels, preload, priority = false, children,
+  mediaId, src, srcMobile, poster, posterSize, alt, hasAudio = false, captions, captionsLabel, labels, preload, priority = false, children,
 }: Props) {
   const players = usePlayers();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -44,8 +45,8 @@ export function VideoPlayer({
     video.addEventListener('emptied', onEmptied);
 
     // 모바일 컷은 화면 폭으로 고른다. video의 source media는 브라우저마다 달라 쓰지 않는다.
-    // 폰을 돌리거나 창 폭을 바꿔 767px를 넘나들면 컷을 바꾼다
-    const narrow = srcMobile ? matchMedia('(max-width: 767px)') : null;
+    // 폰을 돌리거나 창 폭을 바꿔 899/900px를 넘나들면 컷을 바꾼다(레이아웃의 폭 기준점과 같다, PLAN '자동 재생 규칙')
+    const narrow = srcMobile ? matchMedia('(max-width: 899px)') : null;
     const pick = () => (narrow?.matches && srcMobile ? srcMobile : src);
     let url = pick();
     let unregister: (() => void) | null = null;
@@ -136,6 +137,8 @@ export function VideoPlayer({
           ref={posterRef}
           className="player-cover"
           src={poster}
+          width={posterSize?.[0]}
+          height={posterSize?.[1]}
           alt={alt}
           aria-hidden={started || undefined}
           data-hide={started || undefined}

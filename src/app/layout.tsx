@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { AnalyticsEvents } from '@/components/AnalyticsEvents';
+import { AnchorFocus } from '@/components/AnchorFocus';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { StoreChoice } from '@/components/StoreChoice';
 import { WaitlistDialog } from '@/components/WaitlistDialog';
 import { WaitlistForm } from '@/components/WaitlistForm';
+import { WordmarkSprite } from '@/components/Wordmark';
 import { assertCompany, COMPANY } from '@/content/company';
 import { STORE_LINE } from '@/content/faq';
 import { assertLegal } from '@/content/legal';
@@ -51,11 +53,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  width: 'device-width', initialScale: 1, themeColor: '#FFFAF6',
+  width: 'device-width', initialScale: 1, themeColor: '#FFFFFF',   // tokens.css --white와 같다
   // maximumScale, userScalable은 지정하지 않는다(확대 허용)
 };
 
-// 등장 효과의 처음 상태는 JS가 켜졌을 때만 건다(PLAN 'JS 없이 보기'). 첫 페인트 전에 실행되도록 head에 둔다.
+// JS가 켜졌을 때만 거는 규칙(부드러운 스크롤, 재생 버튼, 신청 버튼)은 html.js로 나눈다(PLAN 'JS 없이 보기'). 첫 페인트 전에 실행되도록 head에 둔다.
 // 해시 주소로 바로 들어오면 글꼴이 바뀌며 위쪽 높이가 줄어 부드러운 스크롤의 목적지가 어긋난다. 로드가 끝날 때까지는 바로 이동한다
 const JS_FLAG = "(function(d){d.classList.add('js');"
   + "if(location.hash){d.style.scrollBehavior='auto';addEventListener('load',function(){d.style.scrollBehavior=''})}"
@@ -67,7 +69,10 @@ const GA_INIT = "window.dataLayer=window.dataLayer||[];window.gtag=function(){da
   + `gtag('config',${JSON.stringify(GA_ID)},{allow_google_signals:false,allow_ad_personalization_signals:false,cookie_domain:'none'})`;
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
+  // 첫 화면 글자를 가장 많이 담은 세 묶음(src/lib/fonts.ts)
   preloadFontSubset(FONT_SUBSET.latin);
+  preloadFontSubset(FONT_SUBSET.hangul);
+  preloadFontSubset(FONT_SUBSET.h1);
   const mode = ctaMode();
   return (
     // 'js' 클래스는 위 스크립트가 붙이므로 서버 HTML과 다르다
@@ -77,15 +82,13 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         {GA_ID ? <script dangerouslySetInnerHTML={{ __html: GA_INIT }} /> : null}
       </head>
       <body>
-        <a
-          href="#main"
-          className="sr-only z-50 rounded-pill bg-ink-900 font-bold text-white focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:px-5 focus:py-3"
-        >
-          {COPY.skipLink}
-        </a>
+        <WordmarkSprite />
+        <a href="#main" className="skip-link">{COPY.skipLink}</a>
         <Header />
         {children}
         <Footer />
+        {/* 다른 페이지(/privacy, /terms, 404)에서 누른 머리글 링크도 홈이 그려진 뒤 섹션 제목으로 포커스를 옮기도록 레이아웃에 둔다 */}
+        <AnchorFocus />
         <WaitlistDialog title={COPY.cta[mode]} description={mode === 'live' ? [STORE_LINE] : COPY.final.lead}>
           {mode === 'live' ? <StoreChoice /> : <WaitlistForm />}
         </WaitlistDialog>

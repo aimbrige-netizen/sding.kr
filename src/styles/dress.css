@@ -1,0 +1,50 @@
+/* AI 드레스 합성(PLAN 'AI 드레스 합성', 시안 A 장면 3). 공통 구조는 scene.css다.
+   폰: 무릎 아래까지 자른 3:5 두 장을 화면 폭 가득(사이 4px), 캡션 '원본'과 'AI 합성'은 사진 아래, 고지, 제목과 한 줄,
+       흰 막에는 열마다 캡션과 같은 자리를 정사각으로 자른 목둘레와 밑단(600px부터는 한 칸이 --crop-cap을 넘지 않는다. 컷이 거의 원본 크기라 늘려 그리지 않게).
+   데스크톱: 전신 3:4 두 장이 6칸부터 화면 오른쪽 끝까지 장면 높이로 고정되고 캡션은 사진 위쪽 흰 베일 위, 왼쪽 흰 면에 제목과 한 줄.
+       흰 막에는 6칸씩 목둘레와 밑단(23:9). 파일이 없으면 두 칸 자리에 포스터 카드 한 장이다 */
+@layer components {
+  /* 높이는 3:5 두 칸이 정한다. .shot의 높이 상한(80svh)을 풀어야 가로로 든 폰과 낮은 창에서 사진이 아래의 고지와 제목을 덮지 않는다 */
+  .shot-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-1); overflow: visible; aspect-ratio: auto; max-height: none; }
+  .shot-pair-poster { aspect-ratio: 3 / 2; }
+  .pair-item { position: relative; min-width: 0; margin: 0; }
+  .pair-img { position: relative; overflow: hidden; aspect-ratio: 3 / 5; }
+  .pair-cap {
+    display: block; padding: var(--sp-2_5) 0 0 var(--gutter);
+    font-family: var(--ff-display); font-weight: var(--w-display); font-size: var(--fs-figure);
+    line-height: 1.1; letter-spacing: var(--track-scene); color: var(--ink);
+  }
+  .pair-cap-ai { padding-left: var(--sp-3); color: var(--orange-ink); }
+
+  .hem { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2); width: var(--wrap); margin: var(--sp-6) auto 0; }
+  /* 열마다 캡션 하나(원본 / AI 합성), 그 아래 같은 자리를 자른 목둘레와 밑단 */
+  .hem-item { display: grid; gap: var(--sp-2); align-content: start; min-width: 0; margin: 0; }
+  .hem-crop { aspect-ratio: 1; }
+  .hem-cap { font-family: var(--ff-display); font-weight: var(--w-strong); font-size: var(--fs-callout); line-height: 1.3; letter-spacing: var(--track-callout); color: var(--ink); }
+  .hem-cap-ai { color: var(--orange-ink); }
+  @media (min-width: 600px) and (max-width: 899px) {
+    .hem { grid-template-columns: repeat(2, minmax(0, var(--crop-cap))); }
+  }
+
+  @media (min-width: 900px) {
+    /* 비교 두 장은 6칸의 왼쪽 선부터 화면 오른쪽 끝까지 */
+    .scene-dress .shot {
+      height: 100%; width: auto; background: var(--white);
+      margin-left: calc((100% - var(--wrap)) / 2 + (var(--wrap) - 11 * var(--gap)) * 5 / 12 + 5 * var(--gap));
+    }
+    .pair-item { height: 100%; }
+    .pair-img { height: 100%; aspect-ratio: auto; }
+    .pair-img img { object-position: 50% 40%; }
+    .pair-img::after { content: ""; position: absolute; inset: 0 0 auto; height: 20%; pointer-events: none; background: var(--veil-pair); }
+    .pair-cap { position: absolute; z-index: 1; top: var(--sp-5); left: var(--sp-6); padding: 0; }
+    .pair-cap-ai { left: auto; right: var(--sp-6); }
+    .scene-dress .reel-text { grid-column: 1 / span 5; align-self: center; padding-bottom: var(--sp-6); }
+    .scene-dress .reel-text .callout { margin-top: var(--sp-7); }
+    .scene-dress .strip-lift { grid-column: 6 / -1; }
+    .hem { grid-column: 1 / -1; grid-template-columns: subgrid; row-gap: 0; column-gap: normal; width: auto; margin: 0; padding-top: var(--sp-11); }   /* 칸 사이는 격자의 --gap을 물려받는다 */
+    .hem-item { grid-column: span 6; gap: var(--sp-3_5); --drift: var(--sp-6); }
+    .hem-item + .hem-item { --drift: var(--sp-12); }
+    .hem-crop { aspect-ratio: 23 / 9; }
+    .hem-cap { font-weight: var(--w-display); font-size: var(--fs-figure); letter-spacing: var(--track-scene); }
+  }
+}

@@ -1,0 +1,35 @@
+/* 웨딩 가격 정찰제(PLAN '웨딩 가격 정찰제', 시안 A 장면 1). 공통 구조는 scene.css다.
+   폰: 4:5 옷걸이 사진, 제목, 정의와 굵은 한 줄, 다음 컷이 보이게 가로로 넘기는 네 컷(4:5, 600px부터는 시안 태블릿 값인 40% 폭).
+   데스크톱: 쇼룸 사진이 고정되고 제목은 소품 위 빈 벽(왼쪽 위)에 흰 베일을 깔고 놓인다. 흰 막에는 정의, 한 줄, 같은 줄에 선 네 컷.
+   사진은 위를 기준으로 자른다. 낮고 넓은 창(1280x577 등)에서 가운데 기준이면 소품이 제목 밑으로 올라온다 */
+@layer components {
+  /* 위아래 여백(--sp-1)은 포커스 링 자리다. 링을 안쪽에 그려 화면 끝에서 잘리지 않게 하고, 컷이 그 위를 덮지 않게 한다 */
+  .crops-price {
+    display: flex; gap: var(--sp-2_5); overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter);
+    margin-top: var(--sp-4_5); padding: var(--sp-1) var(--gutter); scrollbar-width: none;
+  }
+  .crops-price::-webkit-scrollbar { display: none; }
+  .crops-price:focus-visible { outline-offset: -3px; }
+  .crops-price .crop { flex: 0 0 66%; aspect-ratio: 4 / 5; scroll-snap-align: start; }
+  @media (min-width: 600px) and (max-width: 899px) {
+    .crops-price .crop { flex-basis: 40%; }
+  }
+
+  @media (min-width: 900px) {
+    .scene-price .shot img { object-position: 50% 0%; }
+    .scene-price .shot-veil { background: var(--veil-price); -webkit-mask-image: var(--mask-price); mask-image: var(--mask-price); }
+    .scene-price .reel-text { grid-column: 1 / span 8; align-self: start; padding-top: var(--sp-10); }
+    .scene-price .strip-text { padding: var(--sp-11) 0 var(--sp-10); }
+    .scene-price .def { font-size: var(--fs-callout); line-height: 1.62; letter-spacing: var(--track-callout); }
+    .scene-price .strip-text .callout { margin-top: var(--sp-1_5); }
+    .crops-price {
+      grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap);
+      margin: 0; padding: 0; overflow: visible;
+    }
+    .crops-price .crop:nth-child(1) { --drift: var(--sp-4_5); }
+    .crops-price .crop:nth-child(2) { --drift: var(--sp-11); }
+    .crops-price .crop:nth-child(3) { --drift: var(--sp-7); }
+    .crops-price .crop:nth-child(4) { --drift: var(--sp-14); }
+  }
+}

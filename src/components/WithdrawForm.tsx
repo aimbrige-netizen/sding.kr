@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
-import { Sparkle } from './Icons';
 import { COPY } from '@/content/site';
 import { formatPhone, normalizePhone } from '@/lib/phone';
 import { getToken, hasTurnstileKey, loadTurnstile, TURNSTILE_WITHDRAW } from '@/lib/turnstile';
@@ -33,8 +32,9 @@ async function send(phone: string, token: string, hp: string): Promise<Failure |
 
 // 신청 폼 자리에 바뀌어 나온다(WaitlistForm). JS가 있어야 열 수 있으므로 하이드레이션 처리는 두지 않는다.
 // 번호는 어디에도 저장하지 않는다. 돌아가면 이 컴포넌트와 함께 사라진다.
-// onBack은 신청 화면으로 돌아가고, onWithdrawn은 취소가 끝났을 때 신청 쪽의 완료 상태를 거둔다
-export function WithdrawForm({ onBack, onWithdrawn }: { onBack: () => void; onWithdrawn: () => void }) {
+// onBack은 신청 화면으로 돌아가고, onWithdrawn은 취소가 끝났을 때 신청 쪽의 완료 상태를 거둔다.
+// aside는 신청 폼이 받은 것을 그대로 받아 블록 아래 줄의 같은 자리에 둔다(마지막 CTA의 제휴 문의)
+export function WithdrawForm({ onBack, onWithdrawn, aside }: { onBack: () => void; onWithdrawn: () => void; aside?: ReactNode }) {
   const id = useId();
   const [phone, setPhone] = useState('');
   const [error, setError] = useState<Failure | null>(null);
@@ -139,6 +139,7 @@ export function WithdrawForm({ onBack, onWithdrawn }: { onBack: () => void; onWi
 
   return (
     <>
+      <div className="wl-block">
       {done ? (
         <p ref={doneRef} tabIndex={-1} className="wl-done">
           <strong>{text.done[0]}</strong> <span>{text.done[1]}</span>
@@ -183,22 +184,20 @@ export function WithdrawForm({ onBack, onWithdrawn }: { onBack: () => void; onWi
             />
           </div>
 
-          <button type="submit" {...{ autoComplete: 'off' }} aria-disabled={pending ? true : undefined} className="btn-primary wl-submit">
+          <button type="submit" {...{ autoComplete: 'off' }} aria-disabled={pending ? true : undefined} className="btn wl-submit">
             <span>{pending ? text.sending : text.submit}</span>
-            <span className="btn-orb" aria-hidden="true">
-              <Sparkle />
-            </span>
           </button>
         </form>
       )}
       <p ref={statusRef} role="status" aria-live="polite" aria-atomic="true" data-error={failed ? '' : undefined} className="wl-status">{status}</p>
       <p role="status" className="sr-only">{pending && !interact ? text.sending : ''}</p>
       <div ref={slotRef} data-open={interact ? '' : undefined} className="wl-slot" />
+      </div>
+      <div className="wl-after">
       <p className="wl-switch">
         <button
           type="button"
           aria-disabled={sending ? true : undefined}
-          className="wl-more"
           onClick={() => {
             if (sendingRef.current) return;
             attempt.current?.abort();
@@ -208,6 +207,8 @@ export function WithdrawForm({ onBack, onWithdrawn }: { onBack: () => void; onWi
           {text.back}
         </button>
       </p>
+      {aside}
+      </div>
     </>
   );
 }

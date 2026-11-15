@@ -1,4 +1,4 @@
-// 임시 아이콘을 만든다. --brand 바탕에 흰 '스'(Pretendard 800)다(PLAN '아이콘과 공유 이미지').
+// 임시 아이콘을 만든다. --orange 바탕에 흰 '스'(Pretendard 800)다(PLAN '아이콘과 공유 이미지').
 // 손으로 실행하고(node scripts/icons.mjs) 빌드에는 들어가지 않는다. 결과 파일은 커밋한다.
 // TODO(logo): 로고 원본이 오면 이 스크립트의 윤곽과 결과 파일을 바꾼다
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -13,7 +13,7 @@ const MARK = 'M9.117 3.006Q9.11 4.053 9.661 5.06Q10.211 6.068 11.348 6.822Q12.48
 
 const svg = ({ size, rx = 0, s = size / 16, tx = 0, ty = 0 }) =>
   `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">` +
-  `<rect width="${size}" height="${size}" rx="${rx}" fill="${token('brand')}"/>` +
+  `<rect width="${size}" height="${size}" rx="${rx}" fill="${token('orange')}"/>` +
   `<path transform="translate(${tx} ${ty}) scale(${s})" fill="${token('white')}" d="${MARK}"/></svg>`;
 
 const png = (spec) => sharp(Buffer.from(svg(spec))).png({ compressionLevel: 9 }).toBuffer();

@@ -1,304 +1,98 @@
-/* 히어로(B안, 청첩장 느낌). 시안 docs/design/hero-b.html, 반영 목록 docs/design/README.md
-   글자 주변 장식(눈, 반짝임, 실링)은 후킹 글자 크기(em, --fs-display)를 기준으로 놓는다 */
+/* 히어로(시안 A 첫 장면). 두 상태는 빌드할 때 Hero.tsx의 data-media가 정한다.
+   폰(기본): 사진이 먼저 오고, 사진 아래쪽(옷 부분)이 흰 바탕으로 녹아든 자리에 날짜와 제목이 앉는다. 얼굴과 꽃다발은 위쪽 4분의 3 안에 있다.
+            그 아래 AI 캡션, 보조 문장, CTA. 창이 낮으면 사진이 낮아져(위를 기준으로 자른다) CTA가 첫 화면에 남는다.
+            가로로 든 폰(가로세로 비 4/3 이상)은 사진을 오른쪽에 세우고 문구를 그 왼쪽에 둔다.
+   데스크톱(900px 이상): 사진 무대(화면 높이에서 머리글과 --hero-rest를 뺀 높이, 폭의 78%까지) 위 왼쪽 흰 벽에 문구, 무대 아래 장면 목차와 캡션.
+   포스터 상태: 데스크톱은 무대 오른쪽 절반에 포스터 카드, 폰은 미디어 자리를 숨긴다.
+   제목과 사진에는 등장 효과가 없다(LCP). 보조 문장, CTA, 목차만 움직임을 줄이지 않은 방문자에게 아래에서 올라온다 */
 @layer components {
   .hero {
-    position: relative;
-    isolation: isolate;
-    overflow-x: clip;
-    min-height: calc(100svh - var(--peek));
-    display: grid;
-    place-items: center;
-    padding: calc(var(--header-h) + var(--hero-gap)) var(--gutter) calc(var(--hero-gap) * 1.6);
-    /* 글로우는 위쪽(--glow-h)에서 끝난다. 'Soon'이 크림 바탕 위에 놓여 대비 3:1을 지킨다 */
-    background: var(--glow-hero) 50% 0 / 100% var(--glow-h) no-repeat, var(--cream);
-    text-align: center;
+    display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "media" "note" "body";
+    padding-top: var(--header-h);   /* 머리글이 음수 여백으로 겹친다 */
   }
-  .hero-in {
-    /* D-day 실링의 폭. 후킹 글자에 비례하되 --seal-min보다 작아지지 않아 12px 라벨이 점선 고리 안에 든다 */
-    --seal-w: max(var(--seal-min), calc(var(--fs-display) * .84));
-    width: 100%;
-    max-width: var(--container);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  /* 낮은 창에서는 사진이 낮아져(아래가 잘린다) CTA가 첫 화면에 남는다. 다만 제목이 얼굴에 닿는 높이(--hero-face-safe)보다는 낮아지지 않는다.
+     width를 정해 두어야 max-height가 비율을 거쳐 폭까지 줄이지 않는다 */
+  .hero-media {
+    grid-area: media; position: relative; overflow: hidden;
+    width: 100%; aspect-ratio: 2 / 3; max-height: max(var(--hero-face-safe), calc(100svh - var(--header-h) - var(--hero-rest-m)));
   }
-  @media (min-width: 1024px) { .hero-in { --seal-w: max(var(--seal-min), calc(var(--fs-display) * .72)); } }
+  .hero-media img { object-position: 50% 0; }
+  .hero-veil { position: absolute; inset: 0; pointer-events: none; background: var(--veil-hero-m); }
 
-  /* 날짜 줄: 가는 선 두 줄 사이에 반짝임과 날짜. 글로우 위에서도 AA를 지키도록 글자는 --ink-900 */
-  .kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--sp-3);
-    color: var(--ink-900);
-    font-size: var(--fs-cap);
-    font-weight: 600;
-    line-height: 1.4;
-    letter-spacing: .06em;
-    font-variant-numeric: tabular-nums;
+  .hero-copy { display: contents; }
+  .hero-head { grid-area: media; align-self: end; z-index: 1; width: var(--wrap); margin-inline: auto; padding-bottom: var(--sp-0_5); }
+  .hero-date {
+    font-family: var(--ff-display); font-weight: var(--w-strong); font-size: var(--fs-date);
+    line-height: 1.4; letter-spacing: 0; color: var(--orange-ink);
   }
-  .kicker::before,
-  .kicker::after {
-    content: "";
-    width: clamp(24px, 4vw, 56px);
-    height: 1px;
-    background: color-mix(in srgb, var(--brand) 45%, transparent);
-  }
-  .kicker-icon {
-    width: 16px;
-    height: 16px;
-    margin-right: calc(var(--sp-1) * -1);
-    color: var(--brand);
+  .hero-title { margin-top: var(--sp-2); font-size: var(--fs-h1); line-height: var(--lh-h1); letter-spacing: var(--track-h1); }
+  .hero-note { grid-area: note; padding-top: var(--sp-2); }
+  .hero-body { grid-area: body; width: var(--wrap); margin-inline: auto; }
+  .hero-sub { margin-top: var(--sp-2_5); font-size: var(--fs-lead); line-height: 1.6; color: var(--gray-700); text-wrap: pretty; }
+  .hero-actions { margin-top: var(--sp-4); }
+  .hero-cta { width: 100%; max-width: 26rem; }   /* 폰은 화면 폭 가득, 넓은 태블릿에서는 26rem까지 */
+  .hero-index { display: none; }
+
+  /* 포스터 상태(폰): 미디어 자리를 숨기고 문구만 둔다 */
+  .hero[data-media="poster"] .hero-media { display: none; }
+  .hero[data-media="poster"] .hero-head { padding-top: var(--sp-12); }
+  .hero .poster { border: 0; }
+  .hero .poster-mark { height: clamp(var(--sp-16), 12cqi, var(--sp-28)); }
+
+  /* 가로로 든 폰과 낮고 넓은 좁은 창(가로세로 비 4/3 이상): 2:3 사진이 화면 폭을 다 쓰면 첫 화면에 창과 머리만 보인다.
+     사진은 머리글 아래 화면 높이로 오른쪽에 세우고, 날짜와 제목, 보조 문장, CTA는 그 왼쪽 흰 바탕에 둔다(얼굴과 겹치지 않는다).
+     캡션은 사진 아래. 제목 크기는 tokens.css가 화면 높이에 맞춘다 */
+  @media (max-width: 899px) and (min-aspect-ratio: 4/3) {
+    .hero { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "head media" "body media" ". note"; column-gap: var(--gap); }
+    .hero-media { width: auto; height: calc(100svh - var(--header-h)); max-height: none; }
+    .hero-veil { display: none; }
+    .hero-head { grid-area: head; align-self: end; width: auto; margin: 0 0 0 var(--gutter); padding: 0; }
+    .hero-body { grid-area: body; width: auto; margin: 0 0 0 var(--gutter); }
+    .hero-note { width: auto; margin: 0; }
+    .hero[data-media="poster"] .hero-head { padding-top: var(--sp-6); }   /* 포스터 상태(사진 없음)에서도 CTA가 첫 화면에 든다 */
   }
 
-  /* 후킹: 가는 'Coming'과 굵은 'Soon'. 1024px 미만은 두 줄, 그 위는 한 줄 */
-  /* TODO(text-spacing): 1024px 미만에서 글자 간격을 넓힌 사용자 설정이면 'Coming'의 끝이 화면에서 잘린다 */
-  .hook {
-    margin-top: var(--hero-gap);
-    font-size: var(--fs-display);
-    font-weight: 300;
-    line-height: .9;
-    letter-spacing: -.035em;
-    font-kerning: normal;
-  }
-  .hook-vis {
-    position: relative;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .hook-lead { color: var(--ink-900); white-space: nowrap; }
-  .hook-word {
-    position: relative;
-    margin: -.02em calc(var(--seal-w) + .02em) 0 0;   /* 'Soon'과 옆의 실링을 한 덩어리로 가운데에 둔다 */
-    color: var(--brand);
-    font-weight: 900;
-    white-space: nowrap;
-  }
-  /* 한 줄 후킹. 글자 간격을 넓힌 사용자 설정(WCAG 1.4.12)에서는 'Soon'과 실링이 다음 줄로 내려가 잘리지 않는다 */
-  @media (min-width: 1024px) {
-    .hook-vis { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: baseline; column-gap: .2em; }
-    .hook-word { margin: 0 .3em 0 0; }
-  }
-  .ch { display: inline-block; }
+  @media (min-width: 900px) {
+    .hero { grid-template-areas: "stage" "index" "note"; }
+    .hero-media {
+      grid-area: stage; aspect-ratio: auto; max-height: none;
+      height: clamp(var(--hero-min), calc(100svh - var(--header-h) - var(--hero-rest)), 78vw);
+    }
+    .hero-cta { max-width: none; }
+    /* 두 사람은 사진 가로 54~86%. 세로로 긴 창에서 양옆이 잘려도 신랑이 남고, 문구는 왼쪽 흰 벽 위에 남는다 */
+    .hero-media img { object-position: 56% 36%; }
+    .hero-veil { background: var(--veil-hero); }
+    .hero-copy { display: block; grid-area: stage; align-self: center; z-index: 1; width: var(--wrap); margin-inline: auto; padding-bottom: var(--sp-2); }
+    .hero-head, .hero-body { width: auto; margin: 0; padding: 0; }
+    .hero-title { margin-top: var(--sp-5); }
+    .hero-sub { margin-top: var(--sp-7); line-height: 1.7; }
+    .hero-actions { margin-top: var(--sp-9); }
+    .hero-cta { width: auto; }
 
-  /* 'Coming'의 i 점 = 반짝임 */
-  .dotless { position: relative; }
-  .tittle {
-    position: absolute;
-    left: 50%;
-    top: .19em;
-    width: .19em;
-    height: .19em;
-    margin-left: -.095em;
-    color: var(--brand);
-    overflow: visible;
+    /* 장면 목차: 네 장면의 한 컷과 기능 이름 */
+    .hero-index {
+      display: grid; grid-area: index; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--gap);
+      margin-block: 0; padding: var(--sp-4_5) 0 0; list-style: none;
+    }
+    .idx { display: flex; align-items: center; gap: var(--sp-4); border-radius: var(--r-frame); color: var(--ink); text-decoration: none; }
+    .idx-img { position: relative; flex: none; width: var(--idx-w); height: var(--idx-h); overflow: hidden; border-radius: var(--r-frame); }
+    .idx-name { font-size: var(--fs-label); font-weight: var(--w-strong); line-height: 1.35; letter-spacing: var(--track-callout); }
+    .hero-note { padding-top: var(--sp-2_5); }
+
+    /* 포스터 상태(데스크톱): 무대 오른쪽 절반에 포스터 카드, 문구는 흰 바탕 위 */
+    .hero[data-media="poster"] .hero-media { display: block; justify-self: end; width: 50%; }
+    .hero[data-media="poster"] .hero-head { padding-top: 0; }
   }
 
-  /* 'Soon'의 oo = 눈. 굵기 900의 o와 같은 바깥 크기(0.546em)와 기준선 */
-  .eye {
-    position: relative;
-    vertical-align: -.01em;
-    width: .546em;
-    height: .547em;
-    margin: 0 -.006em 0 .03em;
-    border: .14em solid currentColor;
-    border-radius: 50%;
-    background: var(--white);
-  }
-  .pupil {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: .15em;
-    height: .15em;
-    margin: -.075em 0 0 -.075em;
-    border-radius: 50%;
-    background: var(--ink-900);
-    transform: translate(var(--px, 0em), var(--py, .05em));   /* 기본 시선: 아래 영상 */
-    transition: transform 420ms var(--ease);
-  }
-  .pupil::after {
-    content: "";
-    position: absolute;
-    left: 20%;
-    top: 16%;
-    width: 36%;
-    height: 36%;
-    border-radius: 50%;
-    background: var(--white);
-  }
-  .eye::after {   /* 눈꺼풀 */
-    content: "";
-    position: absolute;
-    inset: -.012em;
-    border-radius: 50%;
-    background: currentColor;
-    transform: scaleY(0);
-    transform-origin: 50% 0;
-  }
-
-  /* D-day 왁스 실링. 1024px 미만은 'n' 옆에 두어 'Soon'을 가리지 않고, 'Coming'의 'g' 꼬리 아래에서 시작한다(시안과 같은 높이) */
-  .seal {
-    position: absolute;
-    z-index: 2;
-    top: calc(var(--fs-display) * .1);
-    right: calc(-1 * var(--seal-w) - var(--fs-display) * .02);
-    width: var(--seal-w);
-    aspect-ratio: 1;
-    container-type: inline-size;
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0;
-  }
-  @media (min-width: 1024px) {
-    .seal { top: calc(var(--fs-display) * -.25); right: calc(var(--fs-display) * -.6); }
-  }
-  .seal-in {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-content: center;
-    justify-items: center;
-    gap: 3cqw;
-    border-radius: 50%;
-    box-shadow: var(--shadow-seal);   /* 오른쪽으로만 진다. 'n' 옆 크림을 물들이면 'Soon'이 3:1에 못 미친다 */
-    color: var(--white);
-    transform: rotate(10deg);
-  }
-  .seal-shape { position: absolute; inset: -3%; z-index: -1; width: 106%; height: 106%; overflow: visible; }
-  /* 흰 글자 밑은 --brand-deep(4.70:1)이다. 밝은 --brand는 왼쪽 위 가장자리에만 둔다 */
-  .seal-stop-hi { stop-color: var(--brand); }
-  .seal-stop { stop-color: var(--brand-deep); }
-  .seal-ring {
-    fill: none;
-    stroke: color-mix(in srgb, var(--white) 60%, transparent);
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-dasharray: 0 4.6;
-  }
-  .seal-gloss { fill: none; stroke: color-mix(in srgb, var(--white) 55%, transparent); stroke-width: 3.2; stroke-linecap: round; }
-  .seal-dot { fill: color-mix(in srgb, var(--white) 55%, transparent); }
-  .seal-label { font-size: var(--fs-seal-label); font-weight: 700; letter-spacing: .02em; }
-  .seal-num { font-size: var(--fs-seal-num); font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-  .seal-date { font-size: var(--fs-seal-label); font-weight: 800; font-variant-numeric: tabular-nums; }
-
-  /* 떠 있는 반짝임. 후킹 글자를 기준으로 놓아 화면 폭이 바뀌어도 글자와 겹치지 않는다 */
-  .hook-float { position: absolute; z-index: -1; color: var(--brand); pointer-events: none; }
-  .hook-float-1 { left: -.3em; top: -.12em; width: .14em; height: .14em; }
-  .hook-float-2 { right: -.28em; bottom: -.62em; width: .1em; height: .1em; color: var(--brand-deep); }
-  @media (min-width: 1024px) {
-    .hook-float-1 { left: -.42em; top: .12em; width: .15em; height: .15em; }
-    .hook-float-2 { right: -.3em; bottom: -.9em; width: .09em; height: .09em; }
-  }
-
-  .hero-h1 {
-    /* 실링이 최소 폭에 걸려 'Soon' 줄 아래로 내려오는 낮은 화면에서는 그만큼 띄운다(.8 = 줄 높이 .9 - 실링 위치 .1) */
-    margin-top: max(calc(var(--fs-display) * .18), calc(var(--seal-w) - var(--fs-display) * .8 + var(--sp-1)));
-    font-size: var(--fs-h1);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -.03em;
-  }
-  /* 한 줄 후킹은 'g' 꼬리가 바로 위에 있어 자리를 더 둔다 */
-  @media (min-width: 1024px) { .hero-h1 { margin-top: calc(var(--fs-display) * .26); } }
-  .hero-h1 > span { display: block; }
-  @media (min-width: 768px) { .hero-h1 > span { display: inline; } }
-  .hero-sub {
-    max-width: 36em;
-    margin-top: var(--sp-3);
-    color: var(--ink-600);
-    font-size: var(--fs-lead);
-    font-weight: 500;
-    line-height: 1.6;
-    letter-spacing: -.01em;
-    text-wrap: balance;
-  }
-  .hero-cta { margin-top: calc(var(--hero-gap) * 1.3); }
-
-  /* 주 버튼: 오렌지 바탕, 흰 글자 20px·700, 안쪽 흰 원에 반짝임 */
-  .btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--sp-3);
-    min-height: var(--btn-h);
-    padding: 0 calc((var(--btn-h) - var(--sp-12)) / 2) 0 var(--sp-6);   /* 오른쪽 여백 = 원이 버튼 높이 가운데에 오는 거리 */
-    border-radius: var(--r-pill);
-    background: var(--brand);
-    color: var(--white);
-    font-size: var(--btn-fs);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: -.01em;
-    white-space: nowrap;
-    box-shadow: var(--shadow-soft);
-    transition: scale 200ms var(--ease), box-shadow 200ms var(--ease);
-  }
-  /* hover 반응은 hover할 수 있는 기기에서만 건다. 터치는 누른 뒤에도 :hover가 남는다 */
   @media (hover: hover) {
-    .btn-primary:hover { scale: 1.03; box-shadow: var(--shadow-lift); }
-    .btn-primary:hover .btn-orb { rotate: 90deg; scale: 1.06; }
-  }
-  .btn-primary:active { scale: .98; transition-duration: 100ms; }
-  .btn-orb {
-    display: grid;
-    flex: none;
-    place-items: center;
-    width: var(--sp-12);
-    height: var(--sp-12);
-    border-radius: 50%;
-    background: var(--white);
-    color: var(--brand);
-    transition: rotate 500ms var(--ease), scale 500ms var(--ease);
-  }
-  .btn-orb svg { width: 22px; height: 22px; }
-  @media (min-width: 768px) {
-    .btn-primary { gap: var(--sp-4); padding-left: var(--sp-8); }
+    .idx:hover .idx-name { color: var(--orange-ink); }
   }
 
-  /* 등장: 글꼴이 준비되면(html.hook-ready) 글자가 24px 아래에서 차례로 올라온다. 신호는 Hero가 HTML에 넣은 스크립트가 건다.
-     후킹은 LCP 후보라 투명도 0에서 시작하지 않고 이동만 쓴다. JS가 없으면 처음부터 제자리다 */
-  .hook .ch { transition: transform 600ms var(--ease) calc(var(--i, 0) * 80ms); }
-  .js:not(.hook-ready) .hook .ch { transform: translateY(24px); }
-  .js:not(.hook-ready) .hook .seal { opacity: 0; }
-  .hook-ready .hook .seal { animation: stamp 560ms var(--ease) 900ms both; }
-
-  /* 반복: 횟수를 정해 두고, 후킹이 화면에 있을 때만 돈다(data-idle).
-     TODO(motion-222): 5초를 넘는 자동 반복의 WCAG 2.2.2 처리는 docs/OPEN_ITEMS.md에서 정한다 */
-  .hook[data-idle] .eye::after { animation: blink 5.2s linear 2.8s 5; }
-  .hook[data-idle] .eye ~ .eye::after { animation-delay: 2.84s; }
-  .hook[data-idle] .tittle { animation: tittle 4.6s var(--ease) 3.6s 5; }
-  .hook[data-idle] .seal-in { animation: sway 3.2s ease-in-out 2.2s 8 alternate; }
-  .hook[data-idle] .hook-float { animation: twinkle 4.4s ease-in-out 1.6s 5; }
-  .hook[data-idle] .hook-float-2 { animation-delay: 2.7s; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .js:not(.hook-ready) .hook .ch { transform: none; }
-    .pupil { transition: none; }
-    .btn-primary:hover, .btn-primary:active { scale: none; }
-    .btn-primary:hover .btn-orb { rotate: none; scale: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-body, .hero-index { animation: hero-rise 900ms var(--ease-out) both; }
+    .hero-body { animation-delay: 100ms; }
+    .hero-index { animation-delay: 200ms; }
+    .idx-name { transition: color 200ms var(--ease); }
   }
-}
-
-@keyframes stamp {
-  0% { opacity: 0; transform: scale(1.4); }
-  55% { opacity: 1; transform: scale(.93); }
-  100% { opacity: 1; transform: none; }
-}
-@keyframes blink {
-  0%, 6%, 100% { transform: scaleY(0); }
-  3% { transform: scaleY(1); }
-}
-@keyframes tittle {
-  0%, 26%, 100% { transform: none; }
-  8% { transform: rotate(14deg) scale(1.28); }
-  17% { transform: rotate(-6deg) scale(.86); }
-}
-@keyframes sway {
-  from { transform: rotate(10deg); }
-  to { transform: rotate(4deg); }
-}
-@keyframes twinkle {
-  0%, 100% { transform: none; opacity: 1; }
-  50% { transform: scale(.72) rotate(20deg); opacity: .7; }
+  @keyframes hero-rise { from { opacity: 0; transform: translateY(var(--sp-5_5)); } to { opacity: 1; transform: none; } }
 }

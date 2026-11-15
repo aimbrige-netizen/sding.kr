@@ -4,55 +4,42 @@ import { ADDRESS, COMPANY } from '@/content/company';
 import { COPY } from '@/content/site';
 import { ctaMode } from '@/lib/launch';
 
-// 보이는 '|'는 장식이다. 읽기 도구가 단어를 붙여 읽지 않도록 앞뒤에 실제 공백을 둔다
-const Sep = () => <>{' '}<span aria-hidden="true" className="px-1 text-line">|</span>{' '}</>;
-
+// 푸터(PLAN '푸터', '푸터 회사 정보', 시안 A). --gray-100 바탕. 첫 줄에 로고와 링크 3개, 그 아래 상호, 회사 정보, AI 안내, 저작권.
+// 항목마다 li라 읽기 도구가 단어를 붙여 읽지 않는다. 통신판매업신고번호는 값이 비어 있어도 라벨을 보인다.
+// 링크 nav의 이름('사이트 정보')은 머리글 nav('기능')와 다르다
 export function Footer() {
   const { labels } = COPY.footer;
   // 비어 있는 연락처는 빼고 보여 준다. 운영 빌드는 assertCompany()가 빈 값을 막는다
   const contacts = (['phone', 'email', 'privacyOfficer'] as const).filter((k) => COMPANY[k]);
-  // 처리방침은 다른 고지와 눈에 띄게 구분한다(PLAN '법적 페이지'). 피치 위 --brand-deep은 4.26:1이라 작은 글자에 쓰지 않는다
-  const links = [
-    { href: '/privacy', label: COPY.footer.privacy, tone: 'font-extrabold text-ink-900' },
-    { href: '/terms', label: COPY.footer.terms, tone: 'font-normal text-ink-600' },
-    ...(COMPANY.email ? [{ href: `mailto:${COMPANY.email}`, label: COPY.footer.partner, tone: 'font-normal text-ink-600' }] : []),
-  ];
 
   return (
-    <footer className="bg-peach px-(--gutter) pt-12 pb-[calc(var(--buddy)+var(--sp-12)+env(safe-area-inset-bottom))] text-cap font-normal tracking-normal text-ink-600">
-      <div className="mx-auto max-w-site">
-        <Logo tone="text-brand-deep" />{/* 피치 위 --brand는 2.91:1이다(PLAN '색') */}
-        <address className="mt-4 flex flex-col gap-1 not-italic">
-          <p>
-            {COMPANY.legalName}<Sep />{labels.ceo} {COMPANY.ceo}
-          </p>
-          <p>
-            {labels.bizRegNo} {COMPANY.bizRegNo}
-            {COMPANY.showMailOrderLabel && <><Sep />{labels.mailOrderNo} {COMPANY.mailOrderNo}</>}
-          </p>
-          <p>{ADDRESS}</p>
-          {contacts.length > 0 && (
-            <p>
-              {contacts.map((k, i) => (
-                <span key={k}>{i > 0 && <Sep />}{labels[k]} {COMPANY[k]}</span>
-              ))}
-            </p>
-          )}
-        </address>
-        <nav className="mt-4">
-          <ul className="flex flex-wrap items-center">
-            {links.map((l, i) => (
-              <li key={l.href} className="flex items-center">
-                {i > 0 && <span aria-hidden="true" className="px-2">·</span>}
-                <Link href={l.href} className={`inline-flex min-h-(--tap) items-center underline-offset-4 hover:underline ${l.tone}`}>
-                  {l.label}
-                </Link>
-              </li>
-            ))}
+    <footer className="site-footer">
+      <div className="wrap">
+        <div className="foot-top">
+          <Logo href="/#top" label={COPY.homeLabel} className="foot-logo" />
+          <nav className="foot-nav" aria-label={COPY.footer.navLabel}>
+            <ul className="foot-links">
+              {/* 처리방침은 다른 링크와 굵기와 색으로 구분해 보인다(PLAN '법적 페이지') */}
+              <li><Link href="/privacy" className="privacy">{COPY.footer.privacy}</Link></li>
+              <li><Link href="/terms">{COPY.footer.terms}</Link></li>
+              {COMPANY.email ? <li><Link href={`mailto:${COMPANY.email}`}>{COPY.footer.partner}</Link></li> : null}
+            </ul>
+          </nav>
+        </div>
+        <address className="foot-address">
+          <p className="foot-name">{COMPANY.legalName}</p>
+          <ul className="foot-info">
+            <li>{labels.ceo} {COMPANY.ceo}</li>
+            <li>{labels.bizRegNo} {COMPANY.bizRegNo}</li>
+            {COMPANY.showMailOrderLabel ? <li>{labels.mailOrderNo} {COMPANY.mailOrderNo}</li> : null}
+            <li>{ADDRESS}</li>
+            {contacts.map((k) => <li key={k}>{labels[k]} {COMPANY[k]}</li>)}
           </ul>
-        </nav>
-        <p className="mt-2">{ctaMode() === 'live' ? COPY.footer.aiNotice : COPY.footer.aiNoticeSoon}</p>
-        <p className="mt-1">{COPY.footer.copyright}</p>
+        </address>
+        <div className="foot-bottom">
+          <p>{ctaMode() === 'live' ? COPY.footer.aiNotice : COPY.footer.aiNoticeSoon}</p>
+          <p>{COPY.footer.copyright}</p>
+        </div>
       </div>
     </footer>
   );

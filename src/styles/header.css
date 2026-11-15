@@ -1,0 +1,50 @@
+/* 머리글(시안 A). 흰 바탕과 아래 가는 선이고 스크롤 위치를 보지 않는다.
+   음수 아래 여백으로 다음 내용 위에 겹치므로 홈의 첫 장면은 위 여백에 --header-h를 둔다(hero.css).
+   법적 페이지와 404도 위 여백에 --header-h를 더해 제목이 가려지지 않는다 */
+@layer components {
+  .site-header {
+    position: sticky; top: 0; z-index: 20;
+    height: var(--header-h); margin-bottom: calc(-1 * var(--header-h));
+    border-bottom: 1px solid var(--line); background: var(--header-bg);
+  }
+  .site-header-in { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+
+  /* 기능 바로가기와 CTA. CTA는 nav 밖에 둔다. 링크의 누르는 영역은 높이와 폭 모두 --tap 이상이다.
+     세 글자 이름('정찰제' 등)은 --tap보다 좁아 좌우 여백을 더하고, 같은 만큼 음수 여백으로 돌려 글자 자리는 그대로 둔다 */
+  .site-actions { display: flex; align-items: center; gap: var(--sp-9_5); }
+  .site-nav ul { display: flex; gap: var(--sp-8_5); margin: 0; padding: 0; list-style: none; }
+  .site-nav a {
+    display: inline-flex; align-items: center; min-height: var(--tap);
+    padding-inline: var(--sp-1_5); margin-inline: calc(-1 * var(--sp-1_5));
+    font-weight: var(--w-strong); font-size: var(--fs-ui); line-height: 1; letter-spacing: var(--track-tight);
+    color: var(--gray-700); text-decoration: none; white-space: nowrap;
+  }
+  @media (hover: hover) {
+    .site-nav a:hover { color: var(--ink); }
+  }
+
+  /* 머리글 CTA. 모양과 색은 .btn이고 높이, 좌우 여백, 글자 크기만 줄인다 */
+  .btn-compact { min-height: var(--btn-compact-h); padding: 0 var(--btn-compact-pad); font-size: var(--fs-btn-compact); }
+
+  /* 폰: 바로가기를 숨기고 흰 바탕에 --orange-ink 글자와 안쪽 테두리(첫 화면의 큰 버튼과 겹쳐 외치지 않게).
+     Chrome은 1.5px 테두리를 1px로 내리므로 안쪽 그림자로 그린다 */
+  @media (max-width: 899px) {
+    .site-nav { display: none; }
+    .btn.btn-compact { background: transparent; color: var(--orange-ink); box-shadow: inset 0 0 0 1.5px var(--orange-ink); }
+  }
+  @media (max-width: 899px) and (hover: hover) {
+    .btn.btn-compact:hover { background: var(--orange-ink); color: var(--on-accent); }
+  }
+  /* 강제 색 모드는 그림자와 면을 지운다. 진짜 테두리로 버튼 모양을 남긴다 */
+  @media (forced-colors: active) {
+    .btn.btn-compact { border: 1.5px solid var(--edge-forced); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .site-nav a { transition: color 200ms var(--ease); }
+  }
+
+  @media print {
+    .site-header { position: static; margin-bottom: 0; }
+    .site-actions { display: none; }
+  }
+}
